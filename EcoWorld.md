@@ -13,12 +13,12 @@ EcoWorld ist eine interaktive, spielerische Anwendung, welche Nutzer*innen dabei
   
 Basierend darauf wird im Hintergrund eine Schätzung der eingesparten CO2-Menge berechnet. Dabei geht es bewusst nicht um exakte wissenschaftliche Werte. Die Einsparung wird anschließend visuell aufbereitet:
 -	der/die Nutzer*in erhält je nach Größenordnung der eingesparten Menge visuelle Items (wie z.B. Blumen, Pflanzen, Bäume), die in einer eigenen, kleinen digitalen 2D-Welt platziert werden können
--	die Anwendung zeigt einen Score an, welcher den individuellen Fortschritt widerspiegelt (z.B. "Du hast insgesamt schon 100 kg CO2 eingespart!)
+-	die Anwendung zeigt einen Score an, welcher den individuellen Fortschritt widerspiegelt (z.B. "Du hast insgesamt schon 100 kg CO2 eingespart!")
   
 So entsteht ein wachsendes, virtuelles Ökosystem, dass die persönliche Entwicklung des/der Nutzer*in widerspiegelt. 
 Die Anwendung könnte um folgende Aspekte erweitert werden:
 -	Challenges (z.B. eine Woche ohne Auto!)
--	Google-Maps-Integration (zur genaueren Routenbestimmung) 
+-	Google-Maps-Integration (zur genaueren Distanzbestimmung) 
 -	Social-Features zur Bildung von Gruppen, um gemeinsam eine Welt zu pflegen oder die Welten von Freunden zu besuchen, um sich gegenseitig zu motivieren
 -	Einbeziehung anderer Themenfelder, wie z.B. Ernährung 
 Der Fokus liegt dabei auf positiver Verstärkung: Nutzer*innen sollen Spaß dabei haben, ihre digitale Welt weiter zu pflegen und zu erweitern. 
@@ -43,4 +43,5 @@ EcoWorld soll Nutzer langfristig zu einem bewussteren, nachhaltigeren Alltag ani
 -	Motivation durch visuelle Belohnungssysteme fördert
 -	nachhaltiges Verhalten durch visuelles Feedback mit positiven Emotionen verbindet
 -	und die individuelle Verantwortung für Umwelt durch sichtbare Darstellung sichtbar & bewusst macht
+
 
