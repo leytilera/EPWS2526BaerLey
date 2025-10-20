@@ -10,9 +10,11 @@ EcoWorld ist eine interaktive, spielerische Anwendung, welche Nutzer*innen dabei
 -	welches Verkehrsmittel sie genutzt haben (z.B. Fahrrad, Bus, Bahn, zu Fuß)
 -	welches Verkehrsmittel sie ansonsten gewählt hätten (z.B. Auto)
 -	die ungefähre Distanz oder Dauer der Strecke (z.B. 1-10 km, 10-15 min, …)
+  
 Basierend darauf wird im Hintergrund eine Schätzung der eingesparten CO2-Menge berechnet. Dabei geht es bewusst nicht um exakte wissenschaftliche Werte. Die Einsparung wird anschließend visuell aufbereitet:
 -	der/die Nutzer*in erhält je nach Größenordnung der eingesparten Menge visuelle Items (wie z.B. Blumen, Pflanzen, Bäume), die in einer eigenen, kleinen digitalen 2D-Welt platziert werden können
--	die Anwendung zeigt einen Score an, welcher den individuellen Fortschritt widerspiegelt (z.B. "Du hast insgesamt schon 100 kg CO2 eingespart!) 
+-	die Anwendung zeigt einen Score an, welcher den individuellen Fortschritt widerspiegelt (z.B. "Du hast insgesamt schon 100 kg CO2 eingespart!)
+  
 So entsteht ein wachsendes, virtuelles Ökosystem, dass die persönliche Entwicklung des/der Nutzer*in widerspiegelt. 
 Die Anwendung könnte um folgende Aspekte erweitert werden:
 -	Challenges (z.B. eine Woche ohne Auto!)
@@ -41,3 +43,4 @@ EcoWorld soll Nutzer langfristig zu einem bewussteren, nachhaltigeren Alltag ani
 -	Motivation durch visuelle Belohnungssysteme fördert
 -	nachhaltiges Verhalten durch visuelles Feedback mit positiven Emotionen verbindet
 -	und die individuelle Verantwortung für Umwelt durch sichtbare Darstellung sichtbar & bewusst macht
+
