@@ -30,8 +30,6 @@ Diese kompakte Zielgruppenanalyse segmentiert die primären Nutzer unserer förd
 - Kurze Wartezeiten beim Finden eines passenden Gegners
 - Intuitive UI
 
-- 
-
 ---
 
 ### 1.2 Competitive-/Turnierspieler
