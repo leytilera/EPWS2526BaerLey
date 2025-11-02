@@ -14,7 +14,7 @@ Das PoC orientiert sich am geplanten MVP:
 ## 2. Annahmen und Scope (MVP)
 - Fokus: Standard Chess (reguläres Schach), optional Chess960 als zusätzliche Spielvariante
 - primärer Modus: synchrone (Realtime Partien), asynchrone Partien können im weiteren Verlauf als Erweiterung hinzugefügt werden
-- Authentifizierung/Autorisierung: mindestens lokale Accounts; falls genügend Zeit & Ressourcen vorhanden, kann später 0Auth hinzugefügt werden 
+- Authentifizierung/Autorisierung: Anmeldung mit OpenID Connect
 
 ## 3. Technologien 
 
@@ -24,7 +24,7 @@ Das PoC orientiert sich am geplanten MVP:
 - **Backend:** Kotlin (JVM) für REST/WebSocket API — Backend ist server-authoritative; Move-Validierung kann serverseitig per Node-Microservice (chess.js) oder eigener Logik erfolgen
 - **Analyse-Engine:** Stockfish (separater Prozess) für Post-Game Analysen (über UCI) 
 - **Persistence:** PostgreSQL (Games, Users, Moves, Meta), PGN als persistentes Feld + Storage für Audit/Logs
-- **Messaging / Realtime:** WebSocket zwischen Client ↔ Server; ActivityHub oder eigene Spezifikation als Federation-Protokoll
+- **Messaging / Realtime:** WebSocket zwischen Client ↔ Server; ActivityPub oder eigene Spezifikation als Federation-Protokoll
 - **Deployment (PoC):** Docker Compose zur lokalen Reproduktion
 
 ### Kurze Beschreibungen der Bibliotheken
