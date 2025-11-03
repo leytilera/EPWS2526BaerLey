@@ -39,14 +39,14 @@ $$\[
 E_B = 1 - E_A
 \]$$
 
-Ausgehend vom berechneten Erwartungswert wird das neue Rating des Spielers wie folgt berechnet: 
+Ausgehend vom berechneten Erwartungswert wird das neue Rating des jeweiligen Spielers wie folgt berechnet: 
 
-R' = R + k * (S - E)
+$R' = R + k * (S - E)$
 
 Dabei ist:  
 R' = neue Elo-Zahl,  
 R = bisherige Elo-Zahl,  
-S = erzielte Punkte in der Partie,  
+S = erzielte Punkte in der Partie -> 0 bei Verlust, 1 bei Gewinn und 0.5 bei Unentschieden   
 E = erwartete Punkte in der Partie (Erwartungswert),   
 k = Koeffizient
 
@@ -76,7 +76,7 @@ Ein möglicher Lösungsansatz könnte sein:
 ## Implemnetierungsdetails
 // TODO(), werden im weiteren Verlauf des Projekts noch spezifiziert 
 
-Quellen:
+Quellen:  
 https://www.chess.com/de/terms/elo  
 https://de.wikipedia.org/wiki/Elo-Zahl
 
