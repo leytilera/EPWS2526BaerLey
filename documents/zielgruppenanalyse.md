@@ -6,6 +6,8 @@
 # Ziel der Analyse
 Diese kompakte Zielgruppenanalyse segmentiert die primären Nutzer unserer förderierten Schachplattform, beschreibt kurz ihre Charakteristika und leitet daraus priorisierte Anforderungen (Jobs-to-be-Done) ab.
 
+# Wichtige Anmerkung
+Da wir nicht die Ressourcen zur Verfügung haben, um selbst Umfragen und Interviews durchzuführen, basiert die folgende Analyse größtenteils auf Internet-Recherche, Beiträgen in Communities und Annahmen. Das heißt, Teile der Segmentierung und Anforderungen sind hypothesenbasiert und damit spekulativ. 
 
 ## Segmentierung (Übersicht):
 
@@ -23,18 +25,20 @@ Diese kompakte Zielgruppenanalyse segmentiert die primären Nutzer unserer förd
 ## Detaillierte Kurzprofile & zentrale Bedürfnisse
 
 ### 1.1 Gelegenheitsnutzer/Hobbyspieler
-**Definition:** spielt sporadisch/regelmäßig Partien im Browser, Anfänger bis erfahrene Spieler
+**Definition:** spielt sporadisch/regelmäßig Partien im Browser, Anfänger bis erfahrene Spieler  
+(abgeleitet vom Nutzerprofil eines durchschnittlichen Nutzers von Online-Schachplattformen) 
 
 **Zentrale Bedürfnisse:**
 - Schnell und ohne Hürden ein Spiel starten (einfache Anmeldung, schnelles Starten eines Spiels)
 - Kurze Wartezeiten beim Finden eines passenden Gegners
-- Intuitive UI
+- Intuitive und ansprechende UI
 
 ---
 
 ### 1.2 Competitive-/Turnierspieler
 
-**Definition:** erfahrene Spieler, welche regelmäßig Partien spielen
+**Definition:** erfahrene Spieler, welche regelmäßig Partien spielen  
+(abgeleitet vom Nutzerprofil eines durchschnittlichen Nutzers von Online-Schachplattformen) 
 
 **Zentrale Bedürfnisse:**
 - verlässliche, nachvollziehbare und einheitliche Ratings, geringe Toleranz gegenüber Unstimmigkeiten
@@ -116,3 +120,16 @@ Natürlich kann es auch Überschneidungen zwischen den Nutzergruppen geben und S
 
 ---
 
+## Quellen  
+(Auswahl)
+
+https://www.reddit.com/r/chess/comments/1o8rq1b/the_best_free_chess_resources_that_should_be_more/  
+https://www.reddit.com/r/chess/comments/106hfqi/what_is_the_best_chess_platformserver_to_play_on/  
+
+https://www.reddit.com/r/selfhosted/comments/1hc35mn/simple_chess_server/#  
+https://forum.solidproject.org/t/decentralized-chess-game/365/15  
+
+https://www.usenix.org/system/files/usenixsecurity23-grober.pdf [analysiert die generelle Motivation von Self-Hostern]
+ 
+Lichess ([website](https://lichess.org/), [github](https://github.com/lichess-org/lila)) bietet durch öffentlichen Quellcode und Git-Logs aufschlussreiche Einblicke in implementierte Funktionalitäten und den Entwicklungsprozess  
+Chess.com ([website](https://www.chess.com/)) dient als etablierte, große Schachplattform ebenfalls als Inspiration für relevante Funktionalitäten
