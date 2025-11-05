@@ -1,9 +1,10 @@
 ## Dokumente
 
 - [Expose](./documents/expose.md)
-- [Zielgruppenanalyse](./documents/Zielgruppenanalyse.md)
+- [Zielgruppenanalyse](./documents/zielgruppenanalyse.md)
 - [ADRs](./documents/adr/)
-- [PoC](./documents/PoC.md)
+- [PoC](./documents/poc.md)
 - [Probleme und Risiken](./documents/risiken.md)
-- [Elo-Berechnung](./documents/Elo-Berechnung.md)
+- [Elo-Berechnung](./documents/elo-berechnung.md)
 - [UseCases](./documents/usecases/)
+- [Glossar](./documents/glossar/)
