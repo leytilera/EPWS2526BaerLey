@@ -1,7 +1,7 @@
 # Zielgruppenanalyse
 
 **Datum:** 29.10.2025  
-**Version:** 1.0
+**Version:** 2.0
 
 # Ziel der Analyse
 Diese kompakte Zielgruppenanalyse segmentiert die primären Nutzer unserer förderierten Schachplattform, beschreibt kurz ihre Charakteristika und leitet daraus priorisierte Anforderungen (Jobs-to-be-Done) ab.
@@ -25,27 +25,31 @@ Da wir nicht die Ressourcen zur Verfügung haben, um selbst Umfragen und Intervi
 ## Detaillierte Kurzprofile & zentrale Bedürfnisse
 
 ### 1.1 Gelegenheitsnutzer/Hobbyspieler
-**Definition:** spielt sporadisch/regelmäßig Partien im Browser, Anfänger bis erfahrene Spieler  
-(abgeleitet vom Nutzerprofil eines durchschnittlichen Nutzers von Online-Schachplattformen) 
+**Definition:** Änfänger bis erfahrene Spieler, welche sporadisch/regelmäßig Partien im Browser spielen und bereits Plattformen wie z.B. Lichess und chess.com nutzen. Sie spielen primär aus Spaß und für sie stellt Dezentralisation kein zentrales Bedürfnis dar, aber sie sind trotzdem eine potentielle Nutzergruppe und ihre Bedürfnisse sind relevant für uns. 
 
 **Zentrale Bedürfnisse:**
-- Schnell und ohne Hürden ein Spiel starten (einfache Anmeldung, schnelles Starten eines Spiels)
-- Kurze Wartezeiten beim Finden eines passenden Gegners
-- Intuitive und ansprechende UI
+- große, aktive Spielgemeinschaft um zuverlässig und schnell passende Gegner finden zu können (auch Spieler mit höherem Rating, damit Spiele herausfordernd sind)
+- schnelles Matchmaking: geringe Wartezeiten und Filtermöglichkeiten (z.B. Spielvariante, Zeitbegrenzung, Rating)
+- flüssiges Spielerlebnis ohne Verzögerungen und sofortige Rückmeldung nach dem Zug eines Gegners (niedrige Latenz, sichtbare Zugbestätigug)
+- breite Auswahl an Spielvarianten und flexiblen Zeitkontrollen um verschiedene Vorlieben abzudecken 
+- kostenfreie Grundfunktionen ohne Werbeunterbrechungen, da dies auch schon von Konkurrenzplattformen bereitgestellt wird (z.B. [Lichess](https://lichess.org/de) ist Open-Source und komplett kostenlos)
+- einfache, verständliche Post-Game-Analyse (unbegrenzter Zugriff auf Basis-Analyse und PGN-Export)
+- Möglichkeiten, Spieler bei denen der Verdacht besteht, dass sie sich nicht regelkonform verhalten oder cheaten zu identifizieren und zu melden
+- anpassbares Board-/Figurendesign (Themes/Skins) zur Personalisierung der Spieloberfläche
+- Intuitive, stabile UI/UX ohne Abstürze sowie schnelle Reconnect/Recovery-Mechanismen für Verbindungsabbrüche
 
 ---
 
 ### 1.2 Competitive-/Turnierspieler
 
-**Definition:** erfahrene Spieler, welche regelmäßig Partien spielen  
-(abgeleitet vom Nutzerprofil eines durchschnittlichen Nutzers von Online-Schachplattformen) 
+**Definition:** Überwiegend erfahrene, regelmäßig spielende Nutzer mit hoher Spielstärke, welche interessiert an Turnieren und Ranglisten sind. Ihre Bedürfnisse überschneiden sich mit den Anforderungen von Gelegenheitsnutzern/Hobbyspielern, trotzdem werden sie hier als seperate Nutzergruppe definiert, da sie potentiell höhere Ansprüche an Fairplay und Integrität haben sowie ein höheres Interesse an Turnieren, Post-Game-Analyse und gleichwertigen Gegnern.
 
 **Zentrale Bedürfnisse:**
-- verlässliche, nachvollziehbare und einheitliche Ratings, geringe Toleranz gegenüber Unstimmigkeiten
-- Fairplay, Zuverlässigkeit und Vertraulichkeit anderer Instanzen  
-- geringe Latenz, präzise Zeitkontrollen
-- nachträgliche Spiel-Analyse
-  
+- verlässliche, nachvollziehbare und einheitliche Ratings
+- robuste Fairplay- und Integritätsmechanismen, da Zuverlässigkeit und Vertrauen in andere Instanzen essentiell ist
+- Nachvollziehbarkeit und Revisionsmöglichkeiten sowie Aufzeichnung uns Analyse vergangener Spiele, vor allem bei Turnieren
+- Optionen für organisatorische Zusatzmaßnahmen (z.B. Zuschauermodus für Partien anderer Spieler, strengere Matching-Regeln oder Turnier-Moderation) welche bei Bedarf aktiviert werden können
+
 **Relevante Systemanforderungen:**
 - einheitlicher Rating-Algorithmus
 - Matchingalgoritmus zum Finden passender Gegner, basierend auf Filtermöglichkeiten/Rating anderer Spieler
@@ -59,50 +63,55 @@ Da wir nicht die Ressourcen zur Verfügung haben, um selbst Umfragen und Intervi
   
 ### 1.3 Self-Host-affine Spieler
 
-**Definition:** Spieler, welche viel Wert auf Datenschutz, Privatsphäre und Kontrolle legen; überwiegend hohe Technikaffinität 
+**Definition:** Spieler, welche bewusst in einem dezentralen System und auf self-hosted-Instanzen spielen wollen. Für sie sind Datenschutz, Privatsphäre und Kontrolle entscheidende Kriterien. Sie besitzen überwiegend ein hohes Technikinteresse und haben teilweise schon Erfahrungen mit Self-Hosting/Federation, beispielsweise nutzen sie bereits dezentrale Plattformen wie z.B. Mastodon. 
 
 **Zentrale Bedürfnisse:**
-- Transparente Sichtbarkeit/Datenschutz-Einstellungen
-- Vetraulichkeit anderer Instanzen
+- Datenschutz- und Sichtbarkeitseinstellungen (z.B. Sichtbarkeit von Profilinformationen, dem Rating und gespielten Partien), da die Kontrolle über die eigenen Daten eine ausschlaggebende Motivation von Nutzern dezentraler Plattformen ist
+- Transparente Informationen über Instanzen, um das Vertrauen der Spieler in andere Instanzen zu stärken und cross-instance-Interaktionen zu fördern
 
 ---
 
 ### 1.4 Vereins-/Club-Mitglieder
 
-**Definition:** Schachvereine oder Schachgruppen, welche innerhalb ihrer eigenen Community spielen wollen 
+**Definition:** Diese Nutzergruppe umfasst sowohl traditionelle/bereits bestehende Schachgruppen, welche sich bisher in Person treffen und sich gerne um eine Online-Gruppe erweitern wollen; als auch Freundesgruppen oder Menschen welche daran interessiert sind, in einer kleineren Online-Community zu spielen. 
 
+**Zentrale Bedürfnisse:**
+- Möglichkeit, vereinsintern/gruppenintern (d.h. innerhalb der eigenen Instanz) Turniere zu veranstalten
+- Rangliste für Mitglieder der eigenen Instanz sowie gemeinsames Archiv (vergane Spiele + Ratings) um Leistungen zu dokumentieren
+- Funktionen zum Einsehen vergangener Partien anderer Spieler und gemeinsame Analyse abgeschlossener Partien, um sich auszutauschen und gemeinsam zu lernen
+- optionale Live-Zuschauerfunktion oder einfache "Live-Feed" Anzeige für Vereins-/Gruppenturniere (nicht MVP, aber als zukünftige Erweiterung denkbar)
+- Rollen/Permissions für Mitglieder der eigenen Instanz (z.B. Admin, Moderator, Mitglied) zur einfacheren Verwaltung, Kontrolle und Delegation von Aufgaben 
+- Unterstützung verschiedener Spielvarianten und klassischen Zeitkontrollen 
+  
 ---
 
 ### 2.1 Hobby Self-hosters (Technikaffine Einzelpersonen)
 
-**Definition:** Technikinteressierte Einzelpersonen, welche gerne ihre eigene Instanz betreiben wollen; mittlere bis hohe Technikaffinität 
+**Definition:** Technikinteressierte Einzelpersonen, welche aus Spaß oder Überzeugung eine eigene Instanz betreiben wollen. Sie haben überwiegend gute Technikkenntnisse und teilweise bereits Erfahrung mit Self-Hosting, bezitzen eventuell sogar schon die nötige Infrastruktur. Sie möchten experimentieren, Konfigurationen anpassen und sich gff. aktiv an der Entwicklung beteiligen. 
 
 **Zentrale Bedürfnisse:**
-- Einfaches Deployment
-- klare Dokumentation
-- umfassende Konfigurationsmöglichkeiten
+- voll konfigurierbare Server-Optionen, um experimentieren zu können und Einstellungen individuell anpassen zu können
+- open-source-Code, um Mitentwicklung und Transparenz zu ermöglichen
+- keine unnötigen Zusatzkosten, bevorzugte Nutzung bereits vorhandener, etablierter Infrastruktur (z.B. PostgreSQL als Datenbank) zur Reduktion von wartungsaufwand und Kompatibilitätsproblemen
+- Hohe Performance und hohe Skalierbarkeit um flüssige Spiele und geringe Latenzen zu ermöglichen
 
 ---
 
 ### 2.2 Vereins-/Organisations-Hosts
-**Definition:** Hosts von Schachvereinen/Communities, welche ihr eigenes Netzwerk betreiben wollen; Technikkentnisse schwanken  
+**Definition:** Personen (oft Leiter/Verantwortliche von Vereinen oder Gruppen), welche eine eigene Instanz für ihren Verein/ihre Gruppe betreiben wollen oder Menschen, welche Interesse daran haben eine kleinere Community aufzubauen. Da ihre Technikkenntisse schwanken, sind für sie vor allem eine niederschwellige, einfache Aufsetzung und Verwaltung von Instanzen von Bedeutung. 
 
 **Zentrale Bedürfnisse:**
-- umfangreiche Dokumentation
-- einfaches Aufsetzen von Instanzen, da nicht unbedingt gute Technikenntnisse 
-- Verwaltung aller Spieler der Instanz (Mitglieder)
-- Möglichkeit, Turniere zu organisieren oder Ranglisten zu führen
-- gff. Konfigurationsmöglichkeiten um Einstellungen an individuelle Bedürfnisse anzupassen
-- DSGVO-Konformität
+- einfache, gut dokumentierte Deployments inklusive Schritt-für-Schritt-Anleitungen und/oder Beispiel-Setups, damit auch Personen ohne umfangreiche Technikkenntnisse Instanzen aufsetzen und betreiben können
+- intuitive Admintools um Spieler der Instanz (Mitglieder) zu verwalten, Rollen/Zugriffe zu steuern, Turniere zu organisieren und Ranglisten zu führen
+- einfache Konfigurationsoptionen für vereinspezifische/gruppenspezifische Vorlieben, die ohne tiefgehende technische Kenntnisse änderbar sind
 
 ---
 
 ### 2.3 Lernende 
-**Definition:** Personen, die eine eigene Instanz primär aus Lernzwecken betreiben wollen und nicht zwangsläufig am Schachspielen interessiert sind   
+**Definition:** Personen, Kleingruppen oder Organisationen (z.B. Studierende oder (Hoch-)schulen), welche eine eigene Instanz primär aus Lernzwecken betreiben wollen, um Erfahrung mit Self-Hosting und dezentralen Systemen zu sammeln. Sie könnten als eigene Kategorie definiert werden, wir haben uns jedoch dazu entschiedem sie unter Instanzbetreiber einzuordnen, da die Bereitstellung von lernspezifische Materialen (z.B. Tutorials) nicht im Projektziel vorgesehen ist. 
 
 **Zentrale Bedürfnisse**: 
-- umfangreiche Dokumentation, evt. Beispiel-setup
-- umfangreiche Konfigurationsmöglichkeiten 
+- isolierte Setups und umfangreiche Dokumentation, evt. mit Beispiel-Deployments und Demo-Daten, damit sie ohne Risiko experimentieren und Wissen erwerben können
 
 ---
 
