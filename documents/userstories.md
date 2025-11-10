@@ -55,6 +55,17 @@ Als Spieler möchte ich einen anderen Spieler melden können (z.B. bei Verdacht 
 
 ## Instanzbetreiber*innen
 
-// wird noch ergänzt
+**US-100 - Basis Konfiguration**  
+Als Instanzbetreiber möchte ich beim Setup grundlegende Konfigurationsmöglichkeiten haben (Instanzname, Federation-Policy, Rating-Algorithmus-Version), damit meine Instanz korrekt im federierten Netzwerk sichtbar ist. 
+
+**US-101 - Deployment**  
+Als Instanzbetreiber möchte ich die Instanz via Docker-Compose mit minimalem Aufwand deployen können, damit ich auch ohne umfangreiches technisches Wissen eine Instanz betreiben kann.
+
+**US-102 - Administration**  
+Als Instanzbetreiber möchte ich Metrics (Anzahl aktiver Nutzer, Anzahl gespielter Spiele, Federation-Errors, etc.) einsehen können, damit ich den Betrieb überwachen und Reports prüfen kann. 
+
+
+// weitere User-Stories für Instanzbetreiber werden noch ergänzt
  
+
 
