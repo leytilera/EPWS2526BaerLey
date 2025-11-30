@@ -1,0 +1,18 @@
+FROM docker.io/gradle:9.2.1-jdk21 as builder
+
+WORKDIR /usr/src/spring/
+
+COPY src/ src/
+COPY build.gradle ./
+COPY settings.gradle ./
+COPY gradle/ gradle/
+
+RUN gradle build
+RUN rm build/libs/*-plain.jar
+RUN mv build/libs/*.jar build/libs/application.jar
+
+FROM docker.io/eclipse-temurin:21
+
+COPY --from=builder /usr/src/spring/build/libs/application.jar /usr/local/bin/
+
+CMD ["java", "-jar", "/usr/local/bin/application.jar"]
