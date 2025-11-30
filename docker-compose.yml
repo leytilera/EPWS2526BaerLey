@@ -5,3 +5,19 @@ services:
       dockerfile: Dockerfile.backend
     ports:
       - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      - DB_URL=jdbc:postgresql://db:5432/app
+      - DB_USER=app
+      - DB_PASSWORD=1234
+  db:
+    image: docker.io/postgres:18
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=1234
+    volumes:
+      - pgdata:/var/lib/postgresql
+volumes:
+  pgdata:

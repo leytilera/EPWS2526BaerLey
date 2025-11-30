@@ -15,4 +15,4 @@ FROM docker.io/eclipse-temurin:21
 
 COPY --from=builder /usr/src/spring/build/libs/application.jar /usr/local/bin/
 
-CMD ["java", "-jar", "/usr/local/bin/application.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "/usr/local/bin/application.jar"]
