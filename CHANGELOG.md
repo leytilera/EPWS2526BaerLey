@@ -12,5 +12,8 @@
 ## 2025-11-14
 - Added [Domänenmodell](./documents/domaenenmodell.png)
 
+## 2025-11-11
+- Added [Systemanforderungen](./documents/systemanforderungen.md)
+
 ## 2025-11-05
 - Added [Glossar](./documents/glossar.md)
