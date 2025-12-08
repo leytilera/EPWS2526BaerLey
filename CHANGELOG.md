@@ -1,4 +1,10 @@
 # Changelog
+
+## 2025-12-07  
+- Add more risks [Risiken](.documents/risiken.md)
+- Add POC for [ActivityPub](./documents/pocs/0001-s2s-communication-with-activitypub.md)
+- Add POC for [Jockly](./documents/pocs/0002-ui-and-movevalidation-with-jocly.md)
+  
 ## 2025-12-04
 - Moved User-Stories to [Issues](https://github.com/leytilera/EPWS2526BaerLey/issues)
 
