@@ -36,5 +36,14 @@ public class DummyActorService implements IActorService {
     public Actor getActorByUrl(String url) {
         return null;
     }
+
+    @Override
+    public Actor getInstanceActor() {
+        Actor actor = new Actor();
+        actor.setId(federationService.getDomain());
+        actor.setDomain(federationService.getDomain());
+        actor.setUrl(federationService.getBaseUrl() + "/instance");
+        return actor;
+    }
     
 }

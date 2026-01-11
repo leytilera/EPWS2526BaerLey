@@ -10,4 +10,6 @@ public interface IActorService {
 
     Actor getActorByUrl(String url);
 
+    Actor getInstanceActor();
+
 }

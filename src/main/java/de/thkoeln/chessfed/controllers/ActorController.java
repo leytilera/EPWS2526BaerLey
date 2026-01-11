@@ -48,4 +48,25 @@ public class ActorController {
         return HttpStatus.ACCEPTED;
     }
 
+    @GetMapping(value = "/instance", produces = "application/activity+json")
+    public ResponseEntity<ActorDto> getInstanceActor() {
+        Actor actor = actorService.getInstanceActor();
+        return ResponseEntity.ok(new ActorDto(actor.getUrl(), "Person", actor.getId(), actor.getId(), actor.getUrl() + "/inbox", actor.getUrl() + "/outbox"));
+    }
+
+    @GetMapping(value = "/instance/outbox", produces = "application/activity+json")
+    public ResponseEntity<Map<String, Object>> getInstanceOutbox() {
+        Map<String, Object> res = new HashMap<>();
+        res.put("@context", "https://www.w3.org/ns/activitystreams");
+        res.put("type", "OrderedCollection");
+        res.put("totalItems", 0);
+        res.put("orderedItems", new Object[0]);
+        return ResponseEntity.ok(res);
+    }
+
+    @PostMapping(value = "/instance/inbox", consumes = {"application/json", "application/activity+json", "application/ld+json"})
+    public HttpStatusCode postInstanceInbox(@RequestBody Map<String, Object> body) {
+        return HttpStatus.ACCEPTED;
+    }
+
 }
