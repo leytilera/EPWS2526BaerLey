@@ -8,3 +8,6 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+federation:
+  domain: chessfed.tilera.xyz
+  baseUrl: https://chessfed.tilera.xyz
