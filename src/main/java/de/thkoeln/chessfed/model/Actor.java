@@ -1,17 +1,24 @@
 package de.thkoeln.chessfed.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Actor {
 
+    @Id
     private String id;
+    private String localpart;
     private String domain;
-    private String url;
+    private String inbox;
+    private String outbox;
 
-    public String getId() {
-        return id;
+    public String getLocalpart() {
+        return localpart;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setLocalpart(String localpart) {
+        this.localpart = localpart;
     }
 
     public String getDomain() {
@@ -22,12 +29,28 @@ public class Actor {
         this.domain = domain;
     }
 
-    public String getUrl() {
-        return url;
+    public String getId() {
+        return id;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getInbox() {
+        return inbox;
+    }
+
+    public void setInbox(String inbox) {
+        this.inbox = inbox;
+    }
+
+    public String getOutbox() {
+        return outbox;
+    }
+
+    public void setOutbox(String outbox) {
+        this.outbox = outbox;
     }
 
 }

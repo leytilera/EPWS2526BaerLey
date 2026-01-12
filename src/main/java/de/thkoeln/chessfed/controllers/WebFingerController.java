@@ -26,7 +26,7 @@ public class WebFingerController {
         Actor actor = actorService.getActorByAcct(resource);
         JsonResourceDescriptorDto jrd = new JsonResourceDescriptorDto();
         jrd.setSubject(resource);
-        LinkDto link = new LinkDto(actor.getUrl());
+        LinkDto link = new LinkDto(actor.getId());
         jrd.getLinks().add(link);
         return ResponseEntity.ok(jrd);
     }

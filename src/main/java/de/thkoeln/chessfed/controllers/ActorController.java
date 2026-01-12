@@ -30,7 +30,7 @@ public class ActorController {
     @GetMapping(value = "/users/{id}", produces = "application/activity+json")
     public ResponseEntity<ActorDto> getActor(@PathVariable String id) {
         Actor actor = actorService.getActorById(id);
-        return ResponseEntity.ok(new ActorDto(actor.getUrl(), "Person", id, id, actor.getUrl() + "/inbox", actor.getUrl() + "/outbox"));
+        return ResponseEntity.ok(new ActorDto(actor.getId(), "Person", id, id, actor.getInbox(), actor.getOutbox()));
     }
 
     @GetMapping(value = "/users/{id}/outbox", produces = "application/activity+json")
@@ -51,7 +51,7 @@ public class ActorController {
     @GetMapping(value = "/instance", produces = "application/activity+json")
     public ResponseEntity<ActorDto> getInstanceActor() {
         Actor actor = actorService.getInstanceActor();
-        return ResponseEntity.ok(new ActorDto(actor.getUrl(), "Person", actor.getId(), actor.getId(), actor.getUrl() + "/inbox", actor.getUrl() + "/outbox"));
+        return ResponseEntity.ok(new ActorDto(actor.getId(), "Person", actor.getLocalpart(), actor.getLocalpart(), actor.getInbox(), actor.getOutbox()));
     }
 
     @GetMapping(value = "/instance/outbox", produces = "application/activity+json")

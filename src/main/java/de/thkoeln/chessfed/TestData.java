@@ -5,25 +5,22 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import de.thkoeln.chessfed.model.ILocalUserRepository;
-import de.thkoeln.chessfed.model.LocalUser;
+import de.thkoeln.chessfed.services.IActorService;
 
 @Component
 public class TestData implements CommandLineRunner {
 
-    private ILocalUserRepository userRepository;
+    private IActorService actorService;
 
     @Autowired
-    public TestData(ILocalUserRepository userRepository) {
-        this.userRepository = userRepository;
+    public TestData(IActorService actorService) {
+        this.actorService = actorService;
     }
 
     @Override
     @Profile("!prod")
     public void run(String... args) throws Exception {
-        LocalUser user = new LocalUser();
-        user.setUsername("alec");
-        userRepository.save(user);
+        actorService.createUser("alec");
     }
     
 }

@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class LocalUser {
@@ -11,6 +12,8 @@ public class LocalUser {
     @Id
     private UUID id;
     private String username;
+    @OneToOne
+    private Actor actor;
     
     public LocalUser() {
         this.id = UUID.randomUUID();
@@ -30,6 +33,14 @@ public class LocalUser {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public Actor getActor() {
+        return actor;
+    }
+
+    public void setActor(Actor actor) {
+        this.actor = actor;
     }
     
 }
