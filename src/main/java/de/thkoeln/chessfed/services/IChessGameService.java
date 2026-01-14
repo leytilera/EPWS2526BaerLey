@@ -1,5 +1,11 @@
 package de.thkoeln.chessfed.services;
 
+import java.util.List;
+
+import de.thkoeln.chessfed.exception.InvalidMoveException;
+import de.thkoeln.chessfed.model.Actor;
+import de.thkoeln.chessfed.model.ChessGame;
+import de.thkoeln.chessfed.model.ChessMove;
 import de.thkoeln.chessfed.model.ChessPiece;
 import de.thkoeln.chessfed.model.ChessPlayer;
 
@@ -11,8 +17,22 @@ public interface IChessGameService {
 
     ChessPlayer getPlayer(byte fieldFlag);
 
-    int getFiedlId(String fieldDescriptor);
+    int getFieldId(String fieldDescriptor);
 
     String getFieldDescriptor(int fieldId);
+
+    int getFieldRowIndex(int fieldId);
+
+    int getFieldColumnIndex(int fieldId);
+
+    int getFieldId(int rowIndex, int columnIndex);
+
+    ChessMove createMove(ChessGame game, int sourceFieldId, int targetFieldId);
+
+    List<ChessMove> getMoves(ChessGame game);
+
+    void applyMove(ChessMove move) throws InvalidMoveException;
+
+    ChessGame createGame(Actor whitePlayer, Actor blackPlayer);
 
 }
