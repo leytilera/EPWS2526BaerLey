@@ -1,6 +1,7 @@
 package de.thkoeln.chessfed.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.model.Actor;
@@ -34,5 +35,7 @@ public interface IChessGameService {
     void applyMove(ChessMove move) throws InvalidMoveException;
 
     ChessGame createGame(Actor whitePlayer, Actor blackPlayer);
+
+    ChessGame getGame(UUID id);
 
 }

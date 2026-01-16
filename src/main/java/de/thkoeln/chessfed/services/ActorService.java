@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient;
 
 import de.thkoeln.chessfed.dto.JsonResourceDescriptorDto;
 import de.thkoeln.chessfed.dto.LinkDto;
-import de.thkoeln.chessfed.exception.ActorNotFoundException;
+import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.exception.InvalidAcctException;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.IActorRepository;
@@ -41,13 +41,13 @@ public class ActorService implements IActorService {
         if (parts[1].equals(federationService.getDomain())) {
             return getActorById(parts[0]);
         } else {
-            return actorRepository.getByLocalpartAndDomain(parts[0], parts[1]).or(() -> this.resolveRemoteActor(acct, parts[0], parts[1])).orElseThrow(ActorNotFoundException::new);   
+            return actorRepository.getByLocalpartAndDomain(parts[0], parts[1]).or(() -> this.resolveRemoteActor(acct, parts[0], parts[1])).orElseThrow(ResourceNotFoundException::new);   
         }
     }
 
     @Override
     public Actor getActorById(String id) {
-        return actorRepository.getByLocalpartAndDomain(id, federationService.getDomain()).orElseThrow(ActorNotFoundException::new);
+        return actorRepository.getByLocalpartAndDomain(id, federationService.getDomain()).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ActorService implements IActorService {
         try {
             return actorRepository.getReferenceById(url);
         } catch (EntityNotFoundException e) {
-            throw new ActorNotFoundException();
+            throw new ResourceNotFoundException();
         }
     }
 

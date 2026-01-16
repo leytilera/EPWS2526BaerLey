@@ -22,6 +22,15 @@ public class ChessMove {
     private int targetField;
     private boolean castle;
     private boolean capture;
+    private ChessPiece promote;
+
+    public ChessPiece getPromote() {
+        return promote;
+    }
+
+    public void setPromote(ChessPiece promote) {
+        this.promote = promote;
+    }
 
     public UUID getId() {
         return id;

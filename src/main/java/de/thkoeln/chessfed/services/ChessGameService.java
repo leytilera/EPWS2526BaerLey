@@ -2,10 +2,12 @@ package de.thkoeln.chessfed.services;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.ChessGame;
@@ -14,6 +16,7 @@ import de.thkoeln.chessfed.model.ChessPiece;
 import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.IChessGameRepository;
 import de.thkoeln.chessfed.model.IChessMoveRepository;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ChessGameService implements IChessGameService {
@@ -25,9 +28,10 @@ public class ChessGameService implements IChessGameService {
     private static char[] columnLookupTable = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
     @Autowired
-    public ChessGameService(IChessGameRepository gameRepository, IChessMoveRepository moveRepository) {
+    public ChessGameService(IChessGameRepository gameRepository, IChessMoveRepository moveRepository, IRuleEngineService ruleEngine) {
         this.gameRepository = gameRepository;
         this.moveRepository = moveRepository;
+        this.ruleEngine = ruleEngine;
     }
 
     @Override
@@ -104,6 +108,7 @@ public class ChessGameService implements IChessGameService {
         move.setPlayer(game.getCurrentTurn());
         move.setCastle(false);
         move.setCapture(targetFieldId == game.getEnPassentField() || game.getFields()[targetFieldId] != 0);
+        move.setPromote(null);
         return move;
     }
 
@@ -131,8 +136,60 @@ public class ChessGameService implements IChessGameService {
         game.setMoveCounter(0);
         game.setHasEnded(false);
         game.setCastleState((byte) 0);
+        game.setFields(setupBoard());
         gameRepository.save(game);
         return game;
+    }
+
+    private byte[] setupBoard() {
+        byte[] board = new byte[64];
+
+        board[0] = getFieldFlag(ChessPiece.ROOK, ChessPlayer.WHITE);
+        board[1] = getFieldFlag(ChessPiece.KNIGHT, ChessPlayer.WHITE);
+        board[2] = getFieldFlag(ChessPiece.BISHOP, ChessPlayer.WHITE);
+        board[3] = getFieldFlag(ChessPiece.QUEEN, ChessPlayer.WHITE);
+        board[4] = getFieldFlag(ChessPiece.KING, ChessPlayer.WHITE);
+        board[5] = getFieldFlag(ChessPiece.BISHOP, ChessPlayer.WHITE);
+        board[6] = getFieldFlag(ChessPiece.KNIGHT, ChessPlayer.WHITE);
+        board[7] = getFieldFlag(ChessPiece.ROOK, ChessPlayer.WHITE);
+
+        board[8] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[9] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[10] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[11] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[12] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[13] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[14] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+        board[15] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.WHITE);
+
+        board[48] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[49] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[50] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[51] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[52] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[53] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[54] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+        board[55] = getFieldFlag(ChessPiece.PAWN, ChessPlayer.BLACK);
+
+        board[56] = getFieldFlag(ChessPiece.ROOK, ChessPlayer.BLACK);
+        board[57] = getFieldFlag(ChessPiece.KNIGHT, ChessPlayer.BLACK);
+        board[58] = getFieldFlag(ChessPiece.BISHOP, ChessPlayer.BLACK);
+        board[59] = getFieldFlag(ChessPiece.QUEEN, ChessPlayer.BLACK);
+        board[60] = getFieldFlag(ChessPiece.KING, ChessPlayer.BLACK);
+        board[61] = getFieldFlag(ChessPiece.BISHOP, ChessPlayer.BLACK);
+        board[62] = getFieldFlag(ChessPiece.KNIGHT, ChessPlayer.BLACK);
+        board[63] = getFieldFlag(ChessPiece.ROOK, ChessPlayer.BLACK);
+
+        return board;
+    }
+
+    @Override
+    public ChessGame getGame(UUID id) {
+        try {
+            return gameRepository.getReferenceById(id);
+        } catch (EntityNotFoundException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
 }
