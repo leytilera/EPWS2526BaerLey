@@ -192,4 +192,9 @@ public class ChessGameService implements IChessGameService {
         }
     }
 
+    @Override
+    public ChessMove getMove(ChessGame game, int count) {
+        return moveRepository.getByGameAndMoveCount(game, count).orElseThrow(ResourceNotFoundException::new);
+    }
+
 }

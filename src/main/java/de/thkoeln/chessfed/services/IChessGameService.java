@@ -38,4 +38,6 @@ public interface IChessGameService {
 
     ChessGame getGame(UUID id);
 
+    ChessMove getMove(ChessGame game, int count);
+
 }

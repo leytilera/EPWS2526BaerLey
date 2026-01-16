@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.thkoeln.chessfed.dto.ContextDto;
+import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.GameDto;
-import de.thkoeln.chessfed.dto.ReferenceDto;
+import de.thkoeln.chessfed.dto.MoveDto;
 import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
 import de.thkoeln.chessfed.model.ChessPiece;
@@ -43,9 +43,7 @@ public class GameController {
         ChessGame chessGame = gameService.getGame(id);
         List<ChessMove> moves = gameService.getMoves(chessGame);
         GameDto game = new GameDto();
-        game.setContext(new Object[]{"https://www.w3.org/ns/activitystreams", new ContextDto()});
         game.setId(federationService.getBaseUrl() + "/games/" +  id);
-        game.setType("chessfed:Game");
         game.setPublished(null);
         game.setWhite(chessGame.getWhitePlayer().getId());
         game.setBlack(chessGame.getBlackPlayer().getId());
@@ -63,13 +61,28 @@ public class GameController {
         }
         game.setBoard(board);
         game.setTotalItems(moves.size());
-        ReferenceDto[] moveRef = new ReferenceDto[moves.size()];
+        ActivityPubDto[] moveRef = new ActivityPubDto[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
             ChessMove move = moves.get(i);
-            moveRef[i] = new ReferenceDto(federationService.getBaseUrl() + "/games/" + id + "/moves/" + move.getMoveCount(), "chessfed:Move");
+            moveRef[i] = new ActivityPubDto(federationService.getBaseUrl() + "/games/" + id + "/moves/" + move.getMoveCount(), "chessfed:Move");
         }
         game.setItems(moveRef);
         return ResponseEntity.ok(game);
+    }
+
+    @GetMapping(value = "/games/{id}/moves/{moveCount}", produces = "application/activity+json")
+    public ResponseEntity<MoveDto> getMove(@PathVariable UUID id, @PathVariable int moveCount) {
+        ChessGame game = gameService.getGame(id);
+        ChessMove move = gameService.getMove(game, moveCount);
+        MoveDto dto = new MoveDto();
+        dto.setId(federationService.getBaseUrl() + "/games/" + id + "/moves/" + move.getMoveCount());
+        dto.setPublished(null);
+        dto.setSource(gameService.getFieldDescriptor(move.getSourceField()));
+        dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));
+        dto.setCapture(move.isCapture());
+        dto.setCapture(move.isCastle());
+        dto.setPromote(getPieceAbbrev(move.getPromote(), move.getPlayer()));
+        return ResponseEntity.ok(dto);
     }
 
     private String getPieceAbbrev(ChessPiece piece, ChessPlayer player) {

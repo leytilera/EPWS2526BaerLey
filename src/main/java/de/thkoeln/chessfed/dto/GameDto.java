@@ -2,10 +2,7 @@ package de.thkoeln.chessfed.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class GameDto {
-    private Object[] context;
-    private String id;
-    private String type;
+public class GameDto extends ActivityPubDto {
     private String published;
     private String white;
     private String black;
@@ -14,32 +11,11 @@ public class GameDto {
     private String currentTurn;
     private String[][] board;
     private int totalItems;
-    private ReferenceDto[] items;
+    private ActivityPubDto[] items;
 
-    @JsonProperty("@context")
-    public Object[] getContext() {
-        return context;
-    }
-
-    @JsonProperty("@context")
-    public void setContext(Object[] context) {
-        this.context = context;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public GameDto() {
+        setType("chessfed:Game");
+        withContext();
     }
 
     public String getPublished() {
@@ -118,11 +94,11 @@ public class GameDto {
         this.totalItems = totalItems;
     }
 
-    public ReferenceDto[] getItems() {
+    public ActivityPubDto[] getItems() {
         return items;
     }
 
-    public void setItems(ReferenceDto[] items) {
+    public void setItems(ActivityPubDto[] items) {
         this.items = items;
     }
     
