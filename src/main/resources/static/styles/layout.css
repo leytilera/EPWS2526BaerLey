@@ -1,0 +1,107 @@
+/* LAYOUT FOR CHESSBOARD PAGE 
+#################################################################*/
+
+/* Three column base layout */
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--navWidth) 1fr var(--sideWidth);
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+/* Left column, eventually for navigation later */
+.left-column {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel-2);
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+/* Chessfed logo */
+.left-column__brand {
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  font-size: 18px;
+}
+
+/* Center stage */
+.stage {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Board card */
+.board-card {
+  width: calc(var(--boardSize) + 32px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.player-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--header);
+  border-bottom: 1px solid var(--border);
+}
+
+.player-row--bottom {
+  border-top: 1px solid var(--border);
+  border-bottom: none;
+}
+
+/* Right side panels */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.panel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel__header {
+  background: var(--header);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.panel__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  background: rgba(255,255,255,0.03);
+}
+
+.panel__body {
+  padding: 12px;
+}
+
+.panel__body--scroll {
+  max-height: 520px;
+  overflow: auto;
+}

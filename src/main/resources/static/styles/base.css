@@ -1,0 +1,34 @@
+:root {
+    color-scheme: dark;
+}
+
+* { 
+    box-sizing: border-box; 
+}
+
+html, body { 
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ---------- Responsive fallback ---------- */
+@media (max-width: 1200px) {
+  :root { --sideWidth: 320px; --navWidth: 200px; --boardSize: 520px; }
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  .nav { order: 1; }
+  .stage { order: 2; }
+  .side { order: 3; }
+  .board-card { width: 100%; }
+  .board { width: 100%; height: auto; aspect-ratio: 1 / 1; }
+}

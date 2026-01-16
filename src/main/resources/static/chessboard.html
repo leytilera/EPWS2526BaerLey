@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Jocly</title>
+    <base href="/" />
+    <link rel="stylesheet" href="/styles/_combined.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- left column (for navigation or anything else we might need, rn just for Chessfed logo) -->
+        <aside class="left-column">
+            <div class="left-column__brand">Chessfed</div>
+        </aside>
+
+        <!-- middle column (for chessboard) -->
+        <main class="stage">
+            <section class="board-card">
+                <!-- opponent information -->
+                <div class="player-row player-row--top">
+                    <!-- placeholder for profile pic -->
+                    <div class="avatar" aria-hidden="true"></div>
+                    <div class="player-meta">
+                        <div class="player-name" id="opponentName">Opponent (placeholder)</div>
+                        <div class="player-sub" id="opponentStatus">Waiting…</div>
+                    </div>
+                </div>
+
+                <!-- chessboard -->
+                <div class="board-wrap">
+                    <div id="board" class="board"></div>
+                </div>
+
+                <!-- information about current player -->
+                <div class="player-row player-row--bottom">
+                    <div class="avatar" aria-hidden="true"></div>
+                    <div class="player-meta">
+                        <div class="player-name" id="myName">You (placeholder)</div>
+                        <div class="player-sub" id="myStatus">—</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- right column (for status, debug & move history)-->
+        <aside class="right-column">
+            <!-- status -->
+            <section class="panel">
+                <header class="panel__header">
+                    <h2 class="panel__title">Status</h2>
+                    <div class="badge" id="wsStatus">Disconnected</div>
+                </header>
+
+                <div class="panel__body">
+                    <dl class="kv">
+                        <div class="kv__row">
+                            <dt>Game</dt>
+                            <dd id="uiGameId">—</dd>
+                        </div>
+                        <div class="kv__row">
+                            <dt>Color</dt>
+                            <dd id="uiColor">—</dd>
+                        </div>
+                        <div class="kv__row">
+                            <dt>Turn</dt>
+                            <dd id="uiTurn">—</dd>
+                        </div>
+                        <div class="kv__row">
+                            <dt>Last applied</dt>
+                            <dd id="uiLastIndex">—</dd>
+                        </div>
+                    </dl>
+
+                    <!-- debug stuff -->
+                    <div class="debug">
+                        <label class="debug__label" for="moveInput">Debug Move</label>
+                        <div class="debug__row">
+                            <input id="moveInput" class="input" placeholder="e.g. e2-e4" />
+                            <button class="btn" type="button" onclick="sendMove()">Send</button>
+                        </div>
+                        <p class="hint">For testing only :) Need to remove later!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- move history -->
+            <section class="panel">
+                <header class="panel__header">
+                    <h2 class="panel__title">Move History</h2>
+                </header>
+
+                <div class="panel__body panel__body--scroll">
+                    <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
+                    <div class="moves" id="movesHistory"></div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <script src="/node_modules/jocly/dist/browser/jocly.js"></script>
+
+    <script src="/scripts/game.js"></script>
+</body>
+
+</html>
