@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class ChessMove {
@@ -23,6 +24,8 @@ public class ChessMove {
     private boolean castle;
     private boolean capture;
     private ChessPiece promote;
+    @OneToOne
+    private FederatedObject federation;
 
     public ChessPiece getPromote() {
         return promote;
@@ -94,6 +97,14 @@ public class ChessMove {
 
     public void setCapture(boolean capture) {
         this.capture = capture;
+    }
+
+    public FederatedObject getFederation() {
+        return federation;
+    }
+
+    public void setFederation(FederatedObject federation) {
+        this.federation = federation;
     }
 
 }

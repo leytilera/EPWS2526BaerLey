@@ -14,23 +14,26 @@ import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
 import de.thkoeln.chessfed.model.ChessPiece;
 import de.thkoeln.chessfed.model.ChessPlayer;
+import de.thkoeln.chessfed.model.FederatedObject;
 import de.thkoeln.chessfed.model.IChessGameRepository;
 import de.thkoeln.chessfed.model.IChessMoveRepository;
-import jakarta.persistence.EntityNotFoundException;
+import de.thkoeln.chessfed.model.ObjectType;
 
 @Service
 public class ChessGameService implements IChessGameService {
     
     private IChessGameRepository gameRepository;
     private IChessMoveRepository moveRepository;
+    private IFederationService federationService;
     private IRuleEngineService ruleEngine;
     private static char[] rowLookupTable = new char[]{'1', '2', '3', '4', '5', '6', '7', '8'};
     private static char[] columnLookupTable = new char[]{'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'};
 
     @Autowired
-    public ChessGameService(IChessGameRepository gameRepository, IChessMoveRepository moveRepository, IRuleEngineService ruleEngine) {
+    public ChessGameService(IChessGameRepository gameRepository, IChessMoveRepository moveRepository, IFederationService federationService, IRuleEngineService ruleEngine) {
         this.gameRepository = gameRepository;
         this.moveRepository = moveRepository;
+        this.federationService = federationService;
         this.ruleEngine = ruleEngine;
     }
 
@@ -123,6 +126,8 @@ public class ChessGameService implements IChessGameService {
     public void applyMove(ChessMove move) throws InvalidMoveException {
         ChessGame game = ruleEngine.applyMove(move.getGame(), move, this);
         game.setMoveCounter(move.getMoveCount());
+        FederatedObject federatedObject = federationService.createFederatedObject(game.getFederation().getId() + "/moves/" + move.getMoveCount(), ObjectType.MOVE);
+        move.setFederation(federatedObject);
         gameRepository.save(game);
         moveRepository.save(move);
     }
@@ -137,6 +142,8 @@ public class ChessGameService implements IChessGameService {
         game.setHasEnded(false);
         game.setCastleState((byte) 0);
         game.setFields(setupBoard());
+        FederatedObject federation = federationService.createFederatedObject(game.getId(), ObjectType.GAME);
+        game.setFederation(federation);
         gameRepository.save(game);
         return game;
     }
@@ -185,16 +192,27 @@ public class ChessGameService implements IChessGameService {
 
     @Override
     public ChessGame getGame(UUID id) {
-        try {
-            return gameRepository.getReferenceById(id);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException();
-        }
+        return gameRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
     public ChessMove getMove(ChessGame game, int count) {
         return moveRepository.getByGameAndMoveCount(game, count).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public List<ChessGame> getGames(Actor player) {
+        return gameRepository.getAllByWhitePlayerOrBlackPlayer(player, player);
+    }
+
+    @Override
+    public ChessGame getGame(FederatedObject federatedObject) {
+        return gameRepository.getByFederation(federatedObject).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Override
+    public void addRemoteGame(ChessGame game) {
+        gameRepository.save(game);
     }
 
 }

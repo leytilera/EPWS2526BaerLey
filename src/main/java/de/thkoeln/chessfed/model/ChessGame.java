@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class ChessGame {
@@ -24,6 +25,8 @@ public class ChessGame {
     private Actor blackPlayer;
     private boolean hasEnded;
     private int moveCounter;
+    @OneToOne
+    private FederatedObject federation;
     
     public UUID getId() {
         return id;
@@ -95,6 +98,14 @@ public class ChessGame {
 
     public void setMoveCounter(int moveCounter) {
         this.moveCounter = moveCounter;
+    }
+
+    public FederatedObject getFederation() {
+        return federation;
+    }
+
+    public void setFederation(FederatedObject federation) {
+        this.federation = federation;
     }
 
 }

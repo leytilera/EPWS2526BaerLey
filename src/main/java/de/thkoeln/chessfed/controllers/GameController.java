@@ -27,15 +27,13 @@ public class GameController {
     private IChessGameService gameService;
     private IActorService actorService;
     private IChessMoveRepository moveRepository;
-    private IFederationService federationService;
     
     @Autowired
     public GameController(IChessGameService gameService, IActorService actorService,
-            IChessMoveRepository moveRepository, IFederationService federationService) {
+            IChessMoveRepository moveRepository) {
         this.gameService = gameService;
         this.actorService = actorService;
         this.moveRepository = moveRepository;
-        this.federationService = federationService;
     }
 
     @GetMapping(value = "/games/{id}", produces = "application/activity+json")
@@ -43,7 +41,7 @@ public class GameController {
         ChessGame chessGame = gameService.getGame(id);
         List<ChessMove> moves = gameService.getMoves(chessGame);
         GameDto game = new GameDto();
-        game.setId(federationService.getBaseUrl() + "/games/" +  id);
+        game.setId(chessGame.getFederation().getId());
         game.setPublished(null);
         game.setWhite(chessGame.getWhitePlayer().getId());
         game.setBlack(chessGame.getBlackPlayer().getId());
@@ -64,7 +62,7 @@ public class GameController {
         ActivityPubDto[] moveRef = new ActivityPubDto[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
             ChessMove move = moves.get(i);
-            moveRef[i] = new ActivityPubDto(federationService.getBaseUrl() + "/games/" + id + "/moves/" + move.getMoveCount(), "chessfed:Move");
+            moveRef[i] = new ActivityPubDto(move.getFederation().getId(), "chessfed:Move");
         }
         game.setItems(moveRef);
         return ResponseEntity.ok(game);
@@ -75,7 +73,7 @@ public class GameController {
         ChessGame game = gameService.getGame(id);
         ChessMove move = gameService.getMove(game, moveCount);
         MoveDto dto = new MoveDto();
-        dto.setId(federationService.getBaseUrl() + "/games/" + id + "/moves/" + move.getMoveCount());
+        dto.setId(move.getFederation().getId());
         dto.setPublished(null);
         dto.setSource(gameService.getFieldDescriptor(move.getSourceField()));
         dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));

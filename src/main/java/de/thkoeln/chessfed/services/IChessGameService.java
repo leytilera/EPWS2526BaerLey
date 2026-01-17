@@ -9,6 +9,7 @@ import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
 import de.thkoeln.chessfed.model.ChessPiece;
 import de.thkoeln.chessfed.model.ChessPlayer;
+import de.thkoeln.chessfed.model.FederatedObject;
 
 public interface IChessGameService {
     
@@ -36,7 +37,13 @@ public interface IChessGameService {
 
     ChessGame createGame(Actor whitePlayer, Actor blackPlayer);
 
+    void addRemoteGame(ChessGame game);
+
     ChessGame getGame(UUID id);
+
+    ChessGame getGame(FederatedObject federatedObject);
+
+    List<ChessGame> getGames(Actor player);
 
     ChessMove getMove(ChessGame game, int count);
 
