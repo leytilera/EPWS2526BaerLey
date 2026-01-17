@@ -16,6 +16,7 @@ import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.IActorRepository;
 import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
+import de.thkoeln.chessfed.model.ObjectType;
 
 @Service
 public class ActorService implements IActorService {
@@ -63,6 +64,7 @@ public class ActorService implements IActorService {
         actor.setId(federationService.getBaseUrl() + "/instance");
         actor.setInbox(actor.getId() + "/inbox");
         actor.setOutbox(actor.getId() + "/outbox");
+        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
         return actor;
     }
 
@@ -74,6 +76,7 @@ public class ActorService implements IActorService {
         actor.setId(federationService.getBaseUrl() + "/users/" + username);
         actor.setInbox(actor.getId() + "/inbox");
         actor.setOutbox(actor.getId() + "/outbox");
+        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
         actorRepository.save(actor);
         LocalUser user = new LocalUser();
         user.setUsername(username);
@@ -101,6 +104,7 @@ public class ActorService implements IActorService {
                 actor.setId(url);
                 if (actorJson.containsKey("inbox")) actor.setInbox((String) actorJson.get("inbox"));
                 if (actorJson.containsKey("outbox")) actor.setOutbox((String) actorJson.get("outbox"));
+                actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
                 actorRepository.save(actor);
                 return Optional.of(actor);
             }

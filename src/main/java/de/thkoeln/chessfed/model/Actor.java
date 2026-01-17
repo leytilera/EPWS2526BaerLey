@@ -2,6 +2,7 @@ package de.thkoeln.chessfed.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Actor {
@@ -12,6 +13,8 @@ public class Actor {
     private String domain;
     private String inbox;
     private String outbox;
+    @OneToOne
+    private FederatedObject federation;
 
     public String getLocalpart() {
         return localpart;
@@ -51,6 +54,14 @@ public class Actor {
 
     public void setOutbox(String outbox) {
         this.outbox = outbox;
+    }
+
+    public FederatedObject getFederation() {
+        return federation;
+    }
+
+    public void setFederation(FederatedObject federation) {
+        this.federation = federation;
     }
 
 }

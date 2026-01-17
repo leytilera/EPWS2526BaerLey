@@ -4,7 +4,8 @@ public enum ObjectType {
     ACTIVITY,
     ACTOR,
     GAME,
-    MOVE;
+    MOVE,
+    CHALLENGE;
 
     @Override
     public String toString() {
@@ -13,6 +14,7 @@ public enum ObjectType {
             case ACTOR: return "Actor";
             case GAME: return "chessfed:Game";
             case MOVE: return "chessfed:Move";
+            case CHALLENGE: return "chessfed:Challenge";
             default: return "Object";
         }
     }
@@ -21,6 +23,7 @@ public enum ObjectType {
         switch (type) {
             case "chessfed:Game": return GAME;
             case "chessfed:Move": return MOVE;
+            case "chessfed:Challenge": return CHALLENGE;
             case "Actor":
             case "Person": 
             case "Service":

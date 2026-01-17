@@ -56,6 +56,9 @@ public class DummyFederationService implements IFederationService {
             case GAME:
                 prefix = "/games/";
                 break;
+            case CHALLENGE:
+                prefix = "/challenges/";
+                break;
             default:
                 throw new IllegalArgumentException();
 

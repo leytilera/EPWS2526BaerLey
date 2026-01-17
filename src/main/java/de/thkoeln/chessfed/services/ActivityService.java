@@ -97,5 +97,11 @@ public class ActivityService implements IActivityService {
             throw new InvalidActivityException();
         }
     }
+
+    @Override
+    public void postActivity(Activity activity) {
+        activity.setFederation(federationService.createFederatedObject(activity.getId(), ObjectType.ACTIVITY));
+        activityRepository.save(activity);
+    }
     
 }
