@@ -16,15 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 import de.thkoeln.chessfed.dto.ActorDto;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.services.IActorService;
+import de.thkoeln.chessfed.services.IActivityService;
 
 @RestController
 public class ActorController {
 
     private IActorService actorService;
+    private IActivityService activityService;
 
     @Autowired
-    public ActorController(IActorService actorService) {
+    public ActorController(IActorService actorService, IActivityService activityService) {
         this.actorService = actorService;
+        this.activityService = activityService;
     }
     
     @GetMapping(value = "/users/{id}", produces = "application/activity+json")
@@ -45,6 +48,8 @@ public class ActorController {
 
     @PostMapping(value = "/users/{id}/inbox", consumes = {"application/json", "application/activity+json", "application/ld+json"})
     public HttpStatusCode postInbox(@PathVariable String id, @RequestBody Map<String, Object> body) {
+        Actor actor = actorService.getActorById(id);
+        activityService.receiveActivity(actor, body);
         return HttpStatus.ACCEPTED;
     }
 
@@ -66,6 +71,8 @@ public class ActorController {
 
     @PostMapping(value = "/instance/inbox", consumes = {"application/json", "application/activity+json", "application/ld+json"})
     public HttpStatusCode postInstanceInbox(@RequestBody Map<String, Object> body) {
+        Actor actor = actorService.getInstanceActor();
+        activityService.receiveActivity(actor, body);
         return HttpStatus.ACCEPTED;
     }
 

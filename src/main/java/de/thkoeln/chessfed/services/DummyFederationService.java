@@ -38,7 +38,7 @@ public class DummyFederationService implements IFederationService {
 
     @Override
     public FederatedObject createFederatedObject(String url, ObjectType type) {
-        FederatedObject object = new FederatedObject(url, type);
+        FederatedObject object = objectRepository.findById(url).orElseGet(() -> new FederatedObject(url, type));
         objectRepository.save(object);
         return object;
     }

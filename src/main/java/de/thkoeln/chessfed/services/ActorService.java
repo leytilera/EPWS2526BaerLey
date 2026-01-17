@@ -16,7 +16,6 @@ import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.IActorRepository;
 import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ActorService implements IActorService {
@@ -53,11 +52,7 @@ public class ActorService implements IActorService {
     @Override
     public Actor getActorByUrl(String url) {
         if ((federationService.getBaseUrl() + "/instance").equals(url)) return getInstanceActor();
-        try {
-            return actorRepository.getReferenceById(url);
-        } catch (EntityNotFoundException e) {
-            throw new ResourceNotFoundException();
-        }
+        return actorRepository.findById(url).orElseThrow(ResourceNotFoundException::new);
     }
 
     @Override
