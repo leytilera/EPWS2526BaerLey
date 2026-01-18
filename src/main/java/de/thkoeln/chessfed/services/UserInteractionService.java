@@ -51,6 +51,7 @@ public class UserInteractionService implements IUserInteractionService {
         challenge.setWhite(null);
         challenge.setAccepted(false);
         challenge.setInvitation(null);
+        challenge.setInvited(opp);
         challengeRepository.save(challenge);
         Activity invitation = new Activity();
         invitation.setType(ActivityType.INVITE);
@@ -106,6 +107,16 @@ public class UserInteractionService implements IUserInteractionService {
     @Override
     public UUID[] getGames(LocalUser user) {
         return gameService.getGames(user.getActor()).stream().map((g) -> g.getId()).toArray(UUID[]::new);
+    }
+
+    @Override
+    public UUID[] getOpenChallenges(LocalUser user) {
+        return challengeRepository.findAll().stream()
+            .filter((c) -> !c.isAccepted())
+            .filter((c) -> c.getInvited() != null)
+            .filter((c) -> c.getInvited().getFederation().getId().equals(user.getActor().getFederation().getId()))
+            .map((c) -> c.getId())
+            .toArray(UUID[]::new);
     }
     
 }

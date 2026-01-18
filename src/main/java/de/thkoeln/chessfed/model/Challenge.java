@@ -18,6 +18,8 @@ public class Challenge {
     private Actor white;
     @OneToOne
     private Activity invitation;
+    @ManyToOne
+    private Actor invited;
     boolean accepted;
 
     public UUID getId() {
@@ -58,6 +60,14 @@ public class Challenge {
 
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public Actor getInvited() {
+        return invited;
+    }
+
+    public void setInvited(Actor invited) {
+        this.invited = invited;
     }
     
 }

@@ -14,4 +14,6 @@ public interface IUserInteractionService {
 
     UUID[] getGames(LocalUser user);
 
+    UUID[] getOpenChallenges(LocalUser user);
+
 }
