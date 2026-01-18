@@ -45,6 +45,8 @@ public interface IChessGameService {
 
     List<ChessGame> getGames(Actor player);
 
+    ChessMove getMove(FederatedObject federatedObject);
+
     ChessMove getMove(ChessGame game, int count);
 
 }

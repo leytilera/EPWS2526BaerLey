@@ -215,4 +215,9 @@ public class ChessGameService implements IChessGameService {
         gameRepository.save(game);
     }
 
+    @Override
+    public ChessMove getMove(FederatedObject federatedObject) {
+        return moveRepository.getByFederation(federatedObject).orElseThrow(ResourceNotFoundException::new);
+    }
+
 }

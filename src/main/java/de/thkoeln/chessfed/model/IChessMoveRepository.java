@@ -14,4 +14,6 @@ public interface IChessMoveRepository extends JpaRepository<ChessMove, UUID> {
 
     Optional<ChessMove> getByGameAndMoveCount(ChessGame game, int moveCount);
 
+    Optional<ChessMove> getByFederation(FederatedObject federation);
+
 }
