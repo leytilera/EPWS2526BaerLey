@@ -102,5 +102,10 @@ public class UserInteractionService implements IUserInteractionService {
         accept.setTarget(invitation.getTarget().clone());
         activityService.postActivity(accept);
     }
+
+    @Override
+    public UUID[] getGames(LocalUser user) {
+        return gameService.getGames(user.getActor()).stream().map((g) -> g.getId()).toArray(UUID[]::new);
+    }
     
 }

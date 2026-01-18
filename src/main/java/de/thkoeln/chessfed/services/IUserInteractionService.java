@@ -12,4 +12,6 @@ public interface IUserInteractionService {
 
     void acceptInvitation(LocalUser user, UUID challengeId);
 
+    UUID[] getGames(LocalUser user);
+
 }
