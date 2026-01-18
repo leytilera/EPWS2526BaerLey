@@ -18,7 +18,9 @@ import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.ChallengeDto;
 import de.thkoeln.chessfed.dto.GameDto;
+import de.thkoeln.chessfed.dto.MoveDto;
 import de.thkoeln.chessfed.exception.InvalidActivityException;
+import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
 import de.thkoeln.chessfed.model.ActivityType;
@@ -258,7 +260,30 @@ public class ActivityService implements IActivityService {
     }
 
     private void processCreateGame(Activity create) {
-        
+        FederatedObject gme = create.getObject();
+        ChessGame game;
+        try {
+            game = gameService.getGame(gme);
+        } catch (ResourceNotFoundException e) {
+            GameDto dto = fetchRemote(gme.getId(), GameDto.class);
+            game = new ChessGame();
+            game.setFederation(gme);
+            game.setWhitePlayer(actorService.getActorByUrl(dto.getWhite()));
+            game.setBlackPlayer(actorService.getActorByUrl(dto.getBlack()));
+            game.setHasEnded(dto.isFinished());
+            game.setMoveCounter(dto.getTotalItems());
+            byte[] fields = new byte[64];
+            for (int i = 0; i < dto.getBoard().length; i++) {
+                for (int j = 0; j < dto.getBoard()[i].length; j++) {
+                    fields[gameService.getFieldId(i, j)] = gameService.getFieldFlag(ChessPiece.parse(dto.getBoard()[i][j]), ChessPlayer.parse(dto.getBoard()[i][j]));
+                }
+            }
+            game.setFields(fields);
+            if (dto.getEnPassantField() != null) game.setEnPassentField(gameService.getFieldId(dto.getEnPassantField()));
+            game.setCurrentTurn(getPlayerFromActor(dto.isFinished() ? actorService.getActorByUrl(dto.getWinner()) : actorService.getActorByUrl(dto.getCurrentTurn()), game));
+            gameService.createGame(game);
+        }
+       System.out.println("game creation: "+ game.getId());
     }
 
     private void processInvite(Activity invite) {
@@ -311,7 +336,33 @@ public class ActivityService implements IActivityService {
     }
 
     private void processPlayMove(Activity play) {
-
+        FederatedObject mv = play.getObject();
+        FederatedObject gme = play.getTarget()[0];
+        ChessGame game;
+        try {
+            game = gameService.getGame(gme);
+        } catch (ResourceNotFoundException e) {
+            throw new InvalidActivityException();
+            //TODO: request remote game
+        }
+        try {
+            gameService.getMove(gme);
+            return; // Move already processed
+        } catch (ResourceNotFoundException e) {
+            // Continue processing move
+        }
+        MoveDto dto = fetchRemote(mv.getId(), MoveDto.class);
+        ChessMove move = gameService.createMove(game, gameService.getFieldId(dto.getSource()), gameService.getFieldId(dto.getTarget()));
+        move.setCapture(dto.isCapture());
+        move.setCastle(dto.isCastle());
+        if (dto.getPromote() != null) {
+            move.setPromote(ChessPiece.parse(dto.getPromote()));
+        }
+        try {
+            gameService.applyMove(move);
+        } catch (InvalidMoveException e) {
+            throw new InvalidActivityException(e);
+        }
     }
 
     private void createGameFromChallenge(Challenge challenge) {
@@ -333,6 +384,18 @@ public class ActivityService implements IActivityService {
         create.setType(ActivityType.CREATE);
         create.setObject(game.getFederation());
         postActivity(create);
+    }
+
+    private ChessPlayer getPlayerFromActor(Actor actor, ChessGame game) {
+        if (actor == null) {
+            return ChessPlayer.NONE;
+        } else if (actor.getId().equals(game.getWhitePlayer().getId())) {
+            return ChessPlayer.WHITE;
+        } else if (actor.getId().equals(game.getBlackPlayer().getId())) {
+            return ChessPlayer.BLACK;
+        } else {
+            return ChessPlayer.NONE;
+        }
     }
     
 }

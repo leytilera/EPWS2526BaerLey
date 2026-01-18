@@ -37,6 +37,8 @@ public interface IChessGameService {
 
     ChessGame createGame(Actor whitePlayer, Actor blackPlayer);
 
+    void createGame(ChessGame customGame);
+
     void addRemoteGame(ChessGame game);
 
     ChessGame getGame(UUID id);

@@ -220,4 +220,9 @@ public class ChessGameService implements IChessGameService {
         return moveRepository.getByFederation(federatedObject).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @Override
+    public void createGame(ChessGame customGame) {
+        gameRepository.save(customGame);
+    }
+
 }

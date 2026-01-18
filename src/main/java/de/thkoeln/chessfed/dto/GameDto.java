@@ -9,6 +9,7 @@ public class GameDto extends ActivityPubDto {
     private boolean finished;
     private String winner;
     private String currentTurn;
+    private String enPassantField;
     private String[][] board;
     private int totalItems;
     private ActivityPubDto[] items;
@@ -100,6 +101,16 @@ public class GameDto extends ActivityPubDto {
 
     public void setItems(ActivityPubDto[] items) {
         this.items = items;
+    }
+
+    @JsonProperty("chessfed:enPassantField")
+    public String getEnPassantField() {
+        return enPassantField;
+    }
+
+    @JsonProperty("chessfed:enPassantField")
+    public void setEnPassantField(String enPassantField) {
+        this.enPassantField = enPassantField;
     }
     
 }

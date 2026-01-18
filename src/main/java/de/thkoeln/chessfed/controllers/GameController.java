@@ -58,6 +58,7 @@ public class GameController {
             }
         }
         game.setBoard(board);
+        if (chessGame.getEnPassentField() >= 0) game.setEnPassantField(gameService.getFieldDescriptor(chessGame.getEnPassentField()));
         game.setTotalItems(moves.size());
         ActivityPubDto[] moveRef = new ActivityPubDto[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
