@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.services;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 
@@ -53,7 +54,13 @@ public class ActorService implements IActorService {
     @Override
     public Actor getActorByUrl(String url) {
         if ((federationService.getBaseUrl() + "/instance").equals(url)) return getInstanceActor();
-        return actorRepository.findById(url).orElseThrow(ResourceNotFoundException::new);
+        Optional<Actor> actor = actorRepository.findById(url);
+        if (actor.isPresent()) {
+            return actor.get();
+        } else if (!url.startsWith(federationService.getBaseUrl())) {
+            return getRemoteActor(url).orElseThrow(ResourceNotFoundException::new);
+        }
+        throw new ResourceNotFoundException();
     }
 
     @Override
@@ -96,20 +103,35 @@ public class ActorService implements IActorService {
                 }
             }
             if (url != null) {
-                Map<String, Object> actorJson = client.get().uri(url).accept(MediaType.valueOf("application/activity+json")).retrieve().body(Map.class);
-                System.out.println(actorJson.keySet());
-                Actor actor = new Actor();
-                actor.setLocalpart(localpart);
-                actor.setDomain(domain);
-                actor.setId(url);
-                if (actorJson.containsKey("inbox")) actor.setInbox((String) actorJson.get("inbox"));
-                if (actorJson.containsKey("outbox")) actor.setOutbox((String) actorJson.get("outbox"));
-                actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
-                actorRepository.save(actor);
-                return Optional.of(actor);
+                return getRemoteActor(url);
             }
         } catch(Exception e) {
                 // :P    
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Actor> getRemoteActor(String url) {
+        try {
+            URI uri = URI.create(url);
+            Map<String, Object> actorJson = client.get().uri(uri).accept(MediaType.valueOf("application/activity+json")).retrieve().body(Map.class);
+            Actor actor = new Actor();
+            if (actorJson.get("preferredUsername") instanceof String) {
+                actor.setLocalpart((String) actorJson.get("preferredUsername"));
+            } else if (actorJson.get("name") instanceof String) {
+                actor.setLocalpart((String) actorJson.get("name"));
+            } else {
+                actor.setLocalpart(uri.getPath());
+            }
+            actor.setDomain(uri.getHost());
+            actor.setId(url);
+            if (actorJson.containsKey("inbox")) actor.setInbox((String) actorJson.get("inbox"));
+            if (actorJson.containsKey("outbox")) actor.setOutbox((String) actorJson.get("outbox"));
+            actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
+            actorRepository.save(actor);
+            return Optional.of(actor);
+        } catch (Exception e) {
+            // :P
         }
         return Optional.empty();
     }
