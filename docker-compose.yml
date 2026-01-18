@@ -11,6 +11,7 @@ services:
       - DB_URL=jdbc:postgresql://db:5432/app
       - DB_USER=app
       - DB_PASSWORD=1234
+      - APP_DOMAIN=chessfed.leytech.net
   db:
     image: docker.io/postgres:18
     environment:

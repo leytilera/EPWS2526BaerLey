@@ -9,5 +9,5 @@ spring:
     hibernate:
       ddl-auto: update
 federation:
-  domain: chessfed.tilera.xyz
-  baseUrl: https://chessfed.tilera.xyz
+  domain: ${APP_DOMAIN}
+  baseUrl: https://${APP_DOMAIN}
