@@ -12,6 +12,7 @@ import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.IChessGameService;
 
 @Component
+@Profile("!prod")
 public class TestData implements CommandLineRunner {
 
     private IActorService actorService;
@@ -24,7 +25,6 @@ public class TestData implements CommandLineRunner {
     }
 
     @Override
-    @Profile("!prod")
     public void run(String... args) throws Exception {
         Actor alec = actorService.createUser("alec").getActor();
         Actor blec = actorService.createUser("blec").getActor();
