@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-01-18
+- Implemented federated invite and accept Activities
+- Implemented federated game creation and moves
+
+## 2026-01-17
+- Added basic Activity implementation
+- Implemented challenges
+
+## 2026-01-16
+- Added [Datenmodell](./documents/datenmodell.png)
+- Added [ActivityPub Extension Types](./documents/activitypub.md)
+
+## 2026-01-11
+- Added Webfinger and Actor implementation
+
 ## 2025-12-07  
 - Add more risks [Risiken](.documents/risiken.md)
 - Add POC for [ActivityPub](./documents/pocs/0001-s2s-communication-with-activitypub.md)
