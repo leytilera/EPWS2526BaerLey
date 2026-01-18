@@ -126,7 +126,7 @@ public class ChessGameService implements IChessGameService {
     public void applyMove(ChessMove move) throws InvalidMoveException {
         ChessGame game = ruleEngine.applyMove(move.getGame(), move, this);
         game.setMoveCounter(move.getMoveCount());
-        FederatedObject federatedObject = federationService.createFederatedObject(game.getFederation().getId() + "/moves/" + move.getMoveCount(), ObjectType.MOVE);
+        FederatedObject federatedObject = federationService.createFederatedObject(federationService.getBaseUrl() + "/games/" + game.getId() + "/moves/" + move.getMoveCount(), ObjectType.MOVE);
         move.setFederation(federatedObject);
         gameRepository.save(game);
         moveRepository.save(move);
