@@ -346,7 +346,7 @@ public class ActivityService implements IActivityService {
             //TODO: request remote game
         }
         try {
-            gameService.getMove(gme);
+            gameService.getMove(mv);
             return; // Move already processed
         } catch (ResourceNotFoundException e) {
             // Continue processing move
