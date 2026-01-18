@@ -1,29 +1,31 @@
 package de.thkoeln.chessfed.config
 
-import de.thkoeln.chessfed.handlers.ChessGameHandler
+import de.thkoeln.chessfed.handlers.FederatedChessGameHandler
+import de.thkoeln.chessfed.services.IActorService
+import de.thkoeln.chessfed.services.IChessGameService
+import de.thkoeln.chessfed.model.ILocalUserRepository
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.socket.config.annotation.EnableWebSocket
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
-import jakarta.annotation.PostConstruct
 
 @Configuration
 @EnableWebSocket
-class WebSocketConfig: WebSocketConfigurer {
-
-    @PostConstruct
-        fun init() {
-        println("### WebSocketConfig LOADED ###")
-    }
+class WebSocketConfig(
+    private val chessGameService: IChessGameService,
+    private val actorService: IActorService
+    private val localUserRepository: ILocalUserRepository
+): WebSocketConfigurer {
 
     override fun registerWebSocketHandlers(registry: WebSocketHandlerRegistry) {
-        registry.addHandler(ChessGameHandler(), "/game")
+        registry
+        .addHandler(FederatedChessGameHandler(chessGameService, actorService, localUserRepository), "/game")
         .addInterceptors(PlayerSessionHandshakeInterceptor())
         // "http://localhost:8080", "https://deine-domain.tld"
         .setAllowedOrigins("*") // später einschränken für Sicherheit
     }
 
     @Bean
-    fun chessGameHandler(): ChessGameHandler = ChessGameHandler()
+    fun federatedChessGameHandler(): FederatedChessGameHandler = FederatedChessGameHandler(chessGameService, actorService, localUserRepository)
 }

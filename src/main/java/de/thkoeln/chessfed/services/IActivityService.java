@@ -1,7 +1,14 @@
 package de.thkoeln.chessfed.services;
 
-public interface IActivityService {
+import java.util.Map;
 
+import de.thkoeln.chessfed.model.Activity;
+import de.thkoeln.chessfed.model.Actor;
+
+public interface IActivityService {
     
-    
+    void receiveActivity(Actor inboxOwner, Map<String, Object> activityData);
+
+    void postActivity(Activity activity);
+
 }

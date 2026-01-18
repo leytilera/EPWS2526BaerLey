@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Chessfed</title>
+    <base href="/" />
+    <link rel="stylesheet" href="/styles/_combined.css" />
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- left column (for Chessfed logo and maybe optional some information/navigation later)-->
+        <aside class="left-column">
+            <div class="left-column__brand">Chessfed</div>
+        </aside>
+
+        <!-- middle column (for non-active chessboard)-->
+        <main class="stage">
+            <section class="board-card">
+                <div class="board-wrap">
+                    <div id="board" class="board"></div>
+                </div>
+            </section>
+        </main>
+
+        <!-- right column -->
+        <aside class="right-column">
+            <section class="panel">
+                <header class="panel__header">
+                    <h2 class="panel__title">Play</h2>
+                </header>
+
+                <div class="panel__body">
+                    <div class="stack">
+                        <button class="btn btn--primary" id="btnStart">Start Game</button>
+                        <button class="btn" id="btnChallenge">Challenge Friend</button>
+                    </div>
+
+                    <p class="hint" style="margin-top: 12px;">
+                        Both buttons create a new game ID for now. Challenge flow will be extended later.
+                    </p>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <script src="/node_modules/jocly/dist/browser/jocly.js"></script>
+
+    <script>
+        async function initPreviewBoard() {
+            if (typeof Jocly === "undefined") throw new Error("Jocly not loaded");
+
+            const match = await Jocly.createMatch("classic-chess");
+            await match.attachElement(document.getElementById("board"));
+            await match.setViewOptions({ sounds: false });
+        }
+
+        async function createGameAndGo() {
+            // optional: falls du weiter Cookies/Session nutzt
+            await fetch("/api/session/anonymous", { method: "POST", credentials: "include" });
+
+            const res = await fetch("/api/games", { method: "POST" });
+            if (!res.ok) throw new Error("Failed to create game");
+            const data = await res.json();
+
+            const gameId = encodeURIComponent(data.gameId);
+            window.location.href = `/chessboard.html?gameId=${gameId}`;
+        }
+
+        window.addEventListener("load", async () => {
+            await initPreviewBoard();
+
+            document.getElementById("btnStart").addEventListener("click", createGameAndGo);
+            document.getElementById("btnChallenge").addEventListener("click", createGameAndGo);
+        });
+    </script>
+</body>
+</html>

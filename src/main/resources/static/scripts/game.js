@@ -5,9 +5,11 @@ let ws = null;
 let match = null;
 const wsStatus = document.getElementById("wsStatus");
 
-let myColor = null;
+let myColor = null; // "WHITE" || "BLACK" || null
 let turn = null;
 let matchReady = false;
+let finished = false;
+
 let userTurnInProgress = false;
 let awaitingServerAck = false;
 let syncInProgress = false;
@@ -18,7 +20,7 @@ const moveHistory = []
 let reconnectAttempts = 0;
 let reconnectTimer = null;
 
-let lastAppliedMoveIndex = -1;
+let lastAppliedMoveIndex = 0;
 
 
 /* JOCLY */
@@ -46,7 +48,10 @@ async function setBoardPerspective() {
 }
 
 function isMyTurn() {
-    return myColor && turn && myColor === turn;
+  if (!myColor) return false;
+  if (!turn) return false;
+  if (finished) return false;
+  return myColor === turn;
 }
 
 function abortUserTurnIfNeeded() {
@@ -61,6 +66,7 @@ function maybeStartUserTurn() {
     if (!myColor || !turn) return;
     if (awaitingServerAck) return;
     if (syncInProgress) return;
+    if (finished) return;
 
     if (!isMyTurn()) {
         abortUserTurnIfNeeded();
@@ -82,9 +88,20 @@ async function startUserTurnLoop() {
         const result = await match.userTurn();
         const moveString = await match.getMoveString(result.move);
 
+        const parsedMoveString = parseJoclyMoveString(moveString);
+        if (!parsed) {
+            await match.rollback(-1).catch(() => {});
+            awaitingServerAck = false;
+            ws.send(JSON.stringify({ type: "SNAPSHOT_REQUEST" }));
+            userTurnInProgress = false;
+            return;
+        }
+
         awaitingServerAck = true;
+
         ws.send(JSON.stringify({
             type: "MOVE_SUBMIT",
+            // PARSED MOVE STRING
             move: moveString
         }));
         userTurnInProgress = false;
@@ -95,6 +112,16 @@ async function startUserTurnLoop() {
 
         console.error("userTurn failed:", e);
     }
+}
+
+/* MOVE PARSING */
+
+function parseJoclyMoveString(moveString) {
+    return ""
+}
+
+function createJoclyMoveString(move) {
+    return ""
 }
 
 
@@ -108,7 +135,8 @@ function render() {
 }
 
 
-/* DEBUG MOVE SENDING */
+/* DEBUG MOVE SENDING
+    funktioniert aktuell so nicht */
 
 function sendMove() {
     const move = document.getElementById("moveInput").value;
@@ -158,7 +186,6 @@ function initWebSocket() {
 
         if (message.type === "JOINED") {
             myColor = message.color;
-            turn = message.turn;
             render();
             await setBoardPerspective();
             maybeStartUserTurn();

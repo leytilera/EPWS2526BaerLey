@@ -16,13 +16,13 @@ class PlayerSessionHandshakeInterceptor: HandshakeInterceptor {
         wsHandler: WebSocketHandler,
         attributes: MutableMap<String, Any>
     ): Boolean {
-        val servletRequest = (request as? ServletServerHttpRequest)?.servletRequest ?: return false
-        val httpSession = servletRequest.getSession(true)
-        val playerKey = (httpSession.getAttribute("playerKey") as String?) ?: UUID.randomUUID().toString().also {
-            httpSession.setAttribute("playerKey", it)
-        }
-        attributes["playerKey"] = playerKey
+        val servletRequest = (request as? ServletServerHttpRequest)?.servletRequest ?: return true
+        val httpSession = servletRequest.getSession(false) ?: return true
 
+        val playerKey = (httpSession.getAttribute("playerKey") as String?)
+        if (!playerKey.isNullOrBlank()) {
+            attributes["playerKey"] = playerKey
+        }
         return true
     }
 
