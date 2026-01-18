@@ -241,6 +241,8 @@ public class ActivityService implements IActivityService {
             case INVITE: {
                 if (activity.getObject() == null || activity.getObject().getType() != ObjectType.CHALLENGE) {
                     break;
+                } else if (activity.getTarget() == null || activity.getTarget().length != 1 || activity.getTarget()[0].getType() != ObjectType.ACTOR) {
+                    break;
                 }
                 processInvite(activity);
             } break;
@@ -270,6 +272,8 @@ public class ActivityService implements IActivityService {
             challenge.setFederation(ch);
             challenge.setAccepted(false);
             challenge.setInvitation(invite);
+            Actor invited = actorService.getActorByUrl(invite.getTarget()[0].getId());
+            challenge.setInvited(invited);
             if (dto.getWhite() != null) challenge.setWhite(actorService.getActorByUrl(dto.getWhite()));
             challengeRepository.save(challenge);
         }
@@ -301,7 +305,9 @@ public class ActivityService implements IActivityService {
         Challenge challenge = challengeRepository.getByFederation(invite.getObject()).orElseThrow(ResourceNotFoundException::new);
         challenge.setAccepted(true);
         challengeRepository.save(challenge);
-        createGameFromChallenge(challenge);
+        if (challenge.getFederation().getId().startsWith(federationService.getBaseUrl())) {
+            createGameFromChallenge(challenge);
+        }
     }
 
     private void processPlayMove(Activity play) {
