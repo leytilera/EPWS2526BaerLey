@@ -16,15 +16,21 @@ import org.springframework.web.client.RestClient;
 
 import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
+import de.thkoeln.chessfed.dto.ChallengeDto;
+import de.thkoeln.chessfed.dto.GameDto;
 import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
 import de.thkoeln.chessfed.model.ActivityType;
 import de.thkoeln.chessfed.model.Actor;
+import de.thkoeln.chessfed.model.Challenge;
 import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
+import de.thkoeln.chessfed.model.ChessPiece;
+import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.FederatedObject;
 import de.thkoeln.chessfed.model.IActivityRepository;
+import de.thkoeln.chessfed.model.IChallengeRepository;
 import de.thkoeln.chessfed.model.ObjectType;
 
 @Service
@@ -36,14 +42,17 @@ public class ActivityService implements IActivityService {
     private IActorService actorService;
     private IFederationService federationService;
     private IActivityRepository activityRepository;
+    private IChallengeRepository challengeRepository;
+    private MappingService mappingService = new MappingService();
     private RestClient client = RestClient.create();
 
     @Autowired
-    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository) {
+    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository) {
         this.gameService = gameService;
         this.actorService = actorService;
         this.federationService = federationService;
         this.activityRepository = activityRepository;
+        this.challengeRepository = challengeRepository;
     }
 
     @SuppressWarnings({"unchecked", "ALEC"})
@@ -84,8 +93,7 @@ public class ActivityService implements IActivityService {
         }
         
         activityRepository.save(activity);
-
-        //TODO: process activity content
+        processActivity(activity);
     }
 
     private FederatedObject parseObject(Map<String, Object> ref) {
@@ -115,7 +123,10 @@ public class ActivityService implements IActivityService {
     @Override
     public void postActivity(Activity activity) {
         activity.setFederation(federationService.createFederatedObject(activity.getId(), ObjectType.ACTIVITY));
-        activityRepository.save(activity);
+        if (activityRepository.getByFederation(activity.getFederation()).isEmpty()) {
+            activityRepository.save(activity);
+            processActivity(activity);
+        }
         Set<Actor> targets = getTargetActors(activity);
         broadcastActivity(activity, targets);
     }
@@ -214,6 +225,108 @@ public class ActivityService implements IActivityService {
             }
         }
         return targets;
+    }
+
+    private void processActivity(Activity activity) {
+        switch (activity.getType()) {
+            case ACCEPT: {
+                processAccept(activity);
+            } break;
+            case CREATE: {
+                if (activity.getObject() == null || activity.getObject().getType() != ObjectType.GAME) {
+                    break;
+                }
+                processCreateGame(activity);
+            } break;
+            case INVITE: {
+                if (activity.getObject() == null || activity.getObject().getType() != ObjectType.CHALLENGE) {
+                    break;
+                }
+                processInvite(activity);
+            } break;
+            case PLAY: {
+                if (activity.getObject() == null || activity.getObject().getType() != ObjectType.MOVE) {
+                    break;
+                } else if (activity.getTarget() == null || activity.getTarget().length != 1 || activity.getTarget()[0].getType() != ObjectType.GAME) {
+                    break;
+                }
+                processPlayMove(activity);
+            } break;
+        }
+    }
+
+    private void processCreateGame(Activity create) {
+        
+    }
+
+    private void processInvite(Activity invite) {
+        FederatedObject ch = invite.getObject();
+        Challenge challenge;
+        try {
+            challenge = challengeRepository.getByFederation(ch).orElseThrow(ResourceNotFoundException::new);
+        } catch (ResourceNotFoundException e) {
+            ChallengeDto dto = fetchRemote(ch.getId(), ChallengeDto.class);
+            challenge = new Challenge();
+            challenge.setFederation(ch);
+            challenge.setAccepted(false);
+            challenge.setInvitation(invite);
+            if (dto.getWhite() != null) challenge.setWhite(actorService.getActorByUrl(dto.getWhite()));
+            challengeRepository.save(challenge);
+        }
+        //TODO: inform user
+    }
+
+    private void processAccept(Activity accept) {
+        FederatedObject inv = accept.getObject();
+        Activity invite;
+        try {
+            invite = activityRepository.getByFederation(inv).orElseThrow(ResourceNotFoundException::new);
+        } catch (ResourceNotFoundException e) {
+            Map<String, Object> json = fetchRemote(inv.getId(), Map.class);
+            ActivityDto dto = mappingService.parseActivity(json);
+            invite = new Activity();
+            invite.setFederation(federationService.createFederatedObject(dto.getId(), ObjectType.parse(dto.getType())));
+            invite.setActor(actorService.getActorByUrl(dto.getActor().getId()));
+            if (dto.getObject() != null) {
+                invite.setObject(federationService.createFederatedObject(dto.getObject().getId(), ObjectType.parse(dto.getObject().getType())));
+            }
+            if (dto.getTarget() != null) {
+                invite.setTarget(Arrays.stream(dto.getTarget())
+                    .map((t) -> federationService.createFederatedObject(t.getId(), ObjectType.parse(t.getType())))
+                    .toArray(FederatedObject[]::new)
+                );
+            }
+            activityRepository.save(invite);
+        }
+        Challenge challenge = challengeRepository.getByFederation(invite.getObject()).orElseThrow(ResourceNotFoundException::new);
+        challenge.setAccepted(true);
+        challengeRepository.save(challenge);
+        createGameFromChallenge(challenge);
+    }
+
+    private void processPlayMove(Activity play) {
+
+    }
+
+    private void createGameFromChallenge(Challenge challenge) {
+        Actor white;
+        Actor black;
+        if (challenge.getWhite() != null) {
+            white = challenge.getWhite();
+            black = white.getId().equals(challenge.getInvited().getId()) ? challenge.getInvitation().getActor() : challenge.getInvited();
+        } else if (Math.random() > 0.5) {
+            white = challenge.getInvited();
+            black = challenge.getInvitation().getActor();
+        } else {
+            white = challenge.getInvitation().getActor();
+            black = challenge.getInvited();
+        }
+        ChessGame game = gameService.createGame(white, black);
+        Activity create = new Activity();
+        create.setActor(actorService.getInstanceActor());
+        create.setType(ActivityType.CREATE);
+        create.setObject(game.getFederation());
+        postActivity(create);
     }
     
 }

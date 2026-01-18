@@ -72,6 +72,7 @@ public class ActorService implements IActorService {
         actor.setInbox(actor.getId() + "/inbox");
         actor.setOutbox(actor.getId() + "/outbox");
         actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
+        actorRepository.save(actor);
         return actor;
     }
 

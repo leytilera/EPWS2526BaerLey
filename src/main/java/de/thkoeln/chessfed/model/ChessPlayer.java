@@ -15,4 +15,9 @@ public enum ChessPlayer {
                 return NONE;
         }
     }
+
+    public static ChessPlayer parse(String abbrev) {
+        if (abbrev == null || abbrev.isEmpty()) return NONE;
+        return Character.isUpperCase(abbrev.charAt(0)) ? BLACK : WHITE;
+    }
 }
