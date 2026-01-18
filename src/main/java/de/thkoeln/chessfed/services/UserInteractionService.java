@@ -96,6 +96,7 @@ public class UserInteractionService implements IUserInteractionService {
         challenge.setAccepted(true);
         challengeRepository.save(challenge);
         Activity accept = new Activity();
+        accept.setType(ActivityType.ACCEPT);
         accept.setActor(user.getActor());
         accept.setObject(invitation.getFederation());
         accept.setTarget(invitation.getTarget().clone());
