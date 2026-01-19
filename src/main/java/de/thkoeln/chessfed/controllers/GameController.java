@@ -79,7 +79,7 @@ public class GameController {
         dto.setSource(gameService.getFieldDescriptor(move.getSourceField()));
         dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));
         dto.setCapture(move.isCapture());
-        dto.setCapture(move.isCastle());
+        dto.setCastle(move.isCastle());
         dto.setPromote(getPieceAbbrev(move.getPromote(), move.getPlayer()));
         return ResponseEntity.ok(dto);
     }
