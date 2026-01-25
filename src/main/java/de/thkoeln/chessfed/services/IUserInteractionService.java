@@ -2,6 +2,7 @@ package de.thkoeln.chessfed.services;
 
 import java.util.UUID;
 
+import de.thkoeln.chessfed.model.Challenge;
 import de.thkoeln.chessfed.model.LocalUser;
 
 public interface IUserInteractionService {
@@ -14,6 +15,8 @@ public interface IUserInteractionService {
 
     UUID[] getGames(LocalUser user);
 
-    UUID[] getOpenChallenges(LocalUser user);
+    Challenge[] getOpenChallenges(LocalUser user);
+
+    LocalUser getUser(String username);
 
 }

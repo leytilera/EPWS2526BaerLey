@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.controllers;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class DebugController {
     @GetMapping("/debug/users/{username}/challenges")
     public ResponseEntity<UUID[]> getChallenges(@PathVariable String username) {
         LocalUser user = userRepository.getByUsername(username).orElseThrow(ResourceNotFoundException::new);
-        UUID[] games = userInteractionService.getOpenChallenges(user);
+        UUID[] games = Arrays.stream(userInteractionService.getOpenChallenges(user)).map((c) -> c.getId()).toArray(UUID[]::new);
         return ResponseEntity.ok(games);
     }
 

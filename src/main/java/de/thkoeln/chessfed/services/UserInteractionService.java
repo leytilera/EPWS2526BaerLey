@@ -110,13 +110,17 @@ public class UserInteractionService implements IUserInteractionService {
     }
 
     @Override
-    public UUID[] getOpenChallenges(LocalUser user) {
+    public Challenge[] getOpenChallenges(LocalUser user) {
         return challengeRepository.findAll().stream()
             .filter((c) -> !c.isAccepted())
             .filter((c) -> c.getInvited() != null)
             .filter((c) -> c.getInvited().getFederation().getId().equals(user.getActor().getFederation().getId()))
-            .map((c) -> c.getId())
-            .toArray(UUID[]::new);
+            .toArray(Challenge[]::new);
+    }
+
+    @Override
+    public LocalUser getUser(String username) {
+        return userRepository.getByUsername(username).orElseThrow(ResourceNotFoundException::new);
     }
     
 }
