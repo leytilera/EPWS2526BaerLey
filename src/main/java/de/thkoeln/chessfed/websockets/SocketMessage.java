@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.websockets;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -8,6 +9,17 @@ public class SocketMessage {
     private int type;
     private UUID context;
     private Map<String, Object> data;
+
+    public SocketMessage() {
+
+    }
+
+    public SocketMessage(int type, UUID context) {
+        this.type = type;
+        this.context = context;
+        this.data = new HashMap<>();
+    }
+
 
     public int getType() {
         return type;

@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.websockets;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IUserInteractionService;
 import tools.jackson.databind.ObjectMapper;
@@ -22,10 +24,12 @@ public class WebsocketHandler extends TextWebSocketHandler {
     private Map<UUID, Set<WebSocketSession>> sessions = new HashMap<>();
     private Map<WebSocketSession, UUID> sessionToUser = new HashMap<>();
     private IUserInteractionService interactionService;
+    private ILocalUserRepository userRepository;
     private ObjectMapper json = new ObjectMapper();
 
-    public WebsocketHandler(IUserInteractionService interactionService) {
+    public WebsocketHandler(IUserInteractionService interactionService, ILocalUserRepository userRepository) {
         this.interactionService = interactionService;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -53,24 +57,40 @@ public class WebsocketHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         UUID userId = sessionToUser.get(session);
+        LocalUser user = userRepository.findById(userId).get();
         SocketMessage msg = json.readValue(message.getPayload(), SocketMessage.class);
         MessageType type = MessageType.parse(msg.getType());
         switch (type) { //TODO: handle message
             case CHALLENGE_ACCEPT: {
-
-            } break;
-            case CHALLENGE_INVITE: {
-
-            } break;
-            case CREATE_GAME: {
-
+                try {
+                    interactionService.acceptInvitation(user, msg.getContext());
+                } catch (Exception e) {
+                    sendError(session, e.getMessage());
+                }
             } break;
             case MOVE: {
-
+                try {
+                    String source = (String) msg.getData().get("source");
+                    String target = (String) msg.getData().get("target");
+                    String promote = (String) msg.getData().get("promote");
+                    interactionService.playMove(user, msg.getContext(), source, target, promote);
+                } catch (Exception e) {
+                    sendError(session, e.getMessage());
+                }
+            } break;
+            default:{
+                sendError(session, "Message type not supported for client->server: " + type);
             } break;
         }
         
         super.handleTextMessage(session, message);
+    }
+
+    private void sendError(WebSocketSession session, String message) throws IOException {
+        SocketMessage ret = new SocketMessage(-1, null);
+        ret.getData().put("error", message);
+        TextMessage toSend = new TextMessage(json.writeValueAsString(ret));
+        session.sendMessage(toSend);
     }
 
 }
