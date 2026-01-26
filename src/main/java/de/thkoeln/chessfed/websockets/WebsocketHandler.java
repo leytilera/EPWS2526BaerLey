@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -14,11 +17,13 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import de.thkoeln.chessfed.events.MoveEvent;
 import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IUserInteractionService;
 import tools.jackson.databind.ObjectMapper;
 
+@Component
 public class WebsocketHandler extends TextWebSocketHandler {
 
     private Map<UUID, Set<WebSocketSession>> sessions = new HashMap<>();
@@ -27,6 +32,7 @@ public class WebsocketHandler extends TextWebSocketHandler {
     private ILocalUserRepository userRepository;
     private ObjectMapper json = new ObjectMapper();
 
+    @Autowired
     public WebsocketHandler(IUserInteractionService interactionService, ILocalUserRepository userRepository) {
         this.interactionService = interactionService;
         this.userRepository = userRepository;
@@ -91,6 +97,31 @@ public class WebsocketHandler extends TextWebSocketHandler {
         ret.getData().put("error", message);
         TextMessage toSend = new TextMessage(json.writeValueAsString(ret));
         session.sendMessage(toSend);
+    }
+
+    private void sendToUser(UUID userId, SocketMessage message) {
+        String encoded = json.writeValueAsString(message);
+        if (sessions.containsKey(userId)) {
+            sessions.get(userId).forEach((session) -> {
+                try {
+                    session.sendMessage(new TextMessage(encoded));
+                } catch (Exception e) {
+                    // :P
+                }
+            });
+        }
+    }
+
+    @EventListener
+    public void onMove(MoveEvent event) {
+        SocketMessage msg = new SocketMessage();
+        msg.setType(MessageType.MOVE.ordinal());
+        msg.setContext((UUID) event.getGame().getId());
+        msg.setData(new HashMap<>());
+        msg.getData().put("source", event.getSource());
+        msg.getData().put("target", event.getTarget());
+        msg.getData().put("promote", event.getPromote());
+        userRepository.getByActor(event.getOpponent()).ifPresent((usr) -> sendToUser(usr.getId(), msg));
     }
 
 }

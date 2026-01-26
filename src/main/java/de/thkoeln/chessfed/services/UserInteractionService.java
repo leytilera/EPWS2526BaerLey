@@ -3,8 +3,10 @@ package de.thkoeln.chessfed.services;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import de.thkoeln.chessfed.events.MoveEvent;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
@@ -30,16 +32,18 @@ public class UserInteractionService implements IUserInteractionService {
     private ILocalUserRepository userRepository;
     private IFederationService federationService;
     private IChallengeRepository challengeRepository;
+    private ApplicationEventPublisher eventBus;
 
     @Autowired
     public UserInteractionService(IChessGameService gameService, IActivityService activityService, IActorService actorService,
-            ILocalUserRepository userRepository, IFederationService federationService, IChallengeRepository challengeRepository) {
+            ILocalUserRepository userRepository, IFederationService federationService, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus) {
         this.gameService = gameService;
         this.activityService = activityService;
         this.actorService = actorService;
         this.userRepository = userRepository;
         this.federationService = federationService;
         this.challengeRepository = challengeRepository;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -82,6 +86,16 @@ public class UserInteractionService implements IUserInteractionService {
         } catch (InvalidMoveException e) {
             throw new RuntimeException(e);
         }
+        MoveEvent event = new MoveEvent(this);
+        event.setSource(sourceField);
+        event.setTarget(targetField);
+        event.setPromote(promote);
+        event.setCapture(move.isCapture());
+        event.setCapture(move.isCastle());
+        event.setGame(game);
+        event.setPlayer(actor);
+        event.setOpponent(player == ChessPlayer.WHITE ? game.getBlackPlayer() : game.getWhitePlayer());
+        eventBus.publishEvent(event);
         Activity activity = new Activity();
         activity.setType(ActivityType.PLAY);
         activity.setActor(actor);

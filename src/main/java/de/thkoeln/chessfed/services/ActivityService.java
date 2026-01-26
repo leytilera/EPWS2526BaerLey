@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -19,6 +20,7 @@ import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.ChallengeDto;
 import de.thkoeln.chessfed.dto.GameDto;
 import de.thkoeln.chessfed.dto.MoveDto;
+import de.thkoeln.chessfed.events.MoveEvent;
 import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
@@ -45,16 +47,18 @@ public class ActivityService implements IActivityService {
     private IFederationService federationService;
     private IActivityRepository activityRepository;
     private IChallengeRepository challengeRepository;
+    private ApplicationEventPublisher eventBus;
     private MappingService mappingService = new MappingService();
     private RestClient client = RestClient.create();
 
     @Autowired
-    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository) {
+    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus) {
         this.gameService = gameService;
         this.actorService = actorService;
         this.federationService = federationService;
         this.activityRepository = activityRepository;
         this.challengeRepository = challengeRepository;
+        this.eventBus = eventBus;
     }
 
     @SuppressWarnings({"unchecked", "ALEC"})
@@ -363,6 +367,16 @@ public class ActivityService implements IActivityService {
         } catch (InvalidMoveException e) {
             throw new InvalidActivityException(e);
         }
+        MoveEvent event = new MoveEvent(this);
+        event.setGame(game);
+        event.setSource(dto.getSource());
+        event.setTarget(dto.getTarget());
+        event.setPromote(dto.getPromote());
+        event.setCapture(move.isCapture());
+        event.setCastle(move.isCastle());
+        event.setPlayer(play.getActor());
+        event.setOpponent(move.getPlayer() == ChessPlayer.WHITE ? game.getBlackPlayer() : game.getWhitePlayer());
+        eventBus.publishEvent(event);
     }
 
     private void createGameFromChallenge(Challenge challenge) {

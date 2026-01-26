@@ -6,25 +6,20 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 
-import de.thkoeln.chessfed.model.ILocalUserRepository;
-import de.thkoeln.chessfed.services.IUserInteractionService;
-
 @Configuration
 @EnableWebSocket
 public class WebsocketsConfig implements WebSocketConfigurer {
 
-    private IUserInteractionService interactionService;
-    private ILocalUserRepository userRepository;
+    private WebsocketHandler handler;
 
     @Autowired
-    public WebsocketsConfig(IUserInteractionService interactionService, ILocalUserRepository userRepository) {
-        this.interactionService = interactionService;
-        this.userRepository = userRepository;
+    public WebsocketsConfig(WebsocketHandler handler) {
+        this.handler = handler;
     }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(new WebsocketHandler(interactionService, userRepository), "/api/socket").setAllowedOrigins("*");
+        registry.addHandler(handler, "/api/socket").setAllowedOrigins("*");
     }
     
 }
