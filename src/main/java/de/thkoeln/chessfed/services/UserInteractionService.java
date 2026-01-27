@@ -91,7 +91,7 @@ public class UserInteractionService implements IUserInteractionService {
         event.setTarget(targetField);
         event.setPromote(promote);
         event.setCapture(move.isCapture());
-        event.setCapture(move.isCastle());
+        event.setCastle(move.isCastle());
         event.setGame(game);
         event.setPlayer(actor);
         event.setOpponent(player == ChessPlayer.WHITE ? game.getBlackPlayer() : game.getWhitePlayer());

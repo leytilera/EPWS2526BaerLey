@@ -16,8 +16,10 @@ import de.thkoeln.chessfed.dto.ApiChallengeDto;
 import de.thkoeln.chessfed.dto.ApiGameDto;
 import de.thkoeln.chessfed.dto.ApiMoveDto;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
+import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.Challenge;
 import de.thkoeln.chessfed.model.ChessGame;
+import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.IChallengeRepository;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IChessGameService;
@@ -86,6 +88,8 @@ public class ClientController {
     private ApiGameDto mapToDto(ChessGame game) {
         ApiGameDto dto = new ApiGameDto();
         dto.setId(game.getId());
+        Actor current = game.getCurrentTurn() == ChessPlayer.WHITE ? game.getWhitePlayer() : game.getBlackPlayer();
+        dto.setCurrentTurn(current.getLocalpart());
         return dto;
     }
 

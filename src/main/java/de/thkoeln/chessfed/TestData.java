@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.ChessGame;
-import de.thkoeln.chessfed.model.ChessMove;
 import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.IChessGameService;
 
@@ -30,8 +29,6 @@ public class TestData implements CommandLineRunner {
         Actor blec = actorService.createUser("blec").getActor();
         ChessGame game = gameService.createGame(alec, blec);
         System.out.println(game.getId());
-        ChessMove move = gameService.createMove(game, gameService.getFieldId("e2"), gameService.getFieldId("e4"));
-        gameService.applyMove(move);
     }
     
 }

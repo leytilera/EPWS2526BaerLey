@@ -1,0 +1,158 @@
+/* PlAYER COMPONENTS 
+###################################################################### */
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #1b2a40, #0e1623);
+  border: 1px solid var(--border);
+}
+
+.player-meta { 
+    display: flex;
+    flex-direction: column;
+}
+
+.player-name {
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.player-sub {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+/* BOARD COMPONENTS
+#####################################################################*/
+
+.board-wrap {
+  padding: 16px;
+  background: var(--panel);
+}
+
+.board {
+  width: var(--boardSize);
+  height: var(--boardSize);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #0a0e14;
+  overflow: hidden;
+}
+
+/* KEY COMPONENTS
+#####################################################################*/
+
+.kv {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.kv__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.kv dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+.kv dd {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* DEBUG AREA
+#####################################################################*/
+
+.debug { 
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.debug__label { 
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.debug__row { 
+  display: flex;
+  gap: 8px;
+}
+
+/* INPUT FIELDS
+#####################################################################*/
+
+.input {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #0c1119;
+  color: var(--text);
+  outline: none;
+}
+.input:focus { 
+  border-color: #355079;
+}
+
+/* BUTTONS
+#####################################################################*/
+
+.btn {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #121a26;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn:hover {
+  background: #152033;
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* MOVE HISTORY
+#####################################################################*/
+
+.moves {
+  display: grid;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+
+.move-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 1fr;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+}
+
+.move-number {
+  color: var(--muted);
+}
+.move-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.move-cell--empty {
+  color: rgba(159,177,195,0.45);
+}
+
+

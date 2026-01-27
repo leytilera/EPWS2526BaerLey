@@ -42,12 +42,16 @@ public class WebsocketHandler extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         UriComponents components = UriComponentsBuilder.fromUri(session.getUri()).build();
         String userId = components.getQueryParams().getFirst("user");
-        LocalUser user = interactionService.getUser(userId);
-        if (!sessions.containsKey(user.getId())) {
-            sessions.put(user.getId(), new HashSet<>());
-        } 
-        sessions.get(user.getId()).add(session);
-        sessionToUser.put(session, user.getId());
+        try {
+            LocalUser user = interactionService.getUser(userId);
+            if (!sessions.containsKey(user.getId())) {
+                sessions.put(user.getId(), new HashSet<>());
+            } 
+            sessions.get(user.getId()).add(session);
+            sessionToUser.put(session, user.getId());
+        } catch (Exception e) {
+            session.close(CloseStatus.BAD_DATA);
+        }
         super.afterConnectionEstablished(session);
     }
 
@@ -64,9 +68,19 @@ public class WebsocketHandler extends TextWebSocketHandler {
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         UUID userId = sessionToUser.get(session);
         LocalUser user = userRepository.findById(userId).get();
-        SocketMessage msg = json.readValue(message.getPayload(), SocketMessage.class);
+        SocketMessage msg;
+        try {
+            msg = json.readValue(message.getPayload(), SocketMessage.class);
+        } catch (Exception e) {
+            sendError(session, e.getMessage());
+            return;
+        }
         MessageType type = MessageType.parse(msg.getType());
-        switch (type) { //TODO: handle message
+        if (type == null) {
+            sendError(session, "Invalid type: " + msg.getType());
+            return;
+        }
+        switch (type) {
             case CHALLENGE_ACCEPT: {
                 try {
                     interactionService.acceptInvitation(user, msg.getContext());
@@ -121,6 +135,8 @@ public class WebsocketHandler extends TextWebSocketHandler {
         msg.getData().put("source", event.getSource());
         msg.getData().put("target", event.getTarget());
         msg.getData().put("promote", event.getPromote());
+        msg.getData().put("castle", event.isCastle());
+        msg.getData().put("capture", event.isCapture());
         userRepository.getByActor(event.getOpponent()).ifPresent((usr) -> sendToUser(usr.getId(), msg));
     }
 
