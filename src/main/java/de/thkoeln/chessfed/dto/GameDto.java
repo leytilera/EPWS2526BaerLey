@@ -13,6 +13,7 @@ public class GameDto extends ActivityPubDto {
     private String[][] board;
     private int totalItems;
     private ActivityPubDto[] items;
+    private CastleStateDto castleState;
 
     public GameDto() {
         setType("chessfed:Game");
@@ -111,6 +112,16 @@ public class GameDto extends ActivityPubDto {
     @JsonProperty("chessfed:enPassantField")
     public void setEnPassantField(String enPassantField) {
         this.enPassantField = enPassantField;
+    }
+
+    @JsonProperty("chessfed:castleState")
+    public CastleStateDto getCastleState() {
+        return castleState;
+    }
+
+    @JsonProperty("chessfed:castleState")
+    public void setCastleState(CastleStateDto castleState) {
+        this.castleState = castleState;
     }
     
 }

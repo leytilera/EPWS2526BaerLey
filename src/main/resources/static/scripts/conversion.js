@@ -1,3 +1,5 @@
+import { generateFen } from "./fen.js";
+
 function joclyToObj(joclyMove, isWhite) {
     let move = {
         "source": null,
@@ -75,4 +77,12 @@ function objToJocly(obj) {
     return move;
 }
 
-export {joclyToObj, objToJocly};
+function gameToJoclyState(game) {
+    return {
+        "initialBoard": generateFen(game),
+        "game": "classic-chess",
+        "playedMoves": []
+    };
+}
+
+export {joclyToObj, objToJocly, gameToJoclyState};

@@ -26,4 +26,26 @@ public enum ChessPiece {
             default: return null;
         }
     }
+
+    public String getAbbrev() {
+        switch (this) {
+            case BISHOP:
+                return "b";
+            case KING:
+                return "k";
+            case KNIGHT:
+                return "n";
+            case PAWN:
+                return "p";
+            case QUEEN:
+                return "q";
+            case ROOK:
+                return "r";
+        }
+        return null;
+    }
+
+    public String getAbbrev(ChessPlayer player) {
+        return player.transformCase(getAbbrev());
+    }
 }

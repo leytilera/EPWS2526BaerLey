@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.thkoeln.chessfed.Utils;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
+import de.thkoeln.chessfed.dto.CastleStateDto;
 import de.thkoeln.chessfed.dto.GameDto;
 import de.thkoeln.chessfed.dto.MoveDto;
 import de.thkoeln.chessfed.model.ChessGame;
@@ -19,7 +21,6 @@ import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.IChessMoveRepository;
 import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.IChessGameService;
-import de.thkoeln.chessfed.services.IFederationService;
 
 @RestController
 public class GameController {
@@ -54,11 +55,12 @@ public class GameController {
                 int field = gameService.getFieldId(i, j);
                 ChessPiece piece = gameService.getPiece(chessGame.getFields()[field]);
                 ChessPlayer player = gameService.getPlayer(chessGame.getFields()[field]);
-                board[i][j] = getPieceAbbrev(piece, player);
+                board[i][j] = Utils.nullableAction(piece, (p) -> p.getAbbrev(player));
             }
         }
         game.setBoard(board);
         if (chessGame.getEnPassentField() >= 0) game.setEnPassantField(gameService.getFieldDescriptor(chessGame.getEnPassentField()));
+        game.setCastleState(new CastleStateDto());
         game.setTotalItems(moves.size());
         ActivityPubDto[] moveRef = new ActivityPubDto[moves.size()];
         for (int i = 0; i < moves.size(); i++) {
@@ -80,28 +82,8 @@ public class GameController {
         dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));
         dto.setCapture(move.isCapture());
         dto.setCastle(move.isCastle());
-        dto.setPromote(getPieceAbbrev(move.getPromote(), move.getPlayer()));
+        dto.setPromote(Utils.nullableAction(move.getPromote(), (p) -> p.getAbbrev(move.getPlayer())));
         return ResponseEntity.ok(dto);
-    }
-
-    private String getPieceAbbrev(ChessPiece piece, ChessPlayer player) {
-        if (piece == null) return null;
-        switch (piece) {
-            case BISHOP:
-                return player == ChessPlayer.WHITE ? "b" : "B";
-            case KING:
-                return player == ChessPlayer.WHITE ? "k" : "K";
-            case KNIGHT:
-                return player == ChessPlayer.WHITE ? "n" : "N";
-            case PAWN:
-                return player == ChessPlayer.WHITE ? "p" : "P";
-            case QUEEN:
-                return player == ChessPlayer.WHITE ? "q" : "Q";
-            case ROOK:
-                return player == ChessPlayer.WHITE ? "r" : "R";
-            default:
-                return null;
-        }
     }
     
 }
