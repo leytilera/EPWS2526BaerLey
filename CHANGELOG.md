@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-02-07
+- Implemented OIDC login
+- Implemented game switcher in frontend
+
+## 2026-01-31
+- Load game state in frontend
+
+## 2026-01-27
+- Added frontend
+
+## 2026-01-26
+- Added client-server-communication to backend
+- Implemented move sending to client
+
+## 2026-01-25
+- Added some client interaction endpoints to backend
+
 ## 2026-01-18
 - Implemented federated invite and accept Activities
 - Implemented federated game creation and moves
