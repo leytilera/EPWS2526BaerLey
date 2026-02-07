@@ -1,6 +1,6 @@
-async function initWebsocket(messageCallback, user) {
+async function initWebsocket(messageCallback) {
     
-    const ws = new WebSocket(`/api/socket?user=${user}`);
+    const ws = new WebSocket(`/api/socket`);
 
     ws.onmessage = (message) => {
         const json = JSON.parse(message.data);

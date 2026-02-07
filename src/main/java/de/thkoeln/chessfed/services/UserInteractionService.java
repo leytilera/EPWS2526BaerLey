@@ -133,8 +133,8 @@ public class UserInteractionService implements IUserInteractionService {
     }
 
     @Override
-    public LocalUser getUser(String username) {
-        return userRepository.getByUsername(username).orElseThrow(ResourceNotFoundException::new);
+    public LocalUser getUser(String externalId) {
+        return userRepository.getByExternal(externalId).orElseThrow(ResourceNotFoundException::new);
     }
     
 }

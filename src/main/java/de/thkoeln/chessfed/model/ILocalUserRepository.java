@@ -11,4 +11,8 @@ public interface ILocalUserRepository extends JpaRepository<LocalUser, UUID> {
 
     Optional<LocalUser> getByActor(Actor actor);
 
+    Optional<LocalUser> getByExternalOrUsername(String external, String username);
+
+    Optional<LocalUser> getByExternal(String external);
+
 }

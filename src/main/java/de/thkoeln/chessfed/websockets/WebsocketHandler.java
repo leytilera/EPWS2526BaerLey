@@ -14,8 +14,6 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import de.thkoeln.chessfed.events.MoveEvent;
 import de.thkoeln.chessfed.model.ILocalUserRepository;
@@ -40,10 +38,9 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        UriComponents components = UriComponentsBuilder.fromUri(session.getUri()).build();
-        String userId = components.getQueryParams().getFirst("user");
         try {
-            LocalUser user = interactionService.getUser(userId);
+            String externalId = session.getPrincipal().getName();
+            LocalUser user = interactionService.getUser(externalId);
             if (!sessions.containsKey(user.getId())) {
                 sessions.put(user.getId(), new HashSet<>());
             } 

@@ -17,6 +17,6 @@ public interface IUserInteractionService {
 
     Challenge[] getOpenChallenges(LocalUser user);
 
-    LocalUser getUser(String username);
+    LocalUser getUser(String externalId);
 
 }

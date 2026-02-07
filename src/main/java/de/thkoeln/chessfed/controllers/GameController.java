@@ -1,6 +1,7 @@
 package de.thkoeln.chessfed.controllers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.thkoeln.chessfed.Utils;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.CastleStateDto;
 import de.thkoeln.chessfed.dto.GameDto;
@@ -55,7 +55,7 @@ public class GameController {
                 int field = gameService.getFieldId(i, j);
                 ChessPiece piece = gameService.getPiece(chessGame.getFields()[field]);
                 ChessPlayer player = gameService.getPlayer(chessGame.getFields()[field]);
-                board[i][j] = Utils.nullableAction(piece, (p) -> p.getAbbrev(player));
+                board[i][j] = Optional.ofNullable(piece).map((p) -> p.getAbbrev(player)).orElse(null);
             }
         }
         game.setBoard(board);
@@ -82,7 +82,7 @@ public class GameController {
         dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));
         dto.setCapture(move.isCapture());
         dto.setCastle(move.isCastle());
-        dto.setPromote(Utils.nullableAction(move.getPromote(), (p) -> p.getAbbrev(move.getPlayer())));
+        dto.setPromote(Optional.ofNullable(move.getPromote()).map((p) -> p.getAbbrev(move.getPlayer())).orElse(null));
         return ResponseEntity.ok(dto);
     }
     

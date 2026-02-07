@@ -1,22 +1,24 @@
 package de.thkoeln.chessfed.controllers;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticatedPrincipal;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.thkoeln.chessfed.Utils;
 import de.thkoeln.chessfed.dto.ApiChallengeDto;
 import de.thkoeln.chessfed.dto.ApiGameDto;
 import de.thkoeln.chessfed.dto.ApiMoveDto;
 import de.thkoeln.chessfed.dto.CastleStateDto;
+import de.thkoeln.chessfed.dto.LocalUserDto;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.Challenge;
@@ -41,9 +43,19 @@ public class ClientController {
         this.gameService = gameService;
     }
 
+    @GetMapping("/api/user")
+    public ResponseEntity<LocalUserDto> getUser(@AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        LocalUser usr = interactionService.getUser(principal.getName());
+        LocalUserDto dto = new LocalUserDto();
+        dto.setId(usr.getId());
+        dto.setUsername(usr.getUsername());
+        dto.setActor(usr.getActor().getFederation().getId());
+        return ResponseEntity.ok(dto);
+    }
+
     @GetMapping("/api/games")
-    public ResponseEntity<ApiGameDto[]> getCurrentGames(@RequestParam String user) {
-        LocalUser usr = interactionService.getUser(user);
+    public ResponseEntity<ApiGameDto[]> getCurrentGames(@AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        LocalUser usr = interactionService.getUser(principal.getName());
         ApiGameDto[] games = gameService.getGames(usr.getActor()).stream()
             .filter((g) -> !g.isHasEnded())
             .map(this::mapToDto)
@@ -53,8 +65,8 @@ public class ClientController {
     }
 
     @GetMapping("/api/games/{id}")
-    public ResponseEntity<ApiGameDto> getGame(@RequestParam String user, @PathVariable UUID id) {
-        LocalUser usr = interactionService.getUser(user);
+    public ResponseEntity<ApiGameDto> getGame(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id) {
+        LocalUser usr = interactionService.getUser(principal.getName());
         ChessGame game = gameService.getGame(id);
         ApiGameDto dto = mapToDto(game);
         dto.setYourTurn(usr.getActor().getId().equals(dto.getCurrentTurn()));
@@ -62,14 +74,14 @@ public class ClientController {
     }
 
     @PostMapping("/api/games/{id}/moves")
-    public void playMove(@RequestParam String user, @PathVariable UUID id, @RequestBody ApiMoveDto move) {
-        LocalUser usr = interactionService.getUser(user);
+    public void playMove(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id, @RequestBody ApiMoveDto move) {
+        LocalUser usr = interactionService.getUser(principal.getName());
         interactionService.playMove(usr, id, move.getSource(), move.getTarget(), move.getPromote());
     }
 
     @GetMapping("/api/challenges")
-    public ResponseEntity<ApiChallengeDto[]> getCurrentChallenges(@RequestParam String user) {
-        LocalUser usr = interactionService.getUser(user);
+    public ResponseEntity<ApiChallengeDto[]> getCurrentChallenges(@AuthenticationPrincipal AuthenticatedPrincipal principal) {
+        LocalUser usr = interactionService.getUser(principal.getName());
         ApiChallengeDto[] challenges = Arrays.stream(interactionService.getOpenChallenges(usr))
             .map(this::mapToDto)
             .toArray(ApiChallengeDto[]::new);
@@ -77,15 +89,15 @@ public class ClientController {
     }
 
     @GetMapping("/api/challenges/{id}")
-    public ResponseEntity<ApiChallengeDto> getChallenge(@RequestParam String user, @PathVariable UUID id) {
+    public ResponseEntity<ApiChallengeDto> getChallenge(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id) {
         Challenge challenge = challengeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         ApiChallengeDto dto = mapToDto(challenge);
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping("/api/challenges/{id}")
-    public void acceptChallenge(@RequestParam String user, @PathVariable UUID id, @RequestBody Boolean accept) {
-        LocalUser usr = interactionService.getUser(user);
+    public void acceptChallenge(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id, @RequestBody Boolean accept) {
+        LocalUser usr = interactionService.getUser(principal.getName());
         if (accept) {
             interactionService.acceptInvitation(usr, id);
         }
@@ -106,7 +118,7 @@ public class ClientController {
                 int field = gameService.getFieldId(i, j);
                 ChessPiece piece = gameService.getPiece(game.getFields()[field]);
                 ChessPlayer player = gameService.getPlayer(game.getFields()[field]);
-                board[i][j] = Utils.nullableAction(piece, (p) -> p.getAbbrev(player));
+                board[i][j] = Optional.ofNullable(piece).map((p) -> p.getAbbrev(player)).orElse(null);
             }
         }
         dto.setBoard(board);

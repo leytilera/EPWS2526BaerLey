@@ -10,8 +10,6 @@ const state = {
 
 document.addEventListener("DOMContentLoaded", () => {
     state.gameid = window.location.hash.substring(1);
-    const params = new URLSearchParams(window.location.search);
-    state.user = params.get("user");
     main();
 });
 
@@ -32,7 +30,8 @@ async function onMessage(msg) {
 }
 
 async function main() {
-    state.send = await initWebsocket(onMessage, state.user);
+    state.user = await getUserData().username;
+    state.send = await initWebsocket(onMessage);
     
     state.match = await Jocly.createMatch("classic-chess");
     
@@ -62,5 +61,9 @@ async function requestUserInput(send) {
 }
 
 async function getGameState(gameid) {
-    return await fetch(`/api/games/${gameid}?user=${state.user}`).then((res) => res.json());
+    return await fetch(`/api/games/${gameid}`).then((res) => res.json());
+}
+
+async function getUserData() {
+    return await fetch(`/api/user`).then((res) => res.json());
 }
