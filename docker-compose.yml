@@ -12,6 +12,9 @@ services:
       - DB_USER=app
       - DB_PASSWORD=1234
       - APP_DOMAIN=chessfed.leytech.net
+      - OIDC_ISSUER=https://chessfed.tilera.xyz/dex
+      - OIDC_ID=chessfed
+      - OIDC_SECRET=secret
   db:
     image: docker.io/postgres:18
     environment:

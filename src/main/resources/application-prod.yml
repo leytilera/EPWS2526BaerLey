@@ -8,6 +8,19 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  security:
+    oauth2:
+      client:
+        registration:
+          openid:
+            client-id: ${OIDC_ID}
+            client-secret: ${OIDC_SECRET}
+            scope: "openid,profile,email"
+            authorization-grant-type: authorization_code
+            redirect-uri: https://${APP_DOMAIN}/login/oauth2/code/openid
+        client:
+          openid:
+            issuer-uri: ${OIDC_ISSUER}
 federation:
   domain: ${APP_DOMAIN}
   baseUrl: https://${APP_DOMAIN}
