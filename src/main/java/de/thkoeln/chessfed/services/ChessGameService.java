@@ -101,11 +101,21 @@ public class ChessGameService implements IChessGameService {
     }
 
     @Override
-    public void applyMove(ChessMove move) throws InvalidMoveException {
-        ChessGame game = ruleEngine.applyMove(move.getGame(), move, this);
+    public void applyMove(ChessMove move, boolean force) throws InvalidMoveException {
+        ChessPlayer winner = null;
+        if (!force) {
+            winner = ruleEngine.checkMove(move.getGame(), move);
+        }
+        ChessGame game = applyMoveUnchecked(move.getGame(), move);
         game.setMoveCounter(move.getMoveCount());
-        FederatedObject federatedObject = federationService.createFederatedObject(federationService.getBaseUrl() + "/games/" + game.getId() + "/moves/" + move.getMoveCount(), ObjectType.MOVE);
-        move.setFederation(federatedObject);
+        if (winner != null) {
+            game.setHasEnded(true);
+            game.setCurrentTurn(winner);
+        }
+        if (move.getFederation() == null) {
+            FederatedObject federatedObject = federationService.createFederatedObject(federationService.getBaseUrl() + "/games/" + game.getId() + "/moves/" + move.getMoveCount(), ObjectType.MOVE);
+            move.setFederation(federatedObject);
+        }
         gameRepository.save(game);
         moveRepository.save(move);
     }
@@ -201,6 +211,70 @@ public class ChessGameService implements IChessGameService {
     @Override
     public void createGame(ChessGame customGame) {
         gameRepository.save(customGame);
+    }
+
+    private ChessGame applyMoveUnchecked(ChessGame currentState, ChessMove move) {
+        byte[] fields = currentState.getFields();
+        // Update castleing rights
+        ChessPiece piece = ChessPiece.fromField(fields[move.getSourceField()]);
+        if (piece == ChessPiece.KING) {
+            if (move.getPlayer() == ChessPlayer.WHITE) {
+                currentState.getCastleState().setWhiteShort(false);
+                currentState.getCastleState().setWhiteLong(false);
+            } else {
+                currentState.getCastleState().setBlackShort(false);
+                currentState.getCastleState().setBlackLong(false);
+            }
+        } else if (move.getSourceField() == 0 || move.getTargetField() == 0) {
+            currentState.getCastleState().setWhiteLong(false);
+        } else if (move.getSourceField() == 7 || move.getTargetField() == 7) {
+            currentState.getCastleState().setWhiteShort(false);
+        } else if (move.getSourceField() == 56 || move.getTargetField() == 56) {
+            currentState.getCastleState().setBlackLong(false);
+        } else if (move.getSourceField() == 63 || move.getTargetField() == 63) {
+            currentState.getCastleState().setBlackShort(false);
+        }
+        // Move the actual Piece
+        fields[move.getTargetField()] = fields[move.getSourceField()];
+        fields[move.getSourceField()] = 0;
+        // Process En Passant
+        int row = boardService.getFieldRowIndex(move.getTargetField());
+        int column = boardService.getFieldColumnIndex(move.getTargetField());
+        if (move.isCapture() && move.getTargetField() == currentState.getEnPassentField()) {    
+            int captureRow = row < 4 ? 3 : 4;
+            int captureField = boardService.getFieldIndex(captureRow, column);
+            fields[captureField] = 0;
+            currentState.setEnPassentField(-1);
+        } else if (ChessPiece.fromField(fields[move.getTargetField()]) == ChessPiece.PAWN && (row == 3 || row == 4) && (boardService.getFieldRowIndex(move.getSourceField()) == 1 || boardService.getFieldRowIndex(move.getSourceField()) == 6)) {
+            int enPassantRow = row == 3 ? 2 : 5;
+            int enPassantField = boardService.getFieldIndex(enPassantRow, column);
+            currentState.setEnPassentField(enPassantField);
+        } else {
+            currentState.setEnPassentField(-1);
+        }
+        // Castleing
+        if ((move.getSourceField() == 4 || move.getSourceField() == 60) && ChessPiece.fromField(fields[move.getTargetField()]) == ChessPiece.KING) {
+            if (move.getTargetField() == 1) {
+                fields[2] = fields[0];
+                fields[0] = 0;
+            } else if (move.getTargetField() == 6) {
+                fields[5] = fields[7];
+                fields[7] = 0;
+            } else if (move.getTargetField() == 62) {
+                fields[61] = fields[63];
+                fields[63] = 0;
+            } else if (move.getTargetField() == 57) {
+                fields[58] = fields[56];
+                fields[56] = 0;
+            }
+        }
+        // Promotion
+        if (piece == ChessPiece.PAWN && move.getPromote() != null) {
+            fields[move.getTargetField()] = move.getPromote().toField(move.getPlayer());
+        }
+        // Set turn for next player
+        currentState.setCurrentTurn(move.getPlayer().getOpponent());
+        return currentState;
     }
 
 }

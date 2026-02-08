@@ -364,6 +364,7 @@ public class ActivityService implements IActivityService {
             throw new InvalidActivityException();
             //TODO: request remote game
         }
+        boolean isLocal = game.getFederation().getId().startsWith(federationService.getBaseUrl());
         try {
             gameService.getMove(mv);
             return; // Move already processed
@@ -372,13 +373,14 @@ public class ActivityService implements IActivityService {
         }
         MoveDto dto = fetchRemote(mv.getId(), MoveDto.class);
         ChessMove move = gameService.createMove(game, gameService.getFieldId(dto.getSource()), gameService.getFieldId(dto.getTarget()));
+        move.setFederation(mv);
         move.setCapture(dto.isCapture());
         move.setCastle(dto.isCastle());
         if (dto.getPromote() != null) {
             move.setPromote(ChessPiece.parse(dto.getPromote()));
         }
         try {
-            gameService.applyMove(move);
+            gameService.applyMove(move, false);// !isLocal);
         } catch (InvalidMoveException e) {
             throw new InvalidActivityException(e);
         }

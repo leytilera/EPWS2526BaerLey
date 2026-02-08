@@ -33,7 +33,7 @@ public interface IChessGameService {
 
     List<ChessMove> getMoves(ChessGame game);
 
-    void applyMove(ChessMove move) throws InvalidMoveException;
+    void applyMove(ChessMove move, boolean force) throws InvalidMoveException;
 
     ChessGame createGame(Actor whitePlayer, Actor blackPlayer);
 

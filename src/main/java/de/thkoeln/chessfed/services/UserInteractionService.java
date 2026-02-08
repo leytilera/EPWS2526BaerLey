@@ -86,7 +86,7 @@ public class UserInteractionService implements IUserInteractionService {
             move.setPromote(prom);
         }
         try {
-            gameService.applyMove(move);
+            gameService.applyMove(move, false);
         } catch (InvalidMoveException e) {
             throw new RuntimeException(e);
         }
