@@ -20,6 +20,8 @@ import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.ChallengeDto;
 import de.thkoeln.chessfed.dto.GameDto;
 import de.thkoeln.chessfed.dto.MoveDto;
+import de.thkoeln.chessfed.events.GameCreationEvent;
+import de.thkoeln.chessfed.events.InviteEvent;
 import de.thkoeln.chessfed.events.MoveEvent;
 import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
@@ -286,6 +288,8 @@ public class ActivityService implements IActivityService {
             if (dto.getEnPassantField() != null) game.setEnPassentField(gameService.getFieldId(dto.getEnPassantField()));
             game.setCurrentTurn(getPlayerFromActor(dto.isFinished() ? actorService.getActorByUrl(dto.getWinner()) : actorService.getActorByUrl(dto.getCurrentTurn()), game));
             gameService.createGame(game);
+            GameCreationEvent event = new GameCreationEvent(this, game);
+            eventBus.publishEvent(event);
         }
        System.out.println("game creation: "+ game.getId());
     }
@@ -306,7 +310,11 @@ public class ActivityService implements IActivityService {
             if (dto.getWhite() != null) challenge.setWhite(actorService.getActorByUrl(dto.getWhite()));
             challengeRepository.save(challenge);
         }
-        //TODO: inform user
+        InviteEvent event = new InviteEvent(this);
+        event.setChallenge(challenge);
+        event.setSource(invite.getActor());
+        event.setTarget(challenge.getInvited());
+        eventBus.publishEvent(event);
     }
 
     private void processAccept(Activity accept) {
@@ -398,6 +406,8 @@ public class ActivityService implements IActivityService {
         create.setType(ActivityType.CREATE);
         create.setObject(game.getFederation());
         postActivity(create);
+        GameCreationEvent event = new GameCreationEvent(this, game);
+        eventBus.publishEvent(event);
     }
 
     private ChessPlayer getPlayerFromActor(Actor actor, ChessGame game) {

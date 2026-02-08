@@ -1,9 +1,11 @@
 package de.thkoeln.chessfed.websockets;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -15,7 +17,10 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import de.thkoeln.chessfed.events.GameCreationEvent;
+import de.thkoeln.chessfed.events.InviteEvent;
 import de.thkoeln.chessfed.events.MoveEvent;
+import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IUserInteractionService;
@@ -135,6 +140,33 @@ public class WebsocketHandler extends TextWebSocketHandler {
         msg.getData().put("castle", event.isCastle());
         msg.getData().put("capture", event.isCapture());
         userRepository.getByActor(event.getOpponent()).ifPresent((usr) -> sendToUser(usr.getId(), msg));
+    }
+
+    @EventListener
+    public void onGameCreation(GameCreationEvent event) {
+        SocketMessage msg = new SocketMessage();
+        msg.setType(MessageType.CREATE_GAME.ordinal());
+        msg.setContext(event.getGame().getId());
+        msg.setData(new HashMap<>());
+        Arrays.stream(new Actor[]{
+            event.getGame().getWhitePlayer(), 
+            event.getGame().getBlackPlayer()
+        })
+        .map(userRepository::getByActor)
+        .filter(Optional::isPresent)
+        .map(Optional::get)
+        .forEach((user) -> this.sendToUser(user.getId(), msg));
+    }
+
+    @EventListener
+    public void onInvite(InviteEvent event) {
+        SocketMessage msg = new SocketMessage();
+        msg.setType(MessageType.CHALLENGE_INVITE.ordinal());
+        msg.setContext(event.getChallenge().getId());
+        msg.setData(new HashMap<>());
+        msg.getData().put("source", event.getSource().getFederation().getId());
+        msg.getData().put("white", Optional.ofNullable(event.getChallenge().getWhite()).map((a) -> a.getFederation().getId()).orElse(null));
+        userRepository.getByActor(event.getTarget()).ifPresent((usr) -> sendToUser(usr.getId(), msg));
     }
 
 }
