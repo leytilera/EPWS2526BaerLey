@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import de.thkoeln.chessfed.events.MoveEvent;
+import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
@@ -50,6 +51,9 @@ public class UserInteractionService implements IUserInteractionService {
     public void createInvitation(LocalUser user, String opponent) {
         if (!opponent.startsWith("acct:")) opponent = "acct:" + opponent;
         Actor opp = actorService.getActorByAcct(opponent);
+        if (user.getActor().getId().equals(opp.getId())) {
+            throw new InvalidActivityException();
+        }
         Challenge challenge = new Challenge();
         challenge.setFederation(federationService.createFederatedObject(challenge.getId(), ObjectType.CHALLENGE));
         challenge.setWhite(null);
