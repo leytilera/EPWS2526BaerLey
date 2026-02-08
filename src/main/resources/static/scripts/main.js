@@ -1,5 +1,6 @@
 import { gameToJoclyState, joclyToObj, objToJocly } from "./conversion.js";
 import { initWebsocket } from "./websocket.js";
+import { API } from "./api.js";
 
 const state = {
     gameid: null,
@@ -15,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let input = document.querySelector("[data-js-opponent]");
         let opponent = input.value;
         input.value = "";
-        createInvitation(opponent).then(result => {
+        API.createInvitation(opponent).then(result => {
             if (result) {
                 alert(`${opponent} was invited!`);
             } else {
@@ -46,13 +47,13 @@ async function onMessage(msg) {
 }
 
 async function main() {
-    state.user = await getUserData().username;
+    state.user = await API.getUserData().username;
     state.send = await initWebsocket(onMessage);
-    let games = await getGames();
+    let games = await API.getGames();
     games.forEach(game => {
         addGameToList(game.id);
     });
-    getInvitations().then(invitations => {
+    API.getInvitations().then(invitations => {
         invitations.forEach(invitation => {
             addInvitation(invitation.id, invitation);
         })
@@ -80,22 +81,10 @@ async function requestUserInput(send) {
     send(msg);
 }
 
-async function getGameState(gameid) {
-    return await fetch(`/api/games/${gameid}`).then((res) => res.json());
-}
-
-async function getUserData() {
-    return await fetch(`/api/user`).then((res) => res.json());
-}
-
-async function getGames() {
-    return await fetch(`/api/games`).then((res) => res.json());
-}
-
 async function loadGame() {
     if (!state.gameid) return;
 
-    let gameState = await getGameState(state.gameid);
+    let gameState = await API.getGameState(state.gameid);
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
     await state.match.load(init);
@@ -132,19 +121,4 @@ async function acceptInvite(challengeId) {
         context: challengeId
     };
     state.send(msg);
-}
-
-async function getInvitations() {
-    return await fetch(`/api/challenges`).then((res) => res.json());
-}
-
-async function createInvitation(opponent) {
-    let body = JSON.stringify({opponent: opponent});
-    return await fetch(`/api/challenges`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: body
-    }).then(res => res.ok);
 }
