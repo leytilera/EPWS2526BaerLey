@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-02-08
+- Added invitations to frontend
+- Implemented move validation on backend
+
 ## 2026-02-07
 - Implemented OIDC login
 - Implemented game switcher in frontend
