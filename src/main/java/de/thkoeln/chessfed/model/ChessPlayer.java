@@ -18,7 +18,7 @@ public enum ChessPlayer {
 
     public static ChessPlayer parse(String abbrev) {
         if (abbrev == null || abbrev.isEmpty()) return NONE;
-        return Character.isUpperCase(abbrev.charAt(0)) ? BLACK : WHITE;
+        return Character.isUpperCase(abbrev.charAt(0)) ? WHITE : BLACK;
     }
 
     public String transformCase(String abbrev) {
