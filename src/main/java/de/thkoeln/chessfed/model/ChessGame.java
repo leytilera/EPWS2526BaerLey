@@ -2,6 +2,7 @@ package de.thkoeln.chessfed.model;
 
 import java.util.UUID;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -17,7 +18,8 @@ public class ChessGame {
     @Enumerated(EnumType.ORDINAL)
     private ChessPlayer currentTurn;
     private int enPassentField = -1;
-    private byte castleState;
+    @Embedded
+    private CastleState castleState;
     private byte[] fields = new byte[64];
     @ManyToOne
     private Actor whitePlayer;
@@ -52,11 +54,11 @@ public class ChessGame {
         this.enPassentField = enPassentField;
     }
 
-    public byte getCastleState() {
+    public CastleState getCastleState() {
         return castleState;
     }
 
-    public void setCastleState(byte castleState) {
+    public void setCastleState(CastleState castleState) {
         this.castleState = castleState;
     }
 

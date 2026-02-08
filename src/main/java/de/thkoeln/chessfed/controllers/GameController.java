@@ -60,7 +60,12 @@ public class GameController {
         }
         game.setBoard(board);
         if (chessGame.getEnPassentField() >= 0) game.setEnPassantField(gameService.getFieldDescriptor(chessGame.getEnPassentField()));
-        game.setCastleState(new CastleStateDto());
+        CastleStateDto castleState = new CastleStateDto();
+        castleState.setWhiteShort(chessGame.getCastleState().isWhiteShort());
+        castleState.setWhiteLong(chessGame.getCastleState().isWhiteLong());
+        castleState.setBlackShort(chessGame.getCastleState().isBlackShort());
+        castleState.setBlackLong(chessGame.getCastleState().isBlackLong());
+        game.setCastleState(castleState);
         game.setTotalItems(moves.size());
         ActivityPubDto[] moveRef = new ActivityPubDto[moves.size()];
         for (int i = 0; i < moves.size(); i++) {

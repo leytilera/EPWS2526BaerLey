@@ -48,4 +48,19 @@ public enum ChessPiece {
     public String getAbbrev(ChessPlayer player) {
         return player.transformCase(getAbbrev());
     }
+
+    public static ChessPiece fromField(byte fieldFlag) throws IllegalArgumentException {
+        if (fieldFlag == 0) return null;
+        int flag = fieldFlag & 0xFF;
+        boolean isWhite = (fieldFlag & 1) == 0;
+        int pieceId = isWhite ? (flag >>> 1) - 1 : (flag - 1) >>> 1;
+        if (pieceId < 0 || pieceId >= ChessPiece.values().length) throw new IllegalArgumentException("Invalid field flag");
+        return ChessPiece.values()[pieceId];
+    }
+
+    public byte toField(ChessPlayer player) {
+        if (player == ChessPlayer.NONE) return 0;
+        int flag = player == ChessPlayer.WHITE ? (this.ordinal() + 1) << 1 : (this.ordinal() << 1) + 1;
+        return (byte) (flag & 0xFF);
+    }
 }

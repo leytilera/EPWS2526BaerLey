@@ -117,7 +117,12 @@ public class ClientController {
         dto.setCurrentTurn(current.getId());
         dto.setBlack(game.getBlackPlayer().getId());
         dto.setWhite(game.getWhitePlayer().getId());
-        dto.setCastleState(new CastleStateDto());
+        CastleStateDto castleState = new CastleStateDto();
+        castleState.setWhiteShort(game.getCastleState().isWhiteShort());
+        castleState.setWhiteLong(game.getCastleState().isWhiteLong());
+        castleState.setBlackShort(game.getCastleState().isBlackShort());
+        castleState.setBlackLong(game.getCastleState().isBlackLong());
+        dto.setCastleState(castleState);
         if (game.getEnPassentField() >= 0) dto.setEnPassantField(gameService.getFieldDescriptor(game.getEnPassentField()));
         String[][] board = new String[8][8];
         for (int i = 0; i < board.length; i++) {

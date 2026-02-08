@@ -29,6 +29,7 @@ import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
 import de.thkoeln.chessfed.model.ActivityType;
 import de.thkoeln.chessfed.model.Actor;
+import de.thkoeln.chessfed.model.CastleState;
 import de.thkoeln.chessfed.model.Challenge;
 import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
@@ -278,6 +279,12 @@ public class ActivityService implements IActivityService {
             game.setBlackPlayer(actorService.getActorByUrl(dto.getBlack()));
             game.setHasEnded(dto.isFinished());
             game.setMoveCounter(dto.getTotalItems());
+            game.setCastleState(new CastleState(
+                dto.getCastleState().isWhiteShort(), 
+                dto.getCastleState().isWhiteLong(),
+                dto.getCastleState().isBlackShort(),
+                dto.getCastleState().isBlackLong()
+            ));
             byte[] fields = new byte[64];
             for (int i = 0; i < dto.getBoard().length; i++) {
                 for (int j = 0; j < dto.getBoard()[i].length; j++) {

@@ -48,4 +48,9 @@ public enum ChessPlayer {
         return this == WHITE || this == BLACK;
     }
 
+    public static ChessPlayer fromField(byte fieldFlag) {
+        if (fieldFlag == 0) return NONE;
+        return (fieldFlag & 1) == 0 ? WHITE : BLACK;
+    }
+
 }
