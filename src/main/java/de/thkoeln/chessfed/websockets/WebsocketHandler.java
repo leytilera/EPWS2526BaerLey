@@ -160,11 +160,13 @@ public class WebsocketHandler extends TextWebSocketHandler {
 
     @EventListener
     public void onInvite(InviteEvent event) {
+        String userHandle = event.getSource().getLocalpart() + "@" + event.getSource().getDomain();
         SocketMessage msg = new SocketMessage();
         msg.setType(MessageType.CHALLENGE_INVITE.ordinal());
         msg.setContext(event.getChallenge().getId());
         msg.setData(new HashMap<>());
         msg.getData().put("source", event.getSource().getFederation().getId());
+        msg.getData().put("sourceHandle", userHandle);
         msg.getData().put("white", Optional.ofNullable(event.getChallenge().getWhite()).map((a) -> a.getFederation().getId()).orElse(null));
         userRepository.getByActor(event.getTarget()).ifPresent((usr) -> sendToUser(usr.getId(), msg));
     }

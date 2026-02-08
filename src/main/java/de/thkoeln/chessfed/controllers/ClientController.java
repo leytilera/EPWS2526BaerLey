@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.thkoeln.chessfed.dto.ApiChallengeDto;
 import de.thkoeln.chessfed.dto.ApiGameDto;
+import de.thkoeln.chessfed.dto.ApiInviteDto;
 import de.thkoeln.chessfed.dto.ApiMoveDto;
 import de.thkoeln.chessfed.dto.CastleStateDto;
 import de.thkoeln.chessfed.dto.LocalUserDto;
@@ -88,6 +89,12 @@ public class ClientController {
         return ResponseEntity.ok(challenges);
     }
 
+    @PostMapping("/api/challenges")
+    public void createChallenge(@AuthenticationPrincipal AuthenticatedPrincipal principal, @RequestBody ApiInviteDto invitation) {
+        LocalUser usr = interactionService.getUser(principal.getName());
+        interactionService.createInvitation(usr, invitation.getOpponent());
+    }
+
     @GetMapping("/api/challenges/{id}")
     public ResponseEntity<ApiChallengeDto> getChallenge(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id) {
         Challenge challenge = challengeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -128,6 +135,13 @@ public class ClientController {
     private ApiChallengeDto mapToDto(Challenge challenge) {
         ApiChallengeDto dto = new ApiChallengeDto();
         dto.setId(challenge.getId());
+        dto.setWhite(Optional.ofNullable(challenge.getWhite()).map((a) -> a.getFederation().getId()).orElse(null));
+        Actor source = challenge.getInvitation().getActor();
+        dto.setSource(source.getFederation().getId());
+        dto.setSourceHandle(source.getLocalpart() + "@" + source.getDomain());
+        Actor target = challenge.getInvited();
+        dto.setTarget(target.getFederation().getId());
+        dto.setTargetHandle(target.getLocalpart() + "@" + target.getDomain());
         return dto;
     }
 

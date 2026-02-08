@@ -10,6 +10,19 @@ const state = {
 
 document.addEventListener("DOMContentLoaded", () => {
     state.gameid = window.location.hash.substring(1);
+    let button = document.querySelector("[data-js-invite]");
+    button.addEventListener("click", () => {
+        let input = document.querySelector("[data-js-opponent]");
+        let opponent = input.value;
+        input.value = "";
+        createInvitation(opponent).then(result => {
+            if (result) {
+                alert(`${opponent} was invited!`);
+            } else {
+                alert(`Can't invite ${opponent}`);
+            }
+        });
+    });
     main();
 });
 
@@ -27,6 +40,8 @@ async function onMessage(msg) {
         requestUserInput(state.send);
     } else if (msg.type == 0) {
         addGameToList(msg.context);
+    } else if (msg.type == 1) {
+        addInvitation(msg.context, msg.data);
     }
 }
 
@@ -37,6 +52,11 @@ async function main() {
     games.forEach(game => {
         addGameToList(game.id);
     });
+    getInvitations().then(invitations => {
+        invitations.forEach(invitation => {
+            addInvitation(invitation.id, invitation);
+        })
+    })
 
     state.match = await Jocly.createMatch("classic-chess");
     
@@ -77,6 +97,7 @@ async function loadGame() {
 
     let gameState = await getGameState(state.gameid);
     let init = gameToJoclyState(gameState);
+    await state.match.abortUserTurn();
     await state.match.load(init);
 
     if (gameState.yourTurn) {
@@ -88,4 +109,42 @@ async function addGameToList(gameId) {
     let element = document.querySelector("[data-js-gamelist]");
     let entry = `<li><a href="#${gameId}">${gameId}</a></li>`;
     element.innerHTML += entry;
+}
+
+async function addInvitation(id, challenge) {
+    let element = document.querySelector("[data-js-invitations]");
+    let white = "Random";
+    if (challenge.white) {
+        white = challenge.white === challenge.source ? challenge.sourceHandle : "You";
+    }
+    let entry = `<li data-js-challenge="${id}">Invitation from ${challenge.sourceHandle}. White Player: ${white}</li>`;
+    element.innerHTML += entry;
+    let invite = element.querySelector(`[data-js-challenge="${id}"]`);
+    invite.addEventListener("click", () => {
+        acceptInvite(id);
+        element.removeChild(invite);
+    });
+}
+
+async function acceptInvite(challengeId) {
+    let msg = {
+        type: 2,
+        context: challengeId
+    };
+    state.send(msg);
+}
+
+async function getInvitations() {
+    return await fetch(`/api/challenges`).then((res) => res.json());
+}
+
+async function createInvitation(opponent) {
+    let body = JSON.stringify({opponent: opponent});
+    return await fetch(`/api/challenges`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: body
+    }).then(res => res.ok);
 }
