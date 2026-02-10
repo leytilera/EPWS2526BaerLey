@@ -5,7 +5,16 @@ public enum ObjectType {
     ACTOR,
     GAME,
     MOVE,
-    CHALLENGE;
+    CHALLENGE,
+    INVITE,
+    ACCEPT,
+    CREATE,
+    JOIN,
+    PLAY,
+    PERSON,
+    SERVICE,
+    APPLICATION,
+    UNKNOWN;
 
     @Override
     public String toString() {
@@ -15,6 +24,14 @@ public enum ObjectType {
             case GAME: return "chessfed:Game";
             case MOVE: return "chessfed:Move";
             case CHALLENGE: return "chessfed:Challenge";
+            case ACCEPT: return "Accept";
+            case CREATE: return "Create";
+            case INVITE: return "Invite";
+            case JOIN: return "Join";
+            case PLAY: return "chessfed:Play";
+            case PERSON: return "Person";
+            case SERVICE: return "Service";
+            case APPLICATION: return "Application";
             default: return "Object";
         }
     }
@@ -24,17 +41,32 @@ public enum ObjectType {
             case "chessfed:Game": return GAME;
             case "chessfed:Move": return MOVE;
             case "chessfed:Challenge": return CHALLENGE;
-            case "Actor":
-            case "Person": 
-            case "Service":
-            case "Application": return ACTOR;
-            case "Activity":
-            case "Invite": 
-            case "Accept": 
-            case "Join": 
-            case "chessfed:Play": 
-            case "Create": return ACTIVITY;
-            default: return null;
+            case "Actor": return ACTOR;
+            case "Person": return PERSON;
+            case "Service": return SERVICE;
+            case "Application": return APPLICATION;
+            case "Activity": return ACTIVITY;
+            case "Invite": return INVITE;
+            case "Accept": return ACCEPT;
+            case "Join": return JOIN;
+            case "chessfed:Play": return PLAY;
+            case "Create": return CREATE;
+            default: return UNKNOWN;
+        }
+    }
+
+    public ObjectType simplify() {
+        switch (this) {
+            case CHALLENGE:
+            case ACCEPT: 
+            case CREATE:
+            case INVITE: 
+            case JOIN:
+            case PLAY: return ACTIVITY;
+            case PERSON: 
+            case SERVICE: 
+            case APPLICATION: return ACTOR;
+            default: return this;
         }
     }
 

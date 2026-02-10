@@ -46,7 +46,7 @@ public class DummyFederationService implements IFederationService {
     @Override
     public FederatedObject createFederatedObject(UUID id, ObjectType type) {
         String prefix = null;
-        switch (type) {
+        switch (type.simplify()) {
             case ACTIVITY:
                 prefix = "/activities/";
                 break;

@@ -27,7 +27,7 @@ public class ActivityController {
         Activity activity = activityRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         ActivityDto dto = new ActivityDto();
         dto.setId(activity.getFederation().getId());
-        dto.setType(activity.getType().toString());
+        dto.setType(activity.getFederation().getType().toString());
         if (activity.getActor() != null) {
             dto.setActor(new ActivityPubDto(activity.getActor().getId(), "Person"));
         }

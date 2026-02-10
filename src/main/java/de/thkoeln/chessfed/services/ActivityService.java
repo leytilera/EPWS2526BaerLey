@@ -27,7 +27,6 @@ import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
-import de.thkoeln.chessfed.model.ActivityType;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.CastleState;
 import de.thkoeln.chessfed.model.Challenge;
@@ -69,15 +68,14 @@ public class ActivityService implements IActivityService {
     public void receiveActivity(Actor inboxOwner, Map<String, Object> activityData) {
         if (!activityData.containsKey("type") || !(activityData.get("type") instanceof String)) throw new InvalidActivityException();
         if (!activityData.containsKey("id") || !(activityData.get("id") instanceof String)) throw new InvalidActivityException();
-        ActivityType type = ActivityType.parse((String) activityData.get("type"));
-        if (type == ActivityType.UNKNOWN) return;
-        FederatedObject federatedObject = federationService.createFederatedObject((String) activityData.get("id"), ObjectType.ACTIVITY);
+        ObjectType type = ObjectType.parse((String) activityData.get("type"));
+        if (type == ObjectType.UNKNOWN) return;
+        FederatedObject federatedObject = federationService.createFederatedObject((String) activityData.get("id"), type);
         if (activityRepository.getByFederation(federatedObject).isPresent()) return;
         Activity activity = new Activity();
         activity.setFederation(federatedObject);
         Actor actor = parseActor(activityData.get("actor"));
         activity.setActor(actor);
-        activity.setType(type);
 
         Object object = activityData.get("object");
         if (object instanceof String) {
@@ -131,7 +129,7 @@ public class ActivityService implements IActivityService {
 
     @Override
     public void postActivity(Activity activity) {
-        activity.setFederation(federationService.createFederatedObject(activity.getId(), ObjectType.ACTIVITY));
+        if (activity.getFederation() == null) throw new IllegalArgumentException();
         if (activityRepository.getByFederation(activity.getFederation()).isEmpty()) {
             activityRepository.save(activity);
             processActivity(activity);
@@ -143,7 +141,7 @@ public class ActivityService implements IActivityService {
     private void broadcastActivity(Activity activity, Set<Actor> targets) {
         ActivityDto dto = new ActivityDto();
         dto.setId(activity.getFederation().getId());
-        dto.setType(activity.getType().toString());
+        dto.setType(activity.getFederation().getType().toString());
         if (activity.getActor() != null) {
             dto.setActor(new ActivityPubDto(activity.getActor().getFederation().getId(), "Person"));
         }
@@ -211,7 +209,7 @@ public class ActivityService implements IActivityService {
             } else if (obj instanceof FederatedObject) {
                 FederatedObject fed = (FederatedObject) obj;
                 try {
-                    switch (fed.getType()) {
+                    switch (fed.getType().simplify()) {
                         case ACTIVITY: {
                             activityRepository.getByFederation(fed).ifPresent(toVisit::add);
                         } break;
@@ -237,7 +235,7 @@ public class ActivityService implements IActivityService {
     }
 
     private void processActivity(Activity activity) {
-        switch (activity.getType()) {
+        switch (activity.getFederation().getType()) {
             case ACCEPT: {
                 processAccept(activity);
             } break;
@@ -250,7 +248,7 @@ public class ActivityService implements IActivityService {
             case INVITE: {
                 if (activity.getObject() == null || activity.getObject().getType() != ObjectType.CHALLENGE) {
                     break;
-                } else if (activity.getTarget() == null || activity.getTarget().length != 1 || activity.getTarget()[0].getType() != ObjectType.ACTOR) {
+                } else if (activity.getTarget() == null || activity.getTarget().length != 1 || activity.getTarget()[0].getType().simplify() != ObjectType.ACTOR) {
                     break;
                 }
                 processInvite(activity);
@@ -410,9 +408,7 @@ public class ActivityService implements IActivityService {
             black = challenge.getInvited();
         }
         ChessGame game = gameService.createGame(white, black);
-        Activity create = new Activity();
-        create.setActor(actorService.getInstanceActor());
-        create.setType(ActivityType.CREATE);
+        Activity create = createActivity(actorService.getInstanceActor(), ObjectType.CREATE);
         create.setObject(game.getFederation());
         postActivity(create);
         GameCreationEvent event = new GameCreationEvent(this, game);
@@ -429,6 +425,14 @@ public class ActivityService implements IActivityService {
         } else {
             return ChessPlayer.NONE;
         }
+    }
+
+    @Override
+    public Activity createActivity(Actor actor, ObjectType type) {
+        Activity activity = new Activity();
+        activity.setActor(actor);
+        activity.setFederation(federationService.createFederatedObject(activity.getId(), type));
+        return activity;
     }
     
 }

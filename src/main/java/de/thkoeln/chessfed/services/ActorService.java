@@ -71,7 +71,7 @@ public class ActorService implements IActorService {
         actor.setId(federationService.getBaseUrl() + "/instance");
         actor.setInbox(actor.getId() + "/inbox");
         actor.setOutbox(actor.getId() + "/outbox");
-        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
+        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.APPLICATION));
         actorRepository.save(actor);
         return actor;
     }
@@ -84,7 +84,7 @@ public class ActorService implements IActorService {
         actor.setId(federationService.getBaseUrl() + "/users/" + username);
         actor.setInbox(actor.getId() + "/inbox");
         actor.setOutbox(actor.getId() + "/outbox");
-        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
+        actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.PERSON));
         actorRepository.save(actor);
         LocalUser user = new LocalUser();
         user.setUsername(username);
@@ -116,6 +116,8 @@ public class ActorService implements IActorService {
         try {
             URI uri = URI.create(url);
             Map<String, Object> actorJson = client.get().uri(uri).accept(MediaType.valueOf("application/activity+json")).retrieve().body(Map.class);
+            if (!(actorJson.get("type") instanceof String)) return Optional.empty();
+            ObjectType type = ObjectType.parse((String) actorJson.get("type"));
             Actor actor = new Actor();
             if (actorJson.get("preferredUsername") instanceof String) {
                 actor.setLocalpart((String) actorJson.get("preferredUsername"));
@@ -128,7 +130,7 @@ public class ActorService implements IActorService {
             actor.setId(url);
             if (actorJson.containsKey("inbox")) actor.setInbox((String) actorJson.get("inbox"));
             if (actorJson.containsKey("outbox")) actor.setOutbox((String) actorJson.get("outbox"));
-            actor.setFederation(federationService.createFederatedObject(actor.getId(), ObjectType.ACTOR));
+            actor.setFederation(federationService.createFederatedObject(actor.getId(), type));
             actorRepository.save(actor);
             return Optional.of(actor);
         } catch (Exception e) {

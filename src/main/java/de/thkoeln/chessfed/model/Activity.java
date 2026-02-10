@@ -3,8 +3,6 @@ package de.thkoeln.chessfed.model;
 import java.util.UUID;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -23,8 +21,6 @@ public class Activity {
     private FederatedObject object;
     @ManyToMany
     private FederatedObject[] target;
-    @Enumerated(EnumType.ORDINAL)
-    private ActivityType type;
 
     public UUID getId() {
         return id;
@@ -64,14 +60,6 @@ public class Activity {
 
     public void setTarget(FederatedObject[] target) {
         this.target = target;
-    }
-
-    public ActivityType getType() {
-        return type;
-    }
-
-    public void setType(ActivityType type) {
-        this.type = type;
     }
 
 }
