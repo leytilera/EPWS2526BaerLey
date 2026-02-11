@@ -1,11 +1,15 @@
 package de.thkoeln.chessfed.services;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.exception.InvalidActivityException;
+import de.thkoeln.chessfed.model.Activity;
+import de.thkoeln.chessfed.model.FederatedObject;
 
 public class MappingService {
 
@@ -50,6 +54,26 @@ public class MappingService {
                 .toArray(ActivityPubDto[]::new)
             );
         }
+        return dto;
+    }
+
+    public ActivityPubDto mapToDto(FederatedObject object) {
+        return new ActivityPubDto(object.getId(), object.getType().toString());
+    }
+
+    public ActivityDto mapToDto(Activity activity) {
+        ActivityDto dto = new ActivityDto();
+        dto.setId(activity.getFederation().getId());
+        dto.setType(activity.getFederation().getType().toString());
+        dto.setActor(mapToDto(activity.getActor().getFederation()));
+        Optional.ofNullable(activity.getObject())
+            .map(this::mapToDto)
+            .ifPresent(dto::setObject);
+        Optional.ofNullable(activity.getTarget())
+            .map(Arrays::stream)
+            .map((s) -> s.map(this::mapToDto))
+            .map((s) -> s.toArray(ActivityPubDto[]::new))
+            .ifPresent(dto::setTarget);
         return dto;
     }
 

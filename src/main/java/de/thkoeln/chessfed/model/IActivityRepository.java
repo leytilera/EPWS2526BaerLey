@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.model;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -10,5 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface IActivityRepository extends JpaRepository<Activity, UUID> {
     
     Optional<Activity> getByFederation(FederatedObject object);
+
+    List<Activity> getAllByActor(Actor actor);
 
 }

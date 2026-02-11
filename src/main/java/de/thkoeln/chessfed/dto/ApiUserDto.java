@@ -2,11 +2,12 @@ package de.thkoeln.chessfed.dto;
 
 import java.util.UUID;
 
-public class LocalUserDto {
+public class ApiUserDto {
 
     private UUID id;
     private String username;
     private String actor;
+    private String handle;
 
     public UUID getId() {
         return id;
@@ -30,6 +31,14 @@ public class LocalUserDto {
 
     public void setActor(String actor) {
         this.actor = actor;
+    }
+
+    public String getHandle() {
+        return handle;
+    }
+
+    public void setHandle(String handle) {
+        this.handle = handle;
     }
     
 }

@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActorDto;
+import de.thkoeln.chessfed.dto.CollectionDto;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.services.IActorService;
+import de.thkoeln.chessfed.services.MappingService;
 import de.thkoeln.chessfed.services.IActivityService;
 
 @RestController
@@ -23,6 +26,7 @@ public class ActorController {
 
     private IActorService actorService;
     private IActivityService activityService;
+    private MappingService mappingService = new MappingService();
 
     @Autowired
     public ActorController(IActorService actorService, IActivityService activityService) {
@@ -37,13 +41,17 @@ public class ActorController {
     }
 
     @GetMapping(value = "/users/{id}/outbox", produces = "application/activity+json")
-    public ResponseEntity<Map<String, Object>> getOutbox(@PathVariable String id) {
-        Map<String, Object> res = new HashMap<>();
-        res.put("@context", "https://www.w3.org/ns/activitystreams");
-        res.put("type", "OrderedCollection");
-        res.put("totalItems", 0);
-        res.put("orderedItems", new Object[0]);
-        return ResponseEntity.ok(res);
+    public ResponseEntity<CollectionDto> getOutbox(@PathVariable String id) {
+        Actor actor = actorService.getActorById(id);
+        ActivityDto[] dtos = activityService.getOutbox(actor)
+            .stream()
+            .map(mappingService::mapToDto)
+            .toArray(ActivityDto[]::new);
+        CollectionDto dto = new CollectionDto();
+        dto.setId(actor.getOutbox());
+        dto.setItems(dtos);
+        dto.setTotalItems(dtos.length);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping(value = "/users/{id}/inbox", consumes = {"application/json", "application/activity+json", "application/ld+json"})

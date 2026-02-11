@@ -5,6 +5,8 @@ public class ApiMoveDto {
     private String source;
     private String target;
     private String promote;
+    private Boolean capture;
+    private Boolean castle;
     
     public String getSource() {
         return source;
@@ -28,6 +30,22 @@ public class ApiMoveDto {
 
     public void setPromote(String promote) {
         this.promote = promote;
+    }
+
+    public Boolean getCapture() {
+        return capture;
+    }
+
+    public void setCapture(Boolean capture) {
+        this.capture = capture;
+    }
+
+    public Boolean getCastle() {
+        return castle;
+    }
+
+    public void setCastle(Boolean castle) {
+        this.castle = castle;
     }
 
 }

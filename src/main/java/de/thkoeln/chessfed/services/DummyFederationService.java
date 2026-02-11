@@ -71,4 +71,9 @@ public class DummyFederationService implements IFederationService {
         return objectRepository.findById(url).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @Override
+    public boolean isLocal(FederatedObject object) {
+        return object.getId().startsWith(baseUrl);
+    }
+
 }

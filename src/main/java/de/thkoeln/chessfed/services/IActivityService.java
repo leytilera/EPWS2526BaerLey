@@ -1,5 +1,6 @@
 package de.thkoeln.chessfed.services;
 
+import java.util.List;
 import java.util.Map;
 
 import de.thkoeln.chessfed.model.Activity;
@@ -13,5 +14,7 @@ public interface IActivityService {
     void postActivity(Activity activity);
 
     Activity createActivity(Actor actor, ObjectType type);
+
+    List<Activity> getOutbox(Actor outboxOwner);
 
 }

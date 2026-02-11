@@ -15,5 +15,7 @@ public interface IFederationService {
     FederatedObject createFederatedObject(UUID id, ObjectType type);
 
     FederatedObject getFederatedObject(String url);
+
+    boolean isLocal(FederatedObject object);
     
 }

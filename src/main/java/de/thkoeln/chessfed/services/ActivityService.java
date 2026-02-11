@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestClient;
 import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.ChallengeDto;
+import de.thkoeln.chessfed.dto.CollectionDto;
 import de.thkoeln.chessfed.dto.GameDto;
 import de.thkoeln.chessfed.dto.MoveDto;
 import de.thkoeln.chessfed.events.GameCreationEvent;
@@ -296,7 +298,10 @@ public class ActivityService implements IActivityService {
             GameCreationEvent event = new GameCreationEvent(this, game);
             eventBus.publishEvent(event);
         }
-       System.out.println("game creation: "+ game.getId());
+        final ChessGame g = game;
+        Arrays.stream(new Actor[]{game.getWhitePlayer(), game.getBlackPlayer()})
+            .filter((a) -> federationService.isLocal(a.getFederation()))
+            .forEach((a) -> joinGame(a, g));
     }
 
     private void processInvite(Activity invite) {
@@ -433,6 +438,38 @@ public class ActivityService implements IActivityService {
         activity.setActor(actor);
         activity.setFederation(federationService.createFederatedObject(activity.getId(), type));
         return activity;
+    }
+
+    private void joinGame(Actor user, ChessGame game) {
+        Activity join = createActivity(user, ObjectType.JOIN);
+        join.setObject(game.getFederation());
+        postActivity(join);
+    }
+
+    private void fetchOutbox(Actor outboxOwner) {
+        if (federationService.isLocal(outboxOwner.getFederation())) return;
+        CollectionDto dto = fetchRemote(outboxOwner.getOutbox(), CollectionDto.class);
+        for (ActivityPubDto item : dto.getItems()) {
+            try {
+                Map<String, Object> activity = fetchRemote(item.getId(), Map.class);
+                receiveActivity(null, activity);
+            } catch (Exception e) {
+                continue;
+            }
+        }
+    }
+
+    @Override
+    public List<Activity> getOutbox(Actor outboxOwner) {
+        try {
+            fetchOutbox(outboxOwner);
+        } catch (Exception e) {
+            
+        }
+        return activityRepository.getAllByActor(outboxOwner)
+            .stream()
+            .filter((a) -> a.getFederation().getType() == ObjectType.JOIN)
+            .collect(Collectors.toList());
     }
     
 }
