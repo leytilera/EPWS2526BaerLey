@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -260,29 +261,8 @@ public class ActivityService implements IActivityService {
         try {
             game = gameService.getGame(gme);
         } catch (ResourceNotFoundException e) {
-            GameDto dto = fetchRemote(gme.getId(), GameDto.class);
-            game = new ChessGame();
-            game.setFederation(gme);
-            game.setWhitePlayer(actorService.getActorByUrl(dto.getWhite()));
-            game.setBlackPlayer(actorService.getActorByUrl(dto.getBlack()));
-            game.setHasEnded(dto.isFinished());
-            game.setMoveCounter(dto.getTotalItems());
-            game.setCastleState(new CastleState(
-                dto.getCastleState().isWhiteShort(), 
-                dto.getCastleState().isWhiteLong(),
-                dto.getCastleState().isBlackShort(),
-                dto.getCastleState().isBlackLong()
-            ));
-            byte[] fields = new byte[64];
-            for (int i = 0; i < dto.getBoard().length; i++) {
-                for (int j = 0; j < dto.getBoard()[i].length; j++) {
-                    fields[gameService.getFieldId(i, j)] = gameService.getFieldFlag(ChessPiece.parse(dto.getBoard()[i][j]), ChessPlayer.parse(dto.getBoard()[i][j]));
-                }
-            }
-            game.setFields(fields);
-            if (dto.getEnPassantField() != null) game.setEnPassentField(gameService.getFieldId(dto.getEnPassantField()));
-            game.setCurrentTurn(getPlayerFromActor(dto.isFinished() ? actorService.getActorByUrl(dto.getWinner()) : actorService.getActorByUrl(dto.getCurrentTurn()), game));
-            gameService.createGame(game);
+            game = fetchGame(gme);
+            gameService.addRemoteGame(game);
             GameCreationEvent event = new GameCreationEvent(this, game);
             eventBus.publishEvent(event);
         }
@@ -353,7 +333,6 @@ public class ActivityService implements IActivityService {
             game = gameService.getGame(gme);
         } catch (ResourceNotFoundException e) {
             throw new InvalidActivityException();
-            //TODO: request remote game
         }
         boolean isLocal = federationService.isLocal(game.getFederation());
         try {
@@ -373,7 +352,14 @@ public class ActivityService implements IActivityService {
         try {
             gameService.applyMove(move, false);// !isLocal);
         } catch (InvalidMoveException e) {
-            throw new InvalidActivityException(e);
+            if (isLocal) {
+                throw new InvalidActivityException(e);
+            } else {
+                UUID gameId = game.getId();
+                game = fetchGame(gme);
+                game.setId(gameId);
+                gameService.addRemoteGame(game);
+            }
         }
         MoveEvent event = new MoveEvent(this);
         event.setGame(game);
@@ -385,6 +371,32 @@ public class ActivityService implements IActivityService {
         event.setPlayer(play.getActor());
         event.setOpponent(move.getPlayer() == ChessPlayer.WHITE ? game.getBlackPlayer() : game.getWhitePlayer());
         eventBus.publishEvent(event);
+    }
+
+    private ChessGame fetchGame(FederatedObject gme) {
+        GameDto dto = fetchRemote(gme.getId(), GameDto.class);
+        ChessGame game = new ChessGame();
+        game.setFederation(gme);
+        game.setWhitePlayer(actorService.getActorByUrl(dto.getWhite()));
+        game.setBlackPlayer(actorService.getActorByUrl(dto.getBlack()));
+        game.setHasEnded(dto.isFinished());
+        game.setMoveCounter(dto.getTotalItems());
+        game.setCastleState(new CastleState(
+            dto.getCastleState().isWhiteShort(), 
+            dto.getCastleState().isWhiteLong(),
+            dto.getCastleState().isBlackShort(),
+            dto.getCastleState().isBlackLong()
+        ));
+        byte[] fields = new byte[64];
+        for (int i = 0; i < dto.getBoard().length; i++) {
+            for (int j = 0; j < dto.getBoard()[i].length; j++) {
+                fields[gameService.getFieldId(i, j)] = gameService.getFieldFlag(ChessPiece.parse(dto.getBoard()[i][j]), ChessPlayer.parse(dto.getBoard()[i][j]));
+            }
+        }
+        game.setFields(fields);
+        if (dto.getEnPassantField() != null) game.setEnPassentField(gameService.getFieldId(dto.getEnPassantField()));
+        game.setCurrentTurn(getPlayerFromActor(dto.isFinished() ? actorService.getActorByUrl(dto.getWinner()) : actorService.getActorByUrl(dto.getCurrentTurn()), game));
+        return game;
     }
 
     private void createGameFromChallenge(Challenge challenge) {
