@@ -57,7 +57,6 @@ public enum ObjectType {
 
     public ObjectType simplify() {
         switch (this) {
-            case CHALLENGE:
             case ACCEPT: 
             case CREATE:
             case INVITE: 
