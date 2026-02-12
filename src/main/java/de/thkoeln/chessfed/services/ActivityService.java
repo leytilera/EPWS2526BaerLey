@@ -79,18 +79,14 @@ public class ActivityService implements IActivityService {
         Actor actor = parseActor(dto.getActor());
         activity.setActor(actor);
 
-        Object object = dto.getObject();
-        if (object instanceof String) {
-            //TODO: Remote Request
-        } else if (object instanceof ActivityPubDto) {
-            activity.setObject(parseObject((ActivityPubDto) object));
+        ActivityPubDto object = dto.getObject();
+        if (object != null) {
+            activity.setObject(parseObject(object));
         } 
 
-        Object target = dto.getTarget();
-        if (target instanceof String) {
-            //TODO: Remote Request
-        } else {
-            FederatedObject[] arr = Arrays.stream((ActivityPubDto[]) target)
+        ActivityPubDto[] target = dto.getTarget();
+        if (target != null) {
+            FederatedObject[] arr = Arrays.stream(target)
                 .map(this::parseObject)
                 .toArray(FederatedObject[]::new);
             activity.setTarget(arr);
@@ -101,8 +97,11 @@ public class ActivityService implements IActivityService {
     }
 
     private FederatedObject parseObject(ActivityPubDto ref) {
-        ObjectType refType = ObjectType.parse((String) ref.getType());
-        if (refType == null) throw new InvalidActivityException();
+        ObjectType refType = ObjectType.parse(ref.getType());
+        if (refType == ObjectType.UNKNOWN) {
+            ActivityPubDto dto = fetchRemote(ref.getId(), ActivityPubDto.class);
+            return federationService.createFederatedObject(dto.getId(), ObjectType.parse(dto.getType()));
+        }
         return federationService.createFederatedObject(ref.getId(), refType);
     }
 
@@ -162,6 +161,7 @@ public class ActivityService implements IActivityService {
         }
     }
 
+    @SuppressWarnings({"incomplete-switch", "ALEC"})
     private Set<Actor> getTargetActors(Activity activity) {
         Set<Actor> targets = new HashSet<>();
         Set<String> visited = new HashSet<>();
@@ -225,6 +225,7 @@ public class ActivityService implements IActivityService {
         return targets;
     }
 
+    @SuppressWarnings({"incomplete-switch", "ALEC"})
     private void processActivity(Activity activity) {
         switch (activity.getFederation().getType()) {
             case ACCEPT: {
@@ -295,6 +296,7 @@ public class ActivityService implements IActivityService {
         eventBus.publishEvent(event);
     }
 
+    @SuppressWarnings({"unchecked", "ALEC"})
     private void processAccept(Activity accept) {
         FederatedObject inv = accept.getObject();
         Activity invite;
@@ -446,6 +448,7 @@ public class ActivityService implements IActivityService {
         postActivity(join);
     }
 
+    @SuppressWarnings({"unchecked", "ALEC"})
     private void fetchOutbox(Actor outboxOwner) {
         if (federationService.isLocal(outboxOwner.getFederation())) return;
         CollectionDto dto = fetchRemote(outboxOwner.getOutbox(), CollectionDto.class);
