@@ -1,6 +1,7 @@
 package de.thkoeln.chessfed.services;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,9 +14,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import de.thkoeln.chessfed.dto.ActivityDto;
 import de.thkoeln.chessfed.dto.ActivityPubDto;
@@ -30,6 +34,7 @@ import de.thkoeln.chessfed.exception.InvalidActivityException;
 import de.thkoeln.chessfed.exception.InvalidMoveException;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
+import de.thkoeln.chessfed.model.ActivityError;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.CastleState;
 import de.thkoeln.chessfed.model.Challenge;
@@ -39,6 +44,7 @@ import de.thkoeln.chessfed.model.ChessPiece;
 import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.FederatedObject;
 import de.thkoeln.chessfed.model.IActivityRepository;
+import de.thkoeln.chessfed.model.IActivityErrorRepository;
 import de.thkoeln.chessfed.model.IChallengeRepository;
 import de.thkoeln.chessfed.model.ObjectType;
 
@@ -54,10 +60,11 @@ public class ActivityService implements IActivityService {
     private IChallengeRepository challengeRepository;
     private ApplicationEventPublisher eventBus;
     private IMappingService mappingService;
+    private IActivityErrorRepository resendRepository;
     private RestClient client = RestClient.create();
 
     @Autowired
-    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus, IMappingService mappingService) {
+    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus, IMappingService mappingService, IActivityErrorRepository resendRepository) {
         this.gameService = gameService;
         this.actorService = actorService;
         this.federationService = federationService;
@@ -65,6 +72,7 @@ public class ActivityService implements IActivityService {
         this.challengeRepository = challengeRepository;
         this.eventBus = eventBus;
         this.mappingService = mappingService;
+        this.resendRepository = resendRepository;
     }
 
     @Override
@@ -146,18 +154,38 @@ public class ActivityService implements IActivityService {
         }
         for (Actor actor : targets) {
             if (federationService.isLocal(actor.getFederation())) continue;
-            boolean success = client.post()
-                .uri(actor.getInbox())
-                .contentType(activityType)
-                .body(dto)
-                .retrieve()
-                .toBodilessEntity()
-                .getStatusCode()
-                .is2xxSuccessful();
-            if (!success) {
-                //TODO: handle errors
-                System.out.println("ERROR!");
-            }
+            try {
+                HttpStatusCode status = client.post()
+                    .uri(actor.getInbox())
+                    .contentType(activityType)
+                    .body(dto)
+                    .retrieve()
+                    .toBodilessEntity()
+                    .getStatusCode();
+                if (status.is2xxSuccessful()) {
+                    resendRepository.getOneByActivityAndTarget(activity, actor).ifPresent(resendRepository::delete);
+                } else {
+                    throw new RestClientResponseException(null, status, null, null, null, null);
+                }
+            } catch (RestClientResponseException e) {
+                if (e.getStatusCode() != null && e.getStatusCode().is4xxClientError()) {
+                    e.printStackTrace();
+                    throw new InvalidActivityException(e);
+                }
+                resendRepository.getOneByActivityAndTarget(activity, actor).ifPresentOrElse(
+                    (ae) -> {
+                        ae.setErrorCounter(ae.getErrorCounter() + 1);
+                        resendRepository.save(ae);
+                    }, 
+                    () -> {
+                        ActivityError error = new ActivityError();
+                        error.setActivity(activity);
+                        error.setTarget(actor);
+                        error.setErrorCounter(1);
+                        resendRepository.save(error);
+                    }
+                );  
+            }            
         }
     }
 
@@ -352,7 +380,7 @@ public class ActivityService implements IActivityService {
             move.setPromote(ChessPiece.parse(dto.getPromote()));
         }
         try {
-            gameService.applyMove(move, false);// !isLocal);
+            gameService.applyMove(move, false);
         } catch (InvalidMoveException e) {
             if (isLocal) {
                 throw new InvalidActivityException(e);
@@ -473,6 +501,22 @@ public class ActivityService implements IActivityService {
             .stream()
             .filter((a) -> a.getFederation().getType() == ObjectType.JOIN)
             .collect(Collectors.toList());
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void resendActivities() {
+        for (ActivityError error : resendRepository.findAll()) {
+            if (error.getErrorCounter() >= 5) {
+                resendRepository.delete(error);
+            } else {
+                try {
+                    broadcastActivity(error.getActivity(), Collections.singleton(error.getTarget()));
+                } catch (Exception e) {
+                    error.setErrorCounter(error.getErrorCounter() + 1);
+                    resendRepository.save(error);
+                }
+            }
+        }
     }
     
 }
