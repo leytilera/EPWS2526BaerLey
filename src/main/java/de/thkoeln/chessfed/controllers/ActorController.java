@@ -1,6 +1,5 @@
 package de.thkoeln.chessfed.controllers;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.thkoeln.chessfed.dto.ActivityDto;
+import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.dto.ActorDto;
 import de.thkoeln.chessfed.dto.CollectionDto;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.services.IActorService;
-import de.thkoeln.chessfed.services.MappingService;
+import de.thkoeln.chessfed.services.IMappingService;
 import de.thkoeln.chessfed.services.IActivityService;
 
 @RestController
@@ -26,18 +26,19 @@ public class ActorController {
 
     private IActorService actorService;
     private IActivityService activityService;
-    private MappingService mappingService = new MappingService();
+    private IMappingService mappingService;
 
     @Autowired
-    public ActorController(IActorService actorService, IActivityService activityService) {
+    public ActorController(IActorService actorService, IActivityService activityService, IMappingService mappingService) {
         this.actorService = actorService;
         this.activityService = activityService;
+        this.mappingService = mappingService;
     }
     
     @GetMapping(value = "/users/{id}", produces = "application/activity+json")
     public ResponseEntity<ActorDto> getActor(@PathVariable String id) {
         Actor actor = actorService.getActorById(id);
-        return ResponseEntity.ok(new ActorDto(actor.getId(), "Person", id, id, actor.getInbox(), actor.getOutbox()));
+        return ResponseEntity.ok(mappingService.map(actor, ActorDto.class));
     }
 
     @GetMapping(value = "/users/{id}/outbox", produces = "application/activity+json")
@@ -45,7 +46,7 @@ public class ActorController {
         Actor actor = actorService.getActorById(id);
         ActivityDto[] dtos = activityService.getOutbox(actor)
             .stream()
-            .map(mappingService::mapToDto)
+            .map((a) -> mappingService.map(a, ActivityDto.class))
             .toArray(ActivityDto[]::new);
         CollectionDto dto = new CollectionDto();
         dto.setId(actor.getOutbox());
@@ -64,17 +65,15 @@ public class ActorController {
     @GetMapping(value = "/instance", produces = "application/activity+json")
     public ResponseEntity<ActorDto> getInstanceActor() {
         Actor actor = actorService.getInstanceActor();
-        return ResponseEntity.ok(new ActorDto(actor.getId(), "Person", actor.getLocalpart(), actor.getLocalpart(), actor.getInbox(), actor.getOutbox()));
+        return ResponseEntity.ok(mappingService.map(actor, ActorDto.class));
     }
 
     @GetMapping(value = "/instance/outbox", produces = "application/activity+json")
-    public ResponseEntity<Map<String, Object>> getInstanceOutbox() {
-        Map<String, Object> res = new HashMap<>();
-        res.put("@context", "https://www.w3.org/ns/activitystreams");
-        res.put("type", "OrderedCollection");
-        res.put("totalItems", 0);
-        res.put("orderedItems", new Object[0]);
-        return ResponseEntity.ok(res);
+    public ResponseEntity<CollectionDto> getInstanceOutbox() {
+        CollectionDto dto = new CollectionDto();
+        dto.setTotalItems(0);
+        dto.setItems(new ActivityPubDto[0]);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping(value = "/instance/inbox", consumes = {"application/json", "application/activity+json", "application/ld+json"})

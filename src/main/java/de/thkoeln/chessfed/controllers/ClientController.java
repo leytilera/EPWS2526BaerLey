@@ -21,18 +21,16 @@ import de.thkoeln.chessfed.dto.ApiGameDto;
 import de.thkoeln.chessfed.dto.ApiInviteDto;
 import de.thkoeln.chessfed.dto.ApiMoveDto;
 import de.thkoeln.chessfed.dto.ApiUserDto;
-import de.thkoeln.chessfed.dto.CastleStateDto;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.Challenge;
 import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessMove;
-import de.thkoeln.chessfed.model.ChessPiece;
-import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.IChallengeRepository;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.IChessGameService;
+import de.thkoeln.chessfed.services.IMappingService;
 import de.thkoeln.chessfed.services.IUserInteractionService;
 
 @RestController
@@ -42,13 +40,15 @@ public class ClientController {
     private IChessGameService gameService;
     private IChallengeRepository challengeRepository;
     private IActorService actorService;
+    private IMappingService mappingService;
     
     @Autowired
-    public ClientController(IUserInteractionService interactionService, IChessGameService gameService, IChallengeRepository challengeRepository, IActorService actorService) {
+    public ClientController(IUserInteractionService interactionService, IChessGameService gameService, IChallengeRepository challengeRepository, IActorService actorService, IMappingService mappingService) {
         this.interactionService = interactionService;
         this.gameService = gameService;
         this.challengeRepository = challengeRepository;
         this.actorService = actorService;
+        this.mappingService = mappingService;
     }
 
     @GetMapping("/api/user")
@@ -93,7 +93,7 @@ public class ClientController {
         }
         return user.map(gameService::getGames)
             .map(List::stream)
-            .map((s) -> s.map(this::mapToDto))
+            .map((s) -> s.map((g) -> mappingService.map(g, ApiGameDto.class)))
             .map((s) -> s.toArray(ApiGameDto[]::new))
             .map(ResponseEntity::ok)
             .orElseThrow(ResourceNotFoundException::new);
@@ -104,7 +104,7 @@ public class ClientController {
         LocalUser usr = interactionService.getUser(principal.getName());
         ApiGameDto[] games = gameService.getGames(usr.getActor()).stream()
             .filter((g) -> !g.isHasEnded())
-            .map(this::mapToDto)
+            .map((g) -> mappingService.map(g, ApiGameDto.class))
             .map((dto) -> {dto.setYourTurn(usr.getActor().getId().equals(dto.getCurrentTurn())); return dto;})
             .toArray(ApiGameDto[]::new);
         return ResponseEntity.ok(games);
@@ -114,7 +114,7 @@ public class ClientController {
     public ResponseEntity<ApiGameDto> getGame(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id) {
         LocalUser usr = interactionService.getUser(principal.getName());
         ChessGame game = gameService.getGame(id);
-        ApiGameDto dto = mapToDto(game);
+        ApiGameDto dto = mappingService.map(game, ApiGameDto.class);
         dto.setYourTurn(usr.getActor().getId().equals(dto.getCurrentTurn()));
         return ResponseEntity.ok(dto);
     }
@@ -125,7 +125,7 @@ public class ClientController {
         ApiMoveDto[] dto = gameService.getMoves(game)
             .stream()
             .sorted(Comparator.comparingInt(ChessMove::getMoveCount))
-            .map(this::mapToDto)
+            .map((m) -> mappingService.map(m, ApiMoveDto.class))
             .toArray(ApiMoveDto[]::new);
         return ResponseEntity.ok(dto);
     }
@@ -140,7 +140,7 @@ public class ClientController {
     public ResponseEntity<ApiChallengeDto[]> getCurrentChallenges(@AuthenticationPrincipal AuthenticatedPrincipal principal) {
         LocalUser usr = interactionService.getUser(principal.getName());
         ApiChallengeDto[] challenges = Arrays.stream(interactionService.getOpenChallenges(usr))
-            .map(this::mapToDto)
+            .map((c) -> mappingService.map(c, ApiChallengeDto.class))
             .toArray(ApiChallengeDto[]::new);
         return ResponseEntity.ok(challenges);
     }
@@ -154,7 +154,7 @@ public class ClientController {
     @GetMapping("/api/challenges/{id}")
     public ResponseEntity<ApiChallengeDto> getChallenge(@AuthenticationPrincipal AuthenticatedPrincipal principal, @PathVariable UUID id) {
         Challenge challenge = challengeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        ApiChallengeDto dto = mapToDto(challenge);
+        ApiChallengeDto dto = mappingService.map(challenge, ApiChallengeDto.class);
         return ResponseEntity.ok(dto);
     }
 
@@ -164,56 +164,6 @@ public class ClientController {
         if (accept) {
             interactionService.acceptInvitation(usr, id);
         }
-    }
-
-    private ApiGameDto mapToDto(ChessGame game) {
-        ApiGameDto dto = new ApiGameDto();
-        dto.setId(game.getId());
-        Actor current = game.getCurrentTurn().get(game.getWhitePlayer(), game.getBlackPlayer());
-        dto.setCurrentTurn(current.getId());
-        dto.setBlack(game.getBlackPlayer().getId());
-        dto.setWhite(game.getWhitePlayer().getId());
-        CastleStateDto castleState = new CastleStateDto();
-        castleState.setWhiteShort(game.getCastleState().isWhiteShort());
-        castleState.setWhiteLong(game.getCastleState().isWhiteLong());
-        castleState.setBlackShort(game.getCastleState().isBlackShort());
-        castleState.setBlackLong(game.getCastleState().isBlackLong());
-        dto.setCastleState(castleState);
-        if (game.getEnPassentField() >= 0) dto.setEnPassantField(gameService.getFieldDescriptor(game.getEnPassentField()));
-        String[][] board = new String[8][8];
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                int field = gameService.getFieldId(i, j);
-                ChessPiece piece = gameService.getPiece(game.getFields()[field]);
-                ChessPlayer player = gameService.getPlayer(game.getFields()[field]);
-                board[i][j] = Optional.ofNullable(piece).map((p) -> p.getAbbrev(player)).orElse(null);
-            }
-        }
-        dto.setBoard(board);
-        return dto;
-    }
-
-    private ApiChallengeDto mapToDto(Challenge challenge) {
-        ApiChallengeDto dto = new ApiChallengeDto();
-        dto.setId(challenge.getId());
-        dto.setWhite(Optional.ofNullable(challenge.getWhite()).map((a) -> a.getFederation().getId()).orElse(null));
-        Actor source = challenge.getInvitation().getActor();
-        dto.setSource(source.getFederation().getId());
-        dto.setSourceHandle(source.getLocalpart() + "@" + source.getDomain());
-        Actor target = challenge.getInvited();
-        dto.setTarget(target.getFederation().getId());
-        dto.setTargetHandle(target.getLocalpart() + "@" + target.getDomain());
-        return dto;
-    }
-
-    private ApiMoveDto mapToDto(ChessMove move) {
-        ApiMoveDto dto = new ApiMoveDto();
-        dto.setSource(gameService.getFieldDescriptor(move.getSourceField()));
-        dto.setTarget(gameService.getFieldDescriptor(move.getTargetField()));
-        Optional.ofNullable(move.getPromote()).map(ChessPiece::getAbbrev).ifPresent(dto::setPromote);
-        dto.setCapture(move.isCapture());
-        dto.setCastle(move.isCastle());
-        return dto;
     }
 
 }

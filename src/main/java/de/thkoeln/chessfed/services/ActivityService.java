@@ -52,50 +52,44 @@ public class ActivityService implements IActivityService {
     private IActivityRepository activityRepository;
     private IChallengeRepository challengeRepository;
     private ApplicationEventPublisher eventBus;
-    private MappingService mappingService = new MappingService();
+    private IMappingService mappingService;
     private RestClient client = RestClient.create();
 
     @Autowired
-    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus) {
+    public ActivityService(IChessGameService gameService, IActorService actorService, IFederationService federationService, IActivityRepository activityRepository, IChallengeRepository challengeRepository, ApplicationEventPublisher eventBus, IMappingService mappingService) {
         this.gameService = gameService;
         this.actorService = actorService;
         this.federationService = federationService;
         this.activityRepository = activityRepository;
         this.challengeRepository = challengeRepository;
         this.eventBus = eventBus;
+        this.mappingService = mappingService;
     }
 
-    @SuppressWarnings({"unchecked", "ALEC"})
     @Override
     public void receiveActivity(Actor inboxOwner, Map<String, Object> activityData) {
-        if (!activityData.containsKey("type") || !(activityData.get("type") instanceof String)) throw new InvalidActivityException();
-        if (!activityData.containsKey("id") || !(activityData.get("id") instanceof String)) throw new InvalidActivityException();
-        ObjectType type = ObjectType.parse((String) activityData.get("type"));
+        ActivityDto dto = mappingService.parse(activityData, ActivityDto.class);
+        ObjectType type = ObjectType.parse(dto.getType());
         if (type == ObjectType.UNKNOWN) return;
-        FederatedObject federatedObject = federationService.createFederatedObject((String) activityData.get("id"), type);
+        FederatedObject federatedObject = federationService.createFederatedObject(dto.getId(), type);
         if (activityRepository.getByFederation(federatedObject).isPresent()) return;
         Activity activity = new Activity();
         activity.setFederation(federatedObject);
-        Actor actor = parseActor(activityData.get("actor"));
+        Actor actor = parseActor(dto.getActor());
         activity.setActor(actor);
 
-        Object object = activityData.get("object");
+        Object object = dto.getObject();
         if (object instanceof String) {
             //TODO: Remote Request
-        } else if (object instanceof Map) {
-            activity.setObject(parseObject((Map<String, Object>) object));
+        } else if (object instanceof ActivityPubDto) {
+            activity.setObject(parseObject((ActivityPubDto) object));
         } 
 
-        Object target = activityData.get("target");
+        Object target = dto.getTarget();
         if (target instanceof String) {
             //TODO: Remote Request
-        } else if (target instanceof Map) {
-            activity.setTarget(new FederatedObject[]{parseObject((Map<String, Object>) target)});
-        } else if (target instanceof List) {
-            FederatedObject[] arr = ((List<Object>) target).stream()
-                .filter((e) -> e instanceof Map)
-                .map((e) -> (Map<String, Object>) e)
-                .filter((e) -> (e.get("type") instanceof String) || (e.get("id") instanceof String))
+        } else {
+            FederatedObject[] arr = Arrays.stream((ActivityPubDto[]) target)
                 .map(this::parseObject)
                 .toArray(FederatedObject[]::new);
             activity.setTarget(arr);
@@ -105,20 +99,14 @@ public class ActivityService implements IActivityService {
         processActivity(activity);
     }
 
-    private FederatedObject parseObject(Map<String, Object> ref) {
-        if (!(ref.get("type") instanceof String) || !(ref.get("id") instanceof String)) throw new InvalidActivityException();
-        ObjectType refType = ObjectType.parse((String) ref.get("type"));
+    private FederatedObject parseObject(ActivityPubDto ref) {
+        ObjectType refType = ObjectType.parse((String) ref.getType());
         if (refType == null) throw new InvalidActivityException();
-        return federationService.createFederatedObject((String) ref.get("id"), refType);
+        return federationService.createFederatedObject(ref.getId(), refType);
     }
 
-    private Actor parseActor(Object actorObject) {
-        if (actorObject instanceof String) {
-            return actorService.getActorByUrl((String) actorObject);
-        } else if (actorObject instanceof Map && ((Map) actorObject).get("id") instanceof String) {
-            return actorService.getActorByUrl((String)((Map) actorObject).get("id"));
-        }
-        throw new InvalidActivityException();
+    private Actor parseActor(ActivityPubDto actorObject) {
+        return actorService.getActorByUrl(actorObject.getId());
     }
 
     private <T> T fetchRemote(String url, Class<T> type) {
@@ -157,7 +145,7 @@ public class ActivityService implements IActivityService {
             dto.setTarget(target);     
         }
         for (Actor actor : targets) {
-            if (actor.getDomain().equals(federationService.getDomain())) continue;
+            if (federationService.isLocal(actor.getFederation())) continue;
             boolean success = client.post()
                 .uri(actor.getInbox())
                 .contentType(activityType)
@@ -334,7 +322,7 @@ public class ActivityService implements IActivityService {
             invite = activityRepository.getByFederation(inv).orElseThrow(ResourceNotFoundException::new);
         } catch (ResourceNotFoundException e) {
             Map<String, Object> json = fetchRemote(inv.getId(), Map.class);
-            ActivityDto dto = mappingService.parseActivity(json);
+            ActivityDto dto = mappingService.parse(json, ActivityDto.class);
             invite = new Activity();
             invite.setFederation(federationService.createFederatedObject(dto.getId(), ObjectType.parse(dto.getType())));
             invite.setActor(actorService.getActorByUrl(dto.getActor().getId()));
@@ -352,7 +340,7 @@ public class ActivityService implements IActivityService {
         Challenge challenge = challengeRepository.getByFederation(invite.getObject()).orElseThrow(ResourceNotFoundException::new);
         challenge.setAccepted(true);
         challengeRepository.save(challenge);
-        if (challenge.getFederation().getId().startsWith(federationService.getBaseUrl())) {
+        if (federationService.isLocal(challenge.getFederation())) {
             createGameFromChallenge(challenge);
         }
     }
@@ -367,7 +355,7 @@ public class ActivityService implements IActivityService {
             throw new InvalidActivityException();
             //TODO: request remote game
         }
-        boolean isLocal = game.getFederation().getId().startsWith(federationService.getBaseUrl());
+        boolean isLocal = federationService.isLocal(game.getFederation());
         try {
             gameService.getMove(mv);
             return; // Move already processed

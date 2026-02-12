@@ -8,39 +8,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import de.thkoeln.chessfed.dto.ActivityDto;
-import de.thkoeln.chessfed.dto.ActivityPubDto;
 import de.thkoeln.chessfed.exception.ResourceNotFoundException;
 import de.thkoeln.chessfed.model.Activity;
 import de.thkoeln.chessfed.model.IActivityRepository;
+import de.thkoeln.chessfed.services.IMappingService;
 
 @RestController
 public class ActivityController {
  
     private IActivityRepository activityRepository;
+    private IMappingService mappingService;
 
-    public ActivityController(IActivityRepository activityRepository) {
+    public ActivityController(IActivityRepository activityRepository, IMappingService mappingService) {
         this.activityRepository = activityRepository;
+        this.mappingService = mappingService;
     }
 
     @GetMapping("/activities/{id}")
     public ResponseEntity<ActivityDto> getActivity(@PathVariable UUID id) {
         Activity activity = activityRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        ActivityDto dto = new ActivityDto();
-        dto.setId(activity.getFederation().getId());
-        dto.setType(activity.getFederation().getType().toString());
-        if (activity.getActor() != null) {
-            dto.setActor(new ActivityPubDto(activity.getActor().getId(), "Person"));
-        }
-        if (activity.getObject() != null) {
-            dto.setObject(new ActivityPubDto(activity.getObject().getId(), activity.getObject().getType().toString()));
-        }
-        if (activity.getTarget() != null) {
-            ActivityPubDto[] target = new ActivityPubDto[activity.getTarget().length];
-            for (int i = 0; i < target.length; i++) {
-                target[i] = new ActivityPubDto(activity.getTarget()[i].getId(), activity.getTarget()[i].getType().toString());
-            }
-            dto.setTarget(target);
-        }
+        ActivityDto dto = mappingService.map(activity, ActivityDto.class);
         return ResponseEntity.ok(dto);
     }
 
