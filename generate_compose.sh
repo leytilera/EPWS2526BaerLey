@@ -21,10 +21,10 @@ generate_app_service() {
       - OIDC_SECRET=${OIDC_SECRET}
       - USERNAME_ATTRIBUTE=${OIDC_ATTRIBUTE}
 EOF
-  if [ "$1" = false ]; then
+  if [ "$use_caddy" = false ]; then
     cat <<EOF >> docker-compose.yaml
     ports:
-      - "8080:8080"
+      - "${APP_PORT}:8080"
 EOF
   fi
 }
@@ -53,10 +53,10 @@ generate_dex_service() {
     volumes:
       - dex:/var/dex/
 EOF
-  if [ "$1" = false ]; then
+  if [ "$use_caddy" = false ]; then
     cat <<EOF >> docker-compose.yaml
     ports:
-      - "5556:5556"
+      - "${DEX_PORT}:5556"
 EOF
   fi
 }
@@ -172,6 +172,16 @@ ask_user() {
     * ) use_caddy=true;;
   esac
 
+  if [ "$use_caddy" = false ]; then
+    read -p "Enter port for the backend [0-65535]: " APP_PORT
+    if [ "$use_dex" = true ]; then
+      read -p "Enter port for Dex [0-65535]: " DEX_PORT
+      echo "Please configure your reverse proxy to pass requests to https://${APP_DOMAIN}/* to port ${APP_PORT} and to https://${APP_DOMAIN}/dex/* to port ${DEX_PORT}"
+    else
+      echo "Please configure your reverse proxy to pass requests to https://${APP_DOMAIN}/* to port ${APP_PORT}."
+    fi
+  fi
+
 }
 
 generate_dex_config() {
@@ -189,6 +199,7 @@ frontend:
   issuer: "Chessfed Login"
 oauth2:
   skipApprovalScreen: true
+enablePasswordDB: true
 staticClients:
 - id: ${OIDC_ID}
   name: 'Chessfed'
@@ -204,10 +215,15 @@ ${APP_DOMAIN} {
     handle_path /dex/* {
         reverse_proxy http://dex:5556
     }
-
+EOF
+  if [ "$use_dex" = true ]; then
+    cat <<EOF >> deployment/Caddyfile
     handle {
         reverse_proxy http://app:8080
     }
+EOF
+  fi
+  cat <<EOF >> deployment/Caddyfile
 }
 EOF
 }
@@ -222,14 +238,14 @@ EOF
 
 ask_user
 generate_dotenv
-generate_app_service $use_caddy
+generate_app_service
 
 if [ "$use_db" = true ]; then
   generate_db_service
 fi
 
 if [ "$use_dex" = true ]; then
-  generate_dex_service $use_caddy
+  generate_dex_service
   generate_dex_config
 fi
 
@@ -240,3 +256,5 @@ fi
 
 generate_configs $use_dex $use_caddy
 generate_volumes $use_db $use_dex $use_caddy
+
+echo "Compose file generated. Use 'docker compose up' to start."
