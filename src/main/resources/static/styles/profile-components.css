@@ -1,0 +1,233 @@
+/* PROFILE CARD COMPONENTS
+#####################################################################*/
+
+/* header */
+.profile {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  padding: var(--space-6);
+}
+
+.profile-card {
+  background: var(--panel);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+}
+
+.profile-card__header {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.profile-card__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.profile-card__subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* body */
+.profile-card__body {
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  padding: var(--space-5);
+
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-5);
+}
+
+/* avatar */
+.profile-avatar {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.profile-informations-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* username */
+.profile-username {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* handle */
+.profile-handle-container {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.profile-handle {
+  font-size: 16px;
+}
+
+/* bio */
+.profile-bio {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 64ch;
+}
+
+/* meta-informations (joined, played games, ...) */
+.profile-meta {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.profile-meta__item {
+  display: grid;
+  gap: 2px;
+}
+
+.profile-meta__item-label {
+  font-size: 11px;
+  color: rgba(159, 177, 195, 0.7);
+}
+
+.profile-meta__item-value {
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* button */
+.profile-edit {
+  width: fit-content;
+  align-self: flex-end;
+  margin-top: auto;
+}
+
+/* PROFILE CARD GAME HISTORY COMPONENTS
+#####################################################################*/
+
+.profile-game-history {
+  background: var(--panel);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-5);
+}
+
+.profile-game-history__list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* EDIT PROFILE COMPONENTS
+#####################################################################*/
+
+.edit-profile-avatar {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+}
+
+.avatar-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+}
+
+/* overlay avatar icon button */
+.avatar-edit-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+
+  border: 1px solid var(--border-2);
+  background: var(--header);
+  color: var(--text);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+}
+
+.avatar-edit-btn:hover {
+  filter: brightness(1.08);
+}
+
+.edit-form {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.field__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.field__input .field__textarea {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border-3);
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 12px;
+  outline: none;
+}
+
+.field__input:focus,
+.field__textarea:focus {
+  border-color: rgba(159, 177, 195, 0.8);
+}
+
+.field__input[readonly] {
+  color: rgba(230, 237, 246, 0.85);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.field__help {
+  margin: 0;
+  font-size: 11px;
+  color: rgba(159, 177, 195, 0.75);
+}
+
+.edit-form__buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}

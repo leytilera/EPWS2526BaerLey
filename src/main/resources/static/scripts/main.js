@@ -9,6 +9,31 @@ const state = {
     send: null
 };
 
+function setupInvitationEvents() {
+  const list = document.querySelector("[data-js-invitations]");
+  if (!list) return;
+
+  list.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-action]");
+    if (!btn) return;
+
+    const card = btn.closest("[data-js-challenge]");
+    if (!card) return;
+
+    const id = card.dataset.jsChallenge;
+    const action = btn.dataset.action;
+
+    if (action === "accept") {
+      acceptInvite(id);
+      card.remove();
+    }
+
+    if (action === "delete") {
+      card.remove();
+    }
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     state.gameid = window.location.hash.substring(1);
     let button = document.querySelector("[data-js-invite]");
@@ -49,6 +74,7 @@ async function onMessage(msg) {
 async function main() {
     state.user = await API.getUserData().username;
     state.send = await initWebsocket(onMessage);
+    setupInvitationEvents();
     let games = await API.getGames();
     games.forEach(game => {
         addGameToList(game.id);
@@ -101,18 +127,55 @@ async function addGameToList(gameId) {
 }
 
 async function addInvitation(id, challenge) {
-    let element = document.querySelector("[data-js-invitations]");
+    const list = document.querySelector("[data-js-invitations]");
+    if (!list) return;
+
+    if (list.querySelector(`[data-js-challenge="${id}"]`)) return;
+
     let white = "Random";
     if (challenge.white) {
         white = challenge.white === challenge.source ? challenge.sourceHandle : "You";
     }
-    let entry = `<li data-js-challenge="${id}">Invitation from ${challenge.sourceHandle}. White Player: ${white}</li>`;
-    element.innerHTML += entry;
-    let invite = element.querySelector(`[data-js-challenge="${id}"]`);
-    invite.addEventListener("click", () => {
-        acceptInvite(id);
-        element.removeChild(invite);
-    });
+
+    const li = document.createElement("li");
+    li.className = "invitation-card";
+    li.dataset.jsChallenge = id;
+
+    const avatar = document.createElement("div");
+    avatar.className = "invitation-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+
+    const body = document.createElement("div");
+    body.className = "invitation-body";
+
+    const title = document.createElement("div");
+    title.className = "invitation-title";
+    title.textContent = `${challenge.sourceHandle} invited you to play`;
+
+    const meta = document.createElement("div");
+    meta.className = "invitation-meta";
+    meta.textContent = `White Player: ${white}`;
+
+    const actions = document.createElement("div");
+    actions.className = "invitation-actions";
+
+    const acceptBtn = document.createElement("button");
+    acceptBtn.className = "btn";
+    acceptBtn.type = "button";
+    acceptBtn.dataset.action = "accept";
+    acceptBtn.textContent = "Start Game";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn--ghost";
+    deleteBtn.type = "button";
+    deleteBtn.dataset.action = "delete";
+    deleteBtn.textContent = "Delete";
+
+    actions.append(acceptBtn, deleteBtn);
+    body.append(title, meta, actions);
+    li.append(avatar, body);
+    list.prepend(li);
+
 }
 
 async function acceptInvite(challengeId) {

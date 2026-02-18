@@ -15,6 +15,7 @@ public class LocalUser {
     @OneToOne
     private Actor actor;
     private String external;
+    private String bio;
     
     public LocalUser() {
         this.id = UUID.randomUUID();
@@ -52,4 +53,11 @@ public class LocalUser {
         this.external = external;
     }
     
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 }

@@ -13,13 +13,13 @@ html, body {
 body {
     margin: 0;
     font-family: var(--sans);
-    background: var(--bg);
+    background: var(--background);
     color: var(--text);
 }
 
 /* ---------- Responsive fallback ---------- */
 @media (max-width: 1200px) {
-  :root { --sideWidth: 320px; --navWidth: 200px; --boardSize: 520px; }
+  :root { --right-panel-width:: 320px; --left-panel-width: 200px; --boardSize: 520px; }
 }
 
 @media (max-width: 980px) {

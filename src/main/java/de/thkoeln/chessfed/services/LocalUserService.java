@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import de.thkoeln.chessfed.model.ILocalUserRepository;
 import de.thkoeln.chessfed.model.LocalUser;
+import de.thkoeln.chessfed.model.Actor;
+
 
 @Service
 public class LocalUserService extends OidcUserService {
@@ -39,5 +41,20 @@ public class LocalUserService extends OidcUserService {
         userRepository.save(user);
         return new DefaultOidcUser(Collections.emptySet(), oidcUser.getIdToken(), oidcUser.getUserInfo());
     }
-    
+
+    public LocalUser getLocalUser(OidcUser oidcUser) {
+        String external = oidcUser.getSubject();
+        String username = Optional.ofNullable(oidcUser.getPreferredUsername()).orElse(external);
+
+        return userRepository.getByExternalOrUsername(external, username)
+            .orElseThrow(() -> new IllegalStateException("LocalUser not found for logged-in OIDC user"));
+    }
+
+    public LocalUser saveLocalUser(LocalUser user) {
+        return userRepository.save(user);
+    }
+
+    public Optional<LocalUser> getLocalUserByActor(Actor actor) {
+        return userRepository.getByActor(actor);
+    }
 }

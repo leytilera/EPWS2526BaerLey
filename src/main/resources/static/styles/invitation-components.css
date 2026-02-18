@@ -1,0 +1,108 @@
+/* INVITATIONS COMPONENTS
+#####################################################################*/
+
+.invitations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Invitation Card */
+.invitation-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--space-3);
+}
+
+/* Avatar (Placeholder) */
+.invitation-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: #1b2635;
+  /* replace with real profile pic of user later, if it exists */
+  border: 1px solid var(--border-2);
+}
+
+.invitation-body {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.invitation-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.invitation-meta {
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Actions */
+.invitation-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* SEND INVITATION COMPONENTS
+#####################################################################*/
+
+.invite {
+  border-top: 1px solid var(--border-2);
+  padding-top: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.invite__form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.invite__input {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border-2);
+  background: var(--panel-2);
+  color: var(--text);
+  padding: 0 var(--space-4);
+  outline: none;
+}
+
+.invite__input::placeholder {
+  color: rgba(159, 177, 195, 0.7);
+}
+
+.invite__input:focus {
+  border-color: rgba(159, 177, 195, 0.9);
+}
+
+.invite__btn {
+  width: fit-content;
+  border-radius: 10px;
+}
+
+.invite__status {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  min-height: 16px;
+}

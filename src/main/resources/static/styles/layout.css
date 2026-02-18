@@ -1,70 +1,162 @@
-/* LAYOUT FOR CHESSBOARD PAGE 
+/* BASE LAYOUTs FOR CHESSBOARD PAGE 
 #################################################################*/
 
 /* Three column base layout */
 .app-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: var(--navWidth) 1fr var(--sideWidth);
-  gap: var(--gap);
-  padding: var(--gap);
+  grid-template-columns: var(--left-panel-width) minmax(0, 1fr) var(--right-panel-width);
+  gap: var(--space-5);
 }
 
-/* Left column, eventually for navigation later */
-.left-column {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+/* Two column base layout */
+.app-shell--two-columns {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: var(--left-panel-width) minmax(0, 1fr);
+}
+
+/* LEFT SIDE PANEL 
+#################################################################*/
+
+.left-side-panel {
+  width: var(--left-panel-width);
   background: var(--panel-2);
   box-shadow: var(--shadow);
-  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
+
+.left-side-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 /* Chessfed logo */
-.left-column__brand {
+.logo {
+  font-family: var(--sans);
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: 0.4px;
-  font-size: 18px;
+  color: var(--text);
+  padding-top: var(--space-4);
+  padding-left: var(--space-5);
+
 }
 
-/* Center stage */
-.stage {
+/* Navigation Bar */
+.nav-bar {
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-/* Board card */
-.board-card {
-  width: calc(var(--boardSize) + 32px);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
+  padding-left: var(--space-5);
   background: var(--panel);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.player-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  background: var(--header);
+  /*border-top: 1px solid var(--border);*/
   border-bottom: 1px solid var(--border);
 }
 
-.player-row--bottom {
-  border-top: 1px solid var(--border);
-  border-bottom: none;
+.nav-bar__item {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--panel-2);
+  color: var(--muted);
+
+  text-decoration: none;
 }
 
-/* Right side panels */
+.nav-bar__item:hover {
+  color: var(--text);
+  filter: brightness(1.08);
+}
+
+.nav-bar__item.is-active,
+.nav-bar__item[aria-current="page"] {
+  color: var(--text);
+  background: var(--header);
+}
+
+.side-nav__item i {
+  font-size: 18px;
+  line-height: 1;
+}
+
+/* Content of Left Side Panel */
+.left-side-panel__content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-left: var(--space-5);
+  padding-right: var(--space-5);
+}
+
+.left-side-panel__section-header {
+  background: var(--panel-2);
+}
+
+.left-side-panel__section-title {
+  font-size: var(--size-xxl);
+  font-weight: 800;
+}
+
+.left-panel__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+}
+
+/* CENTER 
+#################################################################*/
+
+.center {
+  overflow: hidden;
+  min-width: 0;
+  padding: var(--space-2);
+}
+
+/* Board */
+.board-layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: var(--space-4);
+  align-items: center;
+}
+
+.player-row {
+  width: var(--boardSize);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* RIGHT SIDE PANEL
+#################################################################*/
+
 .right-column {
   display: flex;
   flex-direction: column;
   gap: var(--gap);
+  padding: var(--space-5);
+  padding-left: 0;
 }
 
 .panel {
-  border: 1px solid var(--border);
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /*border: 1px solid var(--border);*/
   border-radius: var(--radius);
   background: var(--panel);
   box-shadow: var(--shadow);
@@ -74,7 +166,9 @@
 .panel__header {
   background: var(--header);
   border-bottom: 1px solid var(--border);
-  padding: 10px 12px;
+  padding-top: var(--space-4);
+  padding-left: var(--space-5);
+  padding-bottom: var(--space-4);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -83,7 +177,7 @@
 
 .panel__title {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--size-xl);
   font-weight: 800;
   letter-spacing: 0.2px;
 }
@@ -94,7 +188,7 @@
   border: 1px solid var(--border);
   border-radius: 999px;
   color: var(--muted);
-  background: rgba(255,255,255,0.03);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .panel__body {
@@ -102,6 +196,8 @@
 }
 
 .panel__body--scroll {
-  max-height: 520px;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow: auto;
+  max-height: none;
 }

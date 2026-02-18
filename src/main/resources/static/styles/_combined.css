@@ -8,4 +8,6 @@
 
 /* Layout and component styles */
 @import url('./layout.css');
-@import url('./componentsNew.css');
+@import url('./base-components.css');
+@import url('./invitation-components.css');
+@import url('./profile-components.css');

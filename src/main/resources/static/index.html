@@ -3,29 +3,104 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Jocly</title>
+    <title>ChessFed</title>
     <link rel="stylesheet" href="./styles/_combined.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="./jocly/jocly.js"></script>
     <script type="module" src="./scripts/main.js"></script>
+    <script type="module" src="./scripts/navigation.js"></script>
 </head>
 
 <body>
     <div class="app-shell">
-        <!-- left column (for navigation or anything else we might need, rn just for Chessfed logo) -->
-        <aside class="left-column">
-            <div class="left-column__brand">Chessfed</div>
-            <ul data-js-gamelist></ul>
+        <!-- left column (for navigation, notifications, invitations & settings) -->
+        <aside class="left-side-panel">
+            <header class="left-side-panel__header">
+                <!-- ChessFed logo -->
+                <div class="logo">ChessFed</div>
+
+                <!-- navigation bar -->
+                <nav class="nav-bar" aria-label="Sidebar Navigation">
+                    <!-- Send Invitations -->
+                    <button class="nav-bar__item is-active" type="button" data-view="invite" aria-label="Send Invitations">
+                        <i class="bi bi-people"></i>
+                    </button>
+
+                    <!-- Notifications -->
+                    <button class="nav-bar__item is-active" type="button" data-view="invitations" aria-current="page" aria-label="Received Invitations">
+                        <i class="bi bi-bell"></i>
+                    </button>
+
+                    <!-- Settings -->
+                    <button class="nav-bar__item is-active" type="button" data-view="settings" aria-label="Settings">
+                        <i class="bi bi-gear"></i>
+                    </button>
+
+                    <!-- Game List? -->
+                    <button class="nav-bar__item is-active" type="button" data-view="game-list" aria-label="Game List">
+                        <i class="bi bi-list"></i>
+                    </button>
+
+                    <!-- Profile -->
+                     <a class="nav-bar__item" href="/profile" aria-label="Profile">
+                        <i class="bi bi-person"></i>
+                     </a>
+                </nav>
+            </header>
+
+            <!-- content of left side panel, changes depending on which menu item has been selected-->
+            <div class="left-side-panel__content">
+                <!-- Send Invitations -->
+                <section class="sidebar-view" data-view="invite" hidden>
+                    <div class="left-side-panel__section-header">
+                        <h2 class="left-side-panel__section-title">Invite Friend to play</h2>
+                    </div>
+
+                    <div class="invite__form">
+                        <input class="invite__input" type="text" placeholder="Enter opponent handle or URL" data-js-opponent>
+                        <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
+                    </div>
+
+                    <p class="invite__status" data-js-invite-status></p>
+                </section>
+
+                <!-- Notifications/Invitations -->
+                <section class="sidebar-view" data-view="invitations">
+                    <div class="left-side-panel__section-header">
+                        <h2 class="left-side-panel__section-title">Invitations</h2>
+                    </div>
+
+                    <div class="left-panel__scroll">
+                        <ul class="invitations-list" data-js-invitations>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Settings -->
+                <section class="sidebar-view" data-view="settings" hidden>
+                    <div class="left-side-panel__section-header">
+                        <h2 class="left-side-panel__section-title">Settings</h2>
+                    </div>
+                </section>
+
+                <!-- Game List -->
+                <section class="sidebar-view" data-view="game-list" hidden>
+                    <div class="left-side-panel__section-header">
+                        <h2 class="left-side-panel__section-title">Active Games</h2>
+                    </div>
+                    <ul data-js-gamelist></ul>
+                </section>
+            </div>
         </aside>
 
         <!-- middle column (for chessboard) -->
-        <main class="stage">
-            <section class="board-card">
+        <main class="center">
+            <section class="board-layout">
                 <!-- opponent information -->
-                <div class="player-row player-row--top">
-                    <!-- placeholder for profile pic -->
-                    <div class="avatar" aria-hidden="true"></div>
+                <div class="player-row">
+                    <div class="board-avatar" id="opponentColor" aria-hidden="true"></div>
                     <div class="player-meta">
-                        <div class="player-name" id="opponentName">Opponent (placeholder)</div>
+                        <div class="player-name" id="opponentName">Opponent</div>
                         <div class="player-sub" id="opponentStatus">Waiting…</div>
                     </div>
                 </div>
@@ -35,58 +110,20 @@
                     <div id="board" class="board" data-js-board=""></div>
                 </div>
 
-                <!-- information about current player -->
-                <div class="player-row player-row--bottom">
-                    <div class="avatar" aria-hidden="true"></div>
+                <!-- own information -->
+                <div class="player-row">
+                    <div class="board-avatar" id="ownColor" aria-hidden="true"></div>
                     <div class="player-meta">
-                        <div class="player-name" id="myName">You (placeholder)</div>
-                        <div class="player-sub" id="myStatus">—</div>
+                        <div class="player-name" id="ownName">You</div>
+                        <div class="player-sub" id="ownStatus"></div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- right column (for status, debug & move history)-->
+        <!-- right column (move history)-->
         <aside class="right-column">
-            <!-- status -->
-            <section class="panel">
-                <header class="panel__header">
-                    <h2 class="panel__title">Status</h2>
-                    <div class="badge" id="wsStatus">Disconnected</div>
-                </header>
-
-                <div class="panel__body">
-                    <dl class="kv">
-                        <div class="kv__row">
-                            <dt>Game</dt>
-                            <dd id="uiGameId">—</dd>
-                        </div>
-                        <div class="kv__row">
-                            <dt>Color</dt>
-                            <dd id="uiColor">—</dd>
-                        </div>
-                        <div class="kv__row">
-                            <dt>Turn</dt>
-                            <dd id="uiTurn">—</dd>
-                        </div>
-                        <div class="kv__row">
-                            <dt>Last applied</dt>
-                            <dd id="uiLastIndex">—</dd>
-                        </div>
-                    </dl>
-
-                    <!-- debug stuff -->
-                    <div class="debug">
-                        <label class="debug__label" for="moveInput">Debug Move</label>
-                        <div class="debug__row">
-                            <input id="moveInput" class="input" placeholder="e.g. e2-e4" />
-                            <button class="btn" type="button" onclick="sendMove()">Send</button>
-                        </div>
-                        <p class="hint">For testing only :) Need to remove later!</p>
-                    </div>
-                </div>
-            </section>
-
+            
             <!-- move history -->
             <section class="panel">
                 <header class="panel__header">
@@ -98,28 +135,7 @@
                     <div class="moves" id="movesHistory"></div>
                 </div>
             </section>
-
-            <section class="panel">
-                <header class="panel__header">
-                    <h2 class="panel__title">Invitations</h2>
-                </header>
-
-                <div class="panel__body panel__body--scroll">
-                    <ul data-js-invitations></ul>
-                </div>
-            </section>
-
-            <section class="panel">
-                <header class="panel__header">
-                    <h2 class="panel__title">Invite Player</h2>
-                </header>
-
-                <div class="panel__body">
-                    <input type="text" data-js-opponent/><button data-js-invite>Invite</button>
-                </div>
-            </section>
         </aside>
     </div>
 </body>
-
 </html>
