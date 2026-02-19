@@ -8,7 +8,7 @@ public class ProfileGameViewModel {
     private String blackInstance;
     private String whiteScore;
     private String blackScore;
-    private String gameUrl;
+    private String gameId;
 
     public void setDate(String date) {
         this.date = date;
@@ -66,11 +66,11 @@ public class ProfileGameViewModel {
         return blackScore;
     }
 
-    public void setGameUrl(String gameUrl) {
-        this.gameUrl = gameUrl;
+    public void setGameId(String gameId) {
+        this.gameId = gameId;
     }
 
-    public String getGameUrl() {
-        return gameUrl;
+    public String getGameId() {
+        return gameId;
     }
 }

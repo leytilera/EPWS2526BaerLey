@@ -1,16 +1,16 @@
 <#import "layout.ftlh" as layout>
 
-    <@layout.page title="ChessFed - Play" scripts=[]>
+    <@layout.page title="ChessFed - Replay" scripts=["/scripts/replay-game.js"]>
         <div class="app-shell--nested-two-columns">
             <!-- middle column (for chessboard) -->
             <div class="center">
                 <section class="board-layout">
-                    <!-- black player information -->
+                    <!-- top player information (currently always black) -->
                     <div class="player-row">
                         <div class="board-avatar avatar--is-black" id="top-player-color" aria-hidden="true"></div>
                         <div class="player-meta">
                             <div class="player-name" id="top-player-name">Black player</div>
-                            <div class="player-sub" id="top-player-status">Active</div>
+                            <div class="player-sub" id="top-player-status">Finished</div>
                         </div>
                     </div>
 
@@ -24,7 +24,7 @@
                         <div class="board-avatar avatar--is-white" id="bottom-player-color" aria-hidden="true"></div>
                         <div class="player-meta">
                             <div class="player-name" id="bottom-player-name">White Player</div>
-                            <div class="player-sub" id="bottom-player-status">Active</div>
+                            <div class="player-sub" id="bottom-player-status">Finished</div>
                         </div>
                     </div>
                 </section>
@@ -42,6 +42,13 @@
                     <div class="panel__body panel__body--scroll">
                         <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
                         <div class="moves" id="move-history"></div>
+                    </div>
+
+                    <div class="replay-buttons" data-js-replay-buttons>
+                        <button class="btn" type="button" data-action="first">First</button>
+                        <button class="btn" type="button" data-action="previous">◀</button>
+                        <button class="btn" type="button" data-action="next">▶</button>
+                        <button class="btn" type="button" data-action="last">Last</button>
                     </div>
                 </section>
             </aside>

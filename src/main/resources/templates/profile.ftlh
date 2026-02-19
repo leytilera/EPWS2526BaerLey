@@ -71,7 +71,7 @@
                         </div>
 
                         <#list activeGames as game>
-                            <a class="game-history__row game-history__row-item" href="${game.gameUrl}"
+                            <a class="game-history__row game-history__row-item" href="/play#${game.gameId}"
                                 aria-label="View Game">
                                 <!-- Date -->
                                 <div class="game-history__cell">
@@ -121,7 +121,7 @@
                         </div>
 
                         <#list finishedGames as game>
-                            <a class="game-history__row game-history__row-item" href="${game.gameUrl}"
+                            <a class="game-history__row game-history__row-item" href="/replay#${game.gameId}"
                                 aria-label="View Game">
                                 <!-- Date -->
                                 <div class="game-history__cell">

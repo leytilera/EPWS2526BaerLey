@@ -1,15 +1,18 @@
 package de.thkoeln.chessfed.controllers;
 
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import de.thkoeln.chessfed.dto.EditProfileDto;
 import de.thkoeln.chessfed.dto.ProfileGameViewModel;
@@ -19,9 +22,9 @@ import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IActorService;
-import de.thkoeln.chessfed.services.LocalUserService;
-import de.thkoeln.chessfed.services.IFederationService;
 import de.thkoeln.chessfed.services.IChessGameService;
+import de.thkoeln.chessfed.services.IFederationService;
+import de.thkoeln.chessfed.services.LocalUserService;
 
 @Controller
 public class ProfileController {
@@ -80,7 +83,7 @@ public class ProfileController {
             viewModel.setWhiteScore("--");
             viewModel.setBlackScore("--");
         }
-        viewModel.setGameUrl("/games/" + game.getId());
+        viewModel.setGameId(game.getId().toString());
 
         return viewModel;
     }

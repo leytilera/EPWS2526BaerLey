@@ -124,6 +124,7 @@ async function main() {
         })
     })
 
+    if (window.location.pathname == "/replay") return;
     state.match = await Jocly.createMatch("classic-chess");
 
     let element = document.querySelector("[data-js-board]");

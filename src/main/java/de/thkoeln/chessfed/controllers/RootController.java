@@ -15,4 +15,9 @@ public class RootController {
     public String play() {
         return "play";
     }
+
+    @GetMapping("/replay")
+    public String replay() {
+        return "replay";
+    }
 }

@@ -186,3 +186,10 @@
   border: var(--border-2);
   border-radius: 10px;
 }
+
+.replay-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-1);
+  padding: var(--space-5);
+}
