@@ -96,12 +96,12 @@
         <!-- middle column (for chessboard) -->
         <main class="center">
             <section class="board-layout">
-                <!-- opponent information -->
+                <!-- black player information -->
                 <div class="player-row">
-                    <div class="board-avatar" id="opponentColor" aria-hidden="true"></div>
+                    <div class="board-avatar avatar--is-black" id="top-player-color" aria-hidden="true"></div>
                     <div class="player-meta">
-                        <div class="player-name" id="opponentName">Opponent</div>
-                        <div class="player-sub" id="opponentStatus">Waiting…</div>
+                        <div class="player-name" id="top-player-name">Black player</div>
+                        <div class="player-sub" id="top-player-status">Active</div>
                     </div>
                 </div>
 
@@ -110,12 +110,12 @@
                     <div id="board" class="board" data-js-board=""></div>
                 </div>
 
-                <!-- own information -->
+                <!-- bottom player information (currently always white) -->
                 <div class="player-row">
-                    <div class="board-avatar" id="ownColor" aria-hidden="true"></div>
+                    <div class="board-avatar avatar--is-white" id="bottom-player-color" aria-hidden="true"></div>
                     <div class="player-meta">
-                        <div class="player-name" id="ownName">You</div>
-                        <div class="player-sub" id="ownStatus"></div>
+                        <div class="player-name" id="bottom-player-name">White Player</div>
+                        <div class="player-sub" id="bottom-player-status">Active</div>
                     </div>
                 </div>
             </section>
@@ -132,7 +132,7 @@
 
                 <div class="panel__body panel__body--scroll">
                     <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
-                    <div class="moves" id="movesHistory"></div>
+                    <div class="moves" id="move-history"></div>
                 </div>
             </section>
         </aside>

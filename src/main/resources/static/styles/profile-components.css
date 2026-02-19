@@ -128,17 +128,68 @@
 /* PROFILE CARD GAME HISTORY COMPONENTS
 #####################################################################*/
 
-.profile-game-history {
+.game-history-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
   background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
   border: 1px solid var(--border-2);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: var(--space-5);
 }
 
-.profile-game-history__list {
+.game-history-card__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.game-history__header {
   display: grid;
+  gap: var(--space-2);
+}
+
+.game-history__table {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.game-history__row {
+  display: grid;
+  grid-template-columns: 120px 1.6fr 90px 1.2fr;
   gap: var(--space-4);
+  text-decoration: none;
+}
+
+.game-history__row-header {
+  opacity: 0.8;
+}
+
+.game-history__row-item {
+  background: var(--panel-2);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  padding: var(--space-2);
+}
+
+.game-history__cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.game-history__avatar {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  display: inline-block;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-2);
 }
 
 /* EDIT PROFILE COMPONENTS

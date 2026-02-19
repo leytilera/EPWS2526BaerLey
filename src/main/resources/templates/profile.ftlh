@@ -110,22 +110,23 @@
                 <div class="profile-card__body">
 
                     <!-- Avatar (placeholder image)-->
-                    <img class="profile-avatar" src="/assets/piotr-makowski-EuAtvK05fqE-unsplash.jpg" alt="Profile avatar" width="72"
-                        height="72" loading="lazy" />
+                    <img class="profile-avatar" src="/assets/piotr-makowski-EuAtvK05fqE-unsplash.jpg"
+                        alt="Profile avatar" width="72" height="72" loading="lazy" />
 
                     <div class="profile-informations-layout">
                         <div class="profile-username">${profile.username}</div>
 
                         <div class="profile-handle-container">
                             <span class="profile-handle" id="profile-handle">${profile.handle}</span>
-                            <button class="btn btn--icon" type="button" aria-label="Copy handle to clipboard" data-js-copy-handle>
+                            <button class="btn btn--icon" type="button" aria-label="Copy handle to clipboard"
+                                data-js-copy-handle>
                                 <i class="bi bi-clipboard"></i>
                             </button>
                         </div>
                         <#if profile.ownProfile>
                             <p class="field__help">Share this with others so they can invite you.</p>
-                        <#else>
-                            <p class="field_help">Use this handle to invite this player.</p>
+                            <#else>
+                                <p class="field__help">Use this handle to invite this player.</p>
                         </#if>
 
                         <#if profile.bio??>
@@ -148,6 +149,110 @@
                         <a class="btn profile-edit" href="/profile/edit">Edit Profile</a>
                     </#if>
                 </div>
+            </section>
+
+            <section class="game-history-card">
+                <header class="game-history-card__header">
+                    <h1 class="game-history-card__title">Active Games</h1>
+                </header>
+
+                <#if activeGames?has_content>
+                    <div class="game-history__table">
+                        <div class="game-history__row game-history__row-header">
+                            <div class="game-history__cell">Date</div>
+                            <div class="game-history__cell">Players</div>
+                            <div class="game-history__cell">Result</div>
+                            <div class="game-history__cell">Instances</div>
+                        </div>
+
+                        <#list activeGames as game>
+                            <a class="game-history__row game-history__row-item" href="${game.gameUrl}"
+                                aria-label="View Game">
+                                <!-- Date -->
+                                <div class="game-history__cell">
+                                    <span class="game-history__date">${game.date}</span>
+                                </div>
+                                <!-- Players -->
+                                <div class="game-history__cell">
+                                    <div>
+                                        <span class="game-history__avatar avatar--is-white" aria-hidden="true"></span>
+                                        <span class="game-history__player-name">${game.whiteName}</span>
+                                    </div>
+                                    <div>
+                                        <span class="game-history__avatar avatar--is-black" aria-hidden="true"></span>
+                                        <span class="game-history__player-name">${game.blackName}</span>
+                                    </div>
+                                </div>
+                                <!-- Result -->
+                                <div class="game-history__cell">
+                                    <div class="game-history__result">${game.whiteScore}</div>
+                                    <div class="game-history__result">${game.whiteScore}</div>
+                                </div>
+                                <!-- Instances -->
+                                <div class="game-history__cell">
+                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                </div>
+                            </a>
+                    </div>
+                    </#list>
+                    <#else>
+                        <div class="game-history--empty">
+                            No active games.
+                        </div>
+                </#if>
+            </section>
+
+            <section class="game-history-card">
+                <header class="game-history-card__header">
+                    <h1 class="game-history-card__title">Finished Games</h1>
+                </header>
+
+                <#if finishedGames?has_content>
+                    <div class="game-history__table">
+                        <div class="game-history__row game-history__row-header">
+                            <div class="game-history__cell">Date</div>
+                            <div class="game-history__cell">Players</div>
+                            <div class="game-history__cell">Result</div>
+                            <div class="game-history__cell">Instances</div>
+                        </div>
+
+                        <#list finishedGames as game>
+                            <a class="game-history__row game-history__row-item" href="${game.gameUrl}"
+                                aria-label="View Game">
+                                <!-- Date -->
+                                <div class="game-history__cell">
+                                    <span class="game-history__date">${game.date}</span>
+                                </div>
+                                <!-- Players -->
+                                <div class="game-history__cell">
+                                    <div>
+                                        <span class="game-history__avatar avatar--is-white" aria-hidden="true"></span>
+                                        <span class="game-history__player-name">${game.whiteName}</span>
+                                    </div>
+                                    <div>
+                                        <span class="game-history__avatar avatar--is-black" aria-hidden="true"></span>
+                                        <span class="game-history__player-name">${game.blackName}</span>
+                                    </div>
+                                </div>
+                                <!-- Result -->
+                                <div class="game-history__cell">
+                                    <div class="game-history__result">${game.whiteScore}</div>
+                                    <div class="game-history__result">${game.whiteScore}</div>
+                                </div>
+                                <!-- Instances -->
+                                <div class="game-history__cell">
+                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                </div>
+                            </a>
+                    </div>
+                    </#list>
+                    <#else>
+                        <div class="game-history--empty">
+                            No finished games yet.
+                        </div>
+                </#if>
             </section>
         </main>
     </div>

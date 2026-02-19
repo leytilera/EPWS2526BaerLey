@@ -9,29 +9,66 @@ const state = {
     send: null
 };
 
+/* Helpers */
+
+function getLocalpartFromHandle(handle) {
+    if (!handle) return "unknown";
+    let string = String(handle);
+
+    if (string.startsWith("acct:")) string = string.slice(5)
+
+    try {
+        const url = new URL(string);
+        const last = url.pathname.split("/").filter(Boolean).pop();
+        return last || url.host || "Unknown";
+    } catch (_) { }
+
+    const at = string.indexOf("@");
+    if (at > 0) return string.slice(0, at);
+
+    return string;
+}
+
+function formatRawMoveToHistoryItem(rawMove) {
+    if (!rawMove) return;
+
+    if (rawMove.castle) {
+        return "O-O";
+    }
+    const seperator = rawMove.capture ? "x" : "-";
+    let moveItem = `${rawMove.source}${seperator}${rawMove.target}`;
+    if (rawMove.promote) {
+        moveItem += `=${rawMove.promote}`;
+    }
+
+    return moveItem;
+}
+
+/* Main functions */
+
 function setupInvitationEvents() {
-  const list = document.querySelector("[data-js-invitations]");
-  if (!list) return;
+    const list = document.querySelector("[data-js-invitations]");
+    if (!list) return;
 
-  list.addEventListener("click", (e) => {
-    const btn = e.target.closest("button[data-action]");
-    if (!btn) return;
+    list.addEventListener("click", (e) => {
+        const btn = e.target.closest("button[data-action]");
+        if (!btn) return;
 
-    const card = btn.closest("[data-js-challenge]");
-    if (!card) return;
+        const card = btn.closest("[data-js-challenge]");
+        if (!card) return;
 
-    const id = card.dataset.jsChallenge;
-    const action = btn.dataset.action;
+        const id = card.dataset.jsChallenge;
+        const action = btn.dataset.action;
 
-    if (action === "accept") {
-      acceptInvite(id);
-      card.remove();
-    }
+        if (action === "accept") {
+            acceptInvite(id);
+            card.remove();
+        }
 
-    if (action === "delete") {
-      card.remove();
-    }
-  });
+        if (action === "delete") {
+            card.remove();
+        }
+    });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -63,6 +100,8 @@ async function onMessage(msg) {
         let moveStr = objToJocly(msg.data);
         let move = await state.match.pickMove(moveStr);
         await state.match.playMove(move);
+        const moves = await API.getMoves(state.gameid);
+        renderMoveHistory(moves);
         requestUserInput(state.send);
     } else if (msg.type == 0) {
         addGameToList(msg.context);
@@ -86,13 +125,13 @@ async function main() {
     })
 
     state.match = await Jocly.createMatch("classic-chess");
-    
+
     let element = document.querySelector("[data-js-board]");
     await state.match.attachElement(element);
-    await state.match.setViewOptions({skin: "skin2dfull"});
+    await state.match.setViewOptions({ skin: "skin2dfull" });
 
     await loadGame();
-    
+
 }
 
 async function requestUserInput(send) {
@@ -105,12 +144,17 @@ async function requestUserInput(send) {
     let moveStr = await state.match.getMoveString(move.move);
     msg.data = joclyToObj(moveStr, isWhite);
     send(msg);
+    const moves = await API.getMoves(state.gameid);
+    renderMoveHistory(moves);
 }
 
 async function loadGame() {
     if (!state.gameid) return;
-
     let gameState = await API.getGameState(state.gameid);
+    applyPlayersInformation(gameState, state.user);
+    let moves = await API.getMoves(state.gameid);
+    renderMoveHistory(moves);
+
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
     await state.match.load(init);
@@ -124,6 +168,51 @@ async function addGameToList(gameId) {
     let element = document.querySelector("[data-js-gamelist]");
     let entry = `<li><a href="#${gameId}">${gameId}</a></li>`;
     element.innerHTML += entry;
+}
+
+function applyPlayersInformation(gameDto, ownUsername) {
+    // add later api request with handle for more accurate informations
+    const whiteName = getLocalpartFromHandle(gameDto.white);
+    const blackName = getLocalpartFromHandle(gameDto.black);
+
+    // white is always at the bottom and black always at the top
+    const elTop = document.getElementById("top-player-name");
+    if (elTop) {
+        elTop.textContent = blackName;
+    }
+    const elBottom = document.getElementById("bottom-player-name");
+    if (elBottom) {
+        elBottom.textContent = whiteName;
+    }
+}
+
+function renderMoveHistory(moves) {
+    const moveHistory = document.getElementById("move-history");
+    if (!moveHistory) {
+        return;
+    }
+
+    if (!Array.isArray(moves) || moves.length === 0) {
+        moveHistory.innerHTML = "";
+        return;
+    }
+    let html = "";
+    for (let i = 0; i < moves.length; i += 2) {
+        const moveNumber = Math.floor(i / 2) + 1;
+        const whiteMove = moves[i] ?? null;
+        const blackMove = moves[i + 1] ?? null;
+        const whiteMoveItem = whiteMove ? formatRawMoveToHistoryItem(whiteMove) : "";
+        const blackMoveItem = blackMove ? formatRawMoveToHistoryItem(blackMove) : "";
+
+        html += `
+            <div class="move-row">
+                <div class="move-number">${moveNumber}.</div>
+                <div class="move-cell">${whiteMoveItem}</div>
+                <div class="move-cell">${blackMoveItem}</div>
+            </div>
+        `;
+    }
+    moveHistory.innerHTML = html;
 }
 
 async function addInvitation(id, challenge) {

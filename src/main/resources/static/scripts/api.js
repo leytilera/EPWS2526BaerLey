@@ -10,6 +10,10 @@ async function getGames() {
     return await fetch('/api/games').then((res) => res.json());
 }
 
+async function getMoves(gameid) {
+    return await fetch(`/api/games/${gameid}/moves`).then((res) => res.json());
+}
+
 async function getInvitations() {
     return await fetch('/api/challenges').then((res) => res.json());
 }
@@ -29,6 +33,7 @@ let API = {
     getGameState,
     getUserData, 
     getGames,
+    getMoves,
     getInvitations,
     createInvitation
 };

@@ -1,23 +1,27 @@
 package de.thkoeln.chessfed.controllers;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 import de.thkoeln.chessfed.dto.EditProfileDto;
+import de.thkoeln.chessfed.dto.ProfileGameViewModel;
 import de.thkoeln.chessfed.dto.ProfileViewModel;
 import de.thkoeln.chessfed.model.Actor;
+import de.thkoeln.chessfed.model.ChessGame;
+import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.LocalUser;
 import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.LocalUserService;
 import de.thkoeln.chessfed.services.IFederationService;
+import de.thkoeln.chessfed.services.IChessGameService;
 
 @Controller
 public class ProfileController {
@@ -25,13 +29,16 @@ public class ProfileController {
     private final LocalUserService localUserService;
     private final IActorService actorService;
     private final IFederationService federationService;
+    private final IChessGameService chessGameService;
 
     public ProfileController(LocalUserService localUserService,
                              IActorService actorService,
-                             IFederationService federationService) {
+                             IFederationService federationService,
+                             IChessGameService chessGameService) {
         this.localUserService = localUserService;
         this.actorService = actorService;
         this.federationService = federationService;
+        this.chessGameService = chessGameService;
     }
 
     private ProfileViewModel toViewModel(LocalUser user) {
@@ -45,6 +52,35 @@ public class ProfileController {
         } else {
             viewModel.setHandle(user.getUsername() + "@" + federationService.getDomain());
         }
+
+        return viewModel;
+    }
+
+    private ProfileGameViewModel toGameViewModel(ChessGame game) {
+        ProfileGameViewModel viewModel = new ProfileGameViewModel();
+
+        Actor white = game.getWhitePlayer();
+        Actor black = game.getBlackPlayer();
+
+        viewModel.setDate("--");
+        viewModel.setWhiteName(white.getLocalpart());
+        viewModel.setBlackName(black.getLocalpart());
+        viewModel.setWhiteInstance("@" + white.getDomain());
+        viewModel.setBlackInstance("@" + black.getDomain());
+
+        if (game.isHasEnded()) {
+            if (game.getCurrentTurn() == ChessPlayer.WHITE) {
+                viewModel.setWhiteScore("1");
+                viewModel.setBlackScore("0");
+            } else {
+                viewModel.setWhiteScore("0");
+                viewModel.setBlackScore("1");
+            }
+        } else {
+            viewModel.setWhiteScore("--");
+            viewModel.setBlackScore("--");
+        }
+        viewModel.setGameUrl("/games/" + game.getId());
 
         return viewModel;
     }
@@ -69,7 +105,27 @@ public class ProfileController {
         ProfileViewModel viewModel = toViewModel(localUser);
         viewModel.setOwnProfile(true);
 
+        Actor actor = localUser.getActor();
+        List<ChessGame> allGames;
+        if (actor != null) {
+            allGames = chessGameService.getGames(actor);
+        } else {
+            allGames = List.of();
+        }
+
+        List<ProfileGameViewModel> finishedGames = allGames.stream()
+            .filter(ChessGame::isHasEnded)
+            .map(this::toGameViewModel)
+            .toList();
+
+        List<ProfileGameViewModel> activeGames = allGames.stream()
+            .filter(game -> !game.isHasEnded())
+            .map(this::toGameViewModel)
+            .toList();
+
         model.addAttribute("profile", viewModel);
+        model.addAttribute("finishedGames", finishedGames);
+        model.addAttribute("activeGames", activeGames);
         return "profile";
     }
 
@@ -138,8 +194,26 @@ public class ProfileController {
             viewModel.setOwnProfile(false);
         }
 
+        List<ChessGame> allGames;
+        if (actor != null) {
+            allGames = chessGameService.getGames(actor);
+        } else {
+            allGames = List.of();
+        }
+
+        List<ProfileGameViewModel> finishedGames = allGames.stream()
+            .filter(ChessGame::isHasEnded)
+            .map(this::toGameViewModel)
+            .toList();
+
+        List<ProfileGameViewModel> activeGames = allGames.stream()
+            .filter(game -> !game.isHasEnded())
+            .map(this::toGameViewModel)
+            .toList();
+
         model.addAttribute("profile", viewModel);
+        model.addAttribute("finishedGames", finishedGames);
+        model.addAttribute("activeGames", activeGames);
         return "profile";
     }
-
 }
