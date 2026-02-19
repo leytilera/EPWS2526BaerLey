@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-02-17
+- Added installation [instructions](./README.md#installationsanleitung) and [script](./generate_compose.sh)
+
 ## 2026-02-08
 - Added invitations to frontend
 - Implemented move validation on backend

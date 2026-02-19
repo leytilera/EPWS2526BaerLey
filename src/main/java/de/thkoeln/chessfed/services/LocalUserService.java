@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -21,6 +22,8 @@ public class LocalUserService extends OidcUserService {
 
     private ILocalUserRepository userRepository;
     private IActorService actorService;
+    @Value("${username.attritube}")
+    private String usernameAttritube;
 
     @Autowired
     public LocalUserService(ILocalUserRepository userRepository, IActorService actorService) {
@@ -32,7 +35,7 @@ public class LocalUserService extends OidcUserService {
     public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
         OidcUser oidcUser = super.loadUser(userRequest);
         
-        String username = Optional.ofNullable(oidcUser.getPreferredUsername()).orElseGet(oidcUser::getSubject);
+        String username = Optional.ofNullable(oidcUser.getClaimAsString(usernameAttritube)).map((u) -> u.replace(" ", "_")).orElseGet(oidcUser::getSubject);
 
         LocalUser user = userRepository.getByExternalOrUsername(oidcUser.getSubject(), username).orElseGet(() -> actorService.createUser(username));
         if (user.getExternal() == null) {
