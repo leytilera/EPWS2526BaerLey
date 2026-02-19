@@ -2,30 +2,32 @@
 #################################################################*/
 
 /* Three column base layout */
-.app-shell {
-  min-height: 100vh;
-  display: grid;
-  grid-template-columns: var(--left-panel-width) minmax(0, 1fr) var(--right-panel-width);
-  gap: var(--space-5);
-}
-
-/* Two column base layout */
-.app-shell--two-columns {
+.app-shell--base {
   min-height: 100vh;
   display: grid;
   grid-template-columns: var(--left-panel-width) minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+/* Two column nested layout */
+.app-shell--nested-two-columns {
+  height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--right-panel-width);
 }
 
 /* LEFT SIDE PANEL 
 #################################################################*/
 
 .left-side-panel {
+  height: 100%;
   width: var(--left-panel-width);
   background: var(--panel-2);
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  overflow: hidden;
 }
 
 .left-side-panel__header {

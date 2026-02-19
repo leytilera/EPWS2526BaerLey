@@ -45,7 +45,7 @@ function setUpGameReplayNavigation() {
     });
 }
 
-async function preloadAllMovesIntoJocly {
+async function preloadAllMovesIntoJocly() {
     for (let i = 0; i < state.moves.length; i++) {
         const dto = state.moves[i];
         const moveString = dtoToJoclyString(dto);

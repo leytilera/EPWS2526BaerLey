@@ -166,7 +166,7 @@ async function loadGame() {
 
 async function addGameToList(gameId) {
     let element = document.querySelector("[data-js-gamelist]");
-    let entry = `<li><a href="#${gameId}">${gameId}</a></li>`;
+    let entry = `<li><a href="/play#${gameId}">${gameId}</a></li>`;
     element.innerHTML += entry;
 }
 
