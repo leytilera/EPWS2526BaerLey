@@ -7,23 +7,22 @@
         <!-- navigation bar -->
         <nav class="nav-bar" aria-label="Sidebar Navigation">
             <!-- Send Invitations -->
-            <button class="nav-bar__item is-active" type="button" data-view="invite" aria-label="Send Invitations">
+            <button class="nav-bar__item" type="button" data-view="invite" aria-label="Send Invitations">
                 <i class="bi bi-people"></i>
             </button>
 
             <!-- Notifications -->
-            <button class="nav-bar__item is-active" type="button" data-view="invitations" aria-current="page"
-                aria-label="Received Invitations">
+            <button class="nav-bar__item" type="button" data-view="invitations" aria-label="Received Invitations">
                 <i class="bi bi-bell"></i>
             </button>
 
             <!-- Settings -->
-            <button class="nav-bar__item is-active" type="button" data-view="settings" aria-label="Settings">
+            <button class="nav-bar__item" type="button" data-view="settings" aria-label="Settings">
                 <i class="bi bi-gear"></i>
             </button>
 
             <!-- Game List -->
-            <button class="nav-bar__item is-active" type="button" data-view="game-list" aria-label="Game List">
+            <button class="nav-bar__item" type="button" data-view="game-list" aria-label="Game List">
                 <i class="bi bi-list"></i>
             </button>
 
