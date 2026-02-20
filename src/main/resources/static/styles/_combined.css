@@ -9,5 +9,6 @@
 /* Layout and component styles */
 @import url('./layout.css');
 @import url('./base-components.css');
+@import url('./game-components.css');
 @import url('./invitation-components.css');
 @import url('./profile-components.css');

@@ -43,9 +43,7 @@
   font-weight: 700;
   font-size: 14px;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
 }
 
 .invitation-meta {

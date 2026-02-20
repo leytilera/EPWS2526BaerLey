@@ -6,27 +6,58 @@ const state = {
     gameid: null,
     match: null,
     user: null,
-    send: null
+    send: null,
+    moves: []
 };
 
 /* Helpers */
 
-function getLocalpartFromHandle(handle) {
-    if (!handle) return "unknown";
-    let string = String(handle);
+function parseActorUrlOrHandle(reference) {
+    if (!reference) {
+        return {
+            localpart: "unknown",
+            domain: null,
+            handle: null,
+            url: null
+        }
+    }
+    let string = String(reference).trim();
 
-    if (string.startsWith("acct:")) string = string.slice(5)
+    if (string.startsWith("acct:")) {
+        string = string.slice(5)
+    }
 
     try {
         const url = new URL(string);
-        const last = url.pathname.split("/").filter(Boolean).pop();
-        return last || url.host || "Unknown";
-    } catch (_) { }
+        const parts = url.pathname.split("/").filter(Boolean);
+        const localpart = parts.pop() ?? null;
+        const domain = url.host ?? null;
+        return {
+            localpart: localpart,
+            domain: domain,
+            handle: localpart && domain ? `${localpart}@${domain}` : null,
+            url: url.href
+        }
+    } catch (e) { }
 
-    const at = string.indexOf("@");
-    if (at > 0) return string.slice(0, at);
-
-    return string;
+    const atIndex = string.indexOf("@");
+    if (atIndex > 0) {
+        const localpart = string.slice(0, atIndex);
+        const domain = string.slice(atIndex + 1);
+        return {
+            localpart: localpart,
+            domain: domain,
+            handle: string,
+            url: null,
+        }
+    } else {
+        return {
+            localpart: string,
+            domain: null,
+            handle: null,
+            url: null,
+        }
+    }
 }
 
 function formatRawMoveToHistoryItem(rawMove) {
@@ -45,6 +76,8 @@ function formatRawMoveToHistoryItem(rawMove) {
 }
 
 /* Main functions */
+
+/* Invitations */
 
 function setupInvitationEvents() {
     const list = document.querySelector("[data-js-invitations]");
@@ -73,8 +106,8 @@ function setupInvitationEvents() {
 
 document.addEventListener("DOMContentLoaded", () => {
     state.gameid = window.location.hash.substring(1);
-    let button = document.querySelector("[data-js-invite]");
-    button.addEventListener("click", () => {
+    let inviteButton = document.querySelector("[data-js-invite]");
+    inviteButton.addEventListener("click", () => {
         let input = document.querySelector("[data-js-opponent]");
         let opponent = input.value;
         input.value = "";
@@ -86,14 +119,81 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     });
+    let viewProfileButton = document.querySelector("[data-js-view-profile]");
+    viewProfileButton.addEventListener("click", () => {
+        let input = document.querySelector("[data-js-opponent]");
+        let handle = input?.value?.trim();
+        if (!handle) return;
+        window.location.href = `/users?acct=${encodeURIComponent(handle)}`
+    })
     main();
 });
 
-window.addEventListener('hashchange', (event) => {
-    event.preventDefault();
-    state.gameid = window.location.hash.substring(1);
-    loadGame();
-});
+async function addInvitation(id, challenge) {
+    const list = document.querySelector("[data-js-invitations]");
+    if (!list) return;
+
+    if (list.querySelector(`[data-js-challenge="${id}"]`)) return;
+
+    let white = "Random";
+    if (challenge.white) {
+        white = challenge.white === challenge.source ? challenge.sourceHandle : "You";
+    }
+
+    const li = document.createElement("li");
+    li.className = "invitation-card";
+    li.dataset.jsChallenge = id;
+
+    const avatar = document.createElement("div");
+    avatar.className = "invitation-avatar";
+    avatar.setAttribute("aria-hidden", "true");
+
+    const body = document.createElement("div");
+    body.className = "invitation-body";
+
+    const title = document.createElement("div");
+    title.className = "invitation-title";
+    title.textContent = `${challenge.sourceHandle} invited you to play`;
+    title.style.cursor = "pointer";
+    title.addEventListener("click", () => {
+        window.location.href = `/users?acct=${encodeURIComponent(challenge.sourceHandle)}`;
+    });
+
+    const meta = document.createElement("div");
+    meta.className = "invitation-meta";
+    meta.textContent = `Variant: Classic Chess`;
+
+    const actions = document.createElement("div");
+    actions.className = "invitation-actions";
+
+    const acceptBtn = document.createElement("button");
+    acceptBtn.className = "btn";
+    acceptBtn.type = "button";
+    acceptBtn.dataset.action = "accept";
+    acceptBtn.textContent = "Start Game";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn btn--ghost";
+    deleteBtn.type = "button";
+    deleteBtn.dataset.action = "delete";
+    deleteBtn.textContent = "Delete";
+
+    actions.append(acceptBtn, deleteBtn);
+    body.append(title, meta, actions);
+    li.append(avatar, body);
+    list.prepend(li);
+
+}
+
+async function acceptInvite(challengeId) {
+    let msg = {
+        type: 2,
+        context: challengeId
+    };
+    state.send(msg);
+}
+
+/* Incoming messages & main */
 
 async function onMessage(msg) {
     if (msg.type == 3 && msg.context == state.gameid) {
@@ -102,9 +202,12 @@ async function onMessage(msg) {
         await state.match.playMove(move);
         const moves = await API.getMoves(state.gameid);
         renderMoveHistory(moves);
+        const gameState = await API.getGameState(state.gameid);
+        addGameToListOrUpdate(gameState);
         requestUserInput(state.send);
     } else if (msg.type == 0) {
-        addGameToList(msg.context);
+        const game = await API.getGameState(msg.context);
+        addGameToListOrUpdate(game);
     } else if (msg.type == 1) {
         addInvitation(msg.context, msg.data);
     }
@@ -116,7 +219,7 @@ async function main() {
     setupInvitationEvents();
     let games = await API.getGames();
     games.forEach(game => {
-        addGameToList(game.id);
+        addGameToListOrUpdate(game);
     });
     API.getInvitations().then(invitations => {
         invitations.forEach(invitation => {
@@ -135,6 +238,8 @@ async function main() {
 
 }
 
+/* Gameplay */
+
 async function requestUserInput(send) {
     let isWhite = await state.match.getTurn() == Jocly.PLAYER_A;
     let move = await state.match.userTurn();
@@ -145,16 +250,31 @@ async function requestUserInput(send) {
     let moveStr = await state.match.getMoveString(move.move);
     msg.data = joclyToObj(moveStr, isWhite);
     send(msg);
-    const moves = await API.getMoves(state.gameid);
-    renderMoveHistory(moves);
+
+    // optimistic move history & turn update
+    state.moves.push({
+        source: msg.data.source,
+        target: msg.data.target,
+        promote: msg.data.promote ?? null,
+        capture: msg.data.capture,
+        castle: msg.data.castle
+    })
+    const game = await API.getGameState(state.gameid);
+    game.yourTurn = false;
+    addGameToListOrUpdate(game);
+    // reload for server truth
+    setTimeout(async () => {
+        state.moves = await API.getMoves(state.gameid);
+        renderMoveHistory(state.moves);
+    }, 600);
 }
 
 async function loadGame() {
     if (!state.gameid) return;
     let gameState = await API.getGameState(state.gameid);
     applyPlayersInformation(gameState, state.user);
-    let moves = await API.getMoves(state.gameid);
-    renderMoveHistory(moves);
+    state.moves = await API.getMoves(state.gameid);
+    renderMoveHistory(state.moves);
 
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
@@ -165,25 +285,70 @@ async function loadGame() {
     }
 }
 
-async function addGameToList(gameId) {
-    let element = document.querySelector("[data-js-gamelist]");
-    let entry = `<li><a href="/play#${gameId}">${gameId}</a></li>`;
-    element.innerHTML += entry;
+async function addGameToListOrUpdate(game) {
+    let gameList = document.querySelector("[data-js-gamelist]");
+    const white = parseActorUrlOrHandle(game.white);
+    const black = parseActorUrlOrHandle(game.black);
+    const turnLabel = game.yourTurn ? "Your turn" : "Wait for opponents turn";
+    let li = document.querySelector(`[data-gameid="${game.id}"]`);
+    const alreadyExists = li;
+
+    if (!alreadyExists) {
+        li = document.createElement("li");
+        li.className = "gamelist-card";
+        li.dataset.gameid = game.id;
+        li.addEventListener("click", () => {
+            window.location.href = `/play#${game.id}`;
+        });
+    }
+    li.innerHTML = `
+        <div class="gamelist-card__header">
+            <div class="gamelist-card__label">ID:</div>
+            <div class="gamelist-card__id">${game.id}</div>
+        </div>
+        <div class="gamelist-card__body">
+            <div class="gamelist-card__player">
+                <span class="gamelist-card__avatar avatar--is-white" aria-hidden="true"></span>
+                <span class="gamelist-card__name">${white.handle ?? white.localpart}</span>
+            </div>
+            <div class="gamelist-card__player">
+                <span class="gamelist-card__avatar avatar--is-black" aria-hidden="true"></span>
+                <span class="gamelist-card__name">${black.handle ?? black.localpart}</span>
+            </div>
+            <div class="gamelist-card__label">${turnLabel}</div>
+        </div>
+        `
+    if (!alreadyExists) {
+        gameList.prepend(li);
+    }
 }
 
-function applyPlayersInformation(gameDto, ownUsername) {
-    // add later api request with handle for more accurate informations
-    const whiteName = getLocalpartFromHandle(gameDto.white);
-    const blackName = getLocalpartFromHandle(gameDto.black);
+function applyPlayersInformation(gameDto) {
+    const white = parseActorUrlOrHandle(gameDto.white);
+    const black = parseActorUrlOrHandle(gameDto.black);
 
     // white is always at the bottom and black always at the top
-    const elTop = document.getElementById("top-player-name");
-    if (elTop) {
-        elTop.textContent = blackName;
+    const topNameEl = document.getElementById("top-player-name");
+    const topStatusEl = document.getElementById("top-player-status");
+    if (topNameEl) {
+        topNameEl.textContent = black.localpart;
+        if (black.handle) {
+            topStatusEl.textContent = black.handle;
+            topStatusEl.style.cursor = "pointer";
+            topStatusEl.onclick = () =>
+                window.location.href = `/users?acct=${encodeURIComponent(black.handle)}`;
+        }
     }
-    const elBottom = document.getElementById("bottom-player-name");
-    if (elBottom) {
-        elBottom.textContent = whiteName;
+    const bottomNameEl = document.getElementById("bottom-player-name");
+    const bottomStatusEl = document.getElementById("bottom-player-status");
+    if (bottomNameEl) {
+        bottomNameEl.textContent = white.localpart;
+        if (white.handle) {
+            bottomStatusEl.textContent = white.handle
+            bottomStatusEl.style.cursor = "pointer";
+            bottomStatusEl.onclick = () =>
+                window.location.href = `/users?acct=${encodeURIComponent(white.handle)}`;
+        }
     }
 }
 
@@ -216,62 +381,10 @@ function renderMoveHistory(moves) {
     moveHistory.innerHTML = html;
 }
 
-async function addInvitation(id, challenge) {
-    const list = document.querySelector("[data-js-invitations]");
-    if (!list) return;
+/* Event Listener */
 
-    if (list.querySelector(`[data-js-challenge="${id}"]`)) return;
-
-    let white = "Random";
-    if (challenge.white) {
-        white = challenge.white === challenge.source ? challenge.sourceHandle : "You";
-    }
-
-    const li = document.createElement("li");
-    li.className = "invitation-card";
-    li.dataset.jsChallenge = id;
-
-    const avatar = document.createElement("div");
-    avatar.className = "invitation-avatar";
-    avatar.setAttribute("aria-hidden", "true");
-
-    const body = document.createElement("div");
-    body.className = "invitation-body";
-
-    const title = document.createElement("div");
-    title.className = "invitation-title";
-    title.textContent = `${challenge.sourceHandle} invited you to play`;
-
-    const meta = document.createElement("div");
-    meta.className = "invitation-meta";
-    meta.textContent = `White Player: ${white}`;
-
-    const actions = document.createElement("div");
-    actions.className = "invitation-actions";
-
-    const acceptBtn = document.createElement("button");
-    acceptBtn.className = "btn";
-    acceptBtn.type = "button";
-    acceptBtn.dataset.action = "accept";
-    acceptBtn.textContent = "Start Game";
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn btn--ghost";
-    deleteBtn.type = "button";
-    deleteBtn.dataset.action = "delete";
-    deleteBtn.textContent = "Delete";
-
-    actions.append(acceptBtn, deleteBtn);
-    body.append(title, meta, actions);
-    li.append(avatar, body);
-    list.prepend(li);
-
-}
-
-async function acceptInvite(challengeId) {
-    let msg = {
-        type: 2,
-        context: challengeId
-    };
-    state.send(msg);
-}
+window.addEventListener('hashchange', (event) => {
+    event.preventDefault();
+    state.gameid = window.location.hash.substring(1);
+    loadGame();
+});

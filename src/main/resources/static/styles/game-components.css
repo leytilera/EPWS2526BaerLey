@@ -54,56 +54,6 @@
   overflow: hidden;
 }
 
-/* INPUT FIELDS
-#####################################################################*/
-
-.input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 10px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #0c1119;
-  color: var(--text);
-  outline: none;
-}
-
-.input:focus {
-  border-color: #355079;
-}
-
-/* BUTTONS
-#####################################################################*/
-
-.btn {
-  height: 32px;
-  padding: 0 var(--space-3);
-  border-radius: 999px;
-  border: 1px solid var(--border-2);
-  background: var(--header);
-  color: var(--text);
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.btn--ghost {
-  background: transparent;
-  color: var(--muted);
-}
-
-.btn:hover {
-  filter: brightness(1.08);
-}
-
-.hint {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-
 /* MOVE HISTORY
 #####################################################################*/
 
@@ -215,6 +165,3 @@
   border: 1px solid var(--border);
   display: inline-block;
 }
-
-
-

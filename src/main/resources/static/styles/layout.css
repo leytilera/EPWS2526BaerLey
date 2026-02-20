@@ -194,7 +194,7 @@
 }
 
 .panel__body {
-  padding: 12px;
+  padding: var(--space-5);
 }
 
 .panel__body--scroll {

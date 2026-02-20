@@ -4,6 +4,7 @@
     --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, sans-serif;
 
     /* font sizes */
+    --size-xs: 11px;
     --size-s: 12px;
     --size-m: 14px;
     --size-l: 16px;
@@ -15,6 +16,9 @@
     --panel: #111823;
     --panel-2: #0f151f;
     --header: #0c121b;
+    --white: #ffffff;
+    --black: #000000;
+    --accent-blue: #58a6ff;
 
     --text: #e6edf6;
     --muted: #9fb1c3;

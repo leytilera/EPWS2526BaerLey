@@ -22,7 +22,7 @@
                     </header>
 
                     <div class="panel__body">
-                        <p>Pick an active game from the list, check your invitations or invite a friend to play!</p>
+                        <p class="">Pick an active game from the list, check your invitations or invite a friend to play!</p>
                     </div>
                 </section>
             </aside>

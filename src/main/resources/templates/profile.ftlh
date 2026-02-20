@@ -91,12 +91,12 @@
                                 <!-- Result -->
                                 <div class="game-history__cell">
                                     <div class="game-history__result">${game.whiteScore}</div>
-                                    <div class="game-history__result">${game.whiteScore}</div>
+                                    <div class="game-history__result">${game.blackScore}</div>
                                 </div>
                                 <!-- Instances -->
                                 <div class="game-history__cell">
                                     <div class="game-history__instance">${game.whiteInstance}</div>
-                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                    <div class="game-history__instance">${game.blackInstance}</div>
                                 </div>
                             </a>
                         </#list>
@@ -141,12 +141,12 @@
                                 <!-- Result -->
                                 <div class="game-history__cell">
                                     <div class="game-history__result">${game.whiteScore}</div>
-                                    <div class="game-history__result">${game.whiteScore}</div>
+                                    <div class="game-history__result">${game.blackScore}</div>
                                 </div>
                                 <!-- Instances -->
                                 <div class="game-history__cell">
                                     <div class="game-history__instance">${game.whiteInstance}</div>
-                                    <div class="game-history__instance">${game.whiteInstance}</div>
+                                    <div class="game-history__instance">${game.blackInstance}</div>
                                 </div>
                             </a>
 

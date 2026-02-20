@@ -45,6 +45,7 @@
             <div class="invite__form">
                 <input class="invite__input" type="text" placeholder="Enter opponent handle or URL" data-js-opponent>
                 <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
+                <button class="btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
             </div>
 
             <p class="invite__status" data-js-invite-status></p>
@@ -74,7 +75,7 @@
             <div class="left-side-panel__section-header">
                 <h2 class="left-side-panel__section-title">Active Games</h2>
             </div>
-            <ul data-js-gamelist></ul>
+            <ul class="gamelist" data-js-gamelist></ul>
         </section>
     </div>
 </aside>
