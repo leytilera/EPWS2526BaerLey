@@ -5,7 +5,7 @@
             <!-- middle column (for chessboard) -->
             <div class="center">
                 <section class="board-layout">
-                    <!-- black player information -->
+                    <!-- top player information (currently always black) -->
                     <div class="player-row">
                         <div class="board-avatar avatar--is-black" id="top-player-color" aria-hidden="true"></div>
                         <div class="player-meta">
@@ -42,6 +42,9 @@
                     <div class="panel__body panel__body--scroll">
                         <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
                         <div class="moves" id="move-history"></div>
+
+                        <!-- game finished card -->
+                         <div id="game-finished"></div>
                     </div>
                 </section>
             </aside>

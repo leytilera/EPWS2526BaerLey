@@ -203,6 +203,11 @@ async function onMessage(msg) {
         const moves = await API.getMoves(state.gameid);
         renderMoveHistory(moves);
         const gameState = await API.getGameState(state.gameid);
+        let result = await state.match.getFinished()
+        if (result.finished) {
+            showFinishedCard(gameState, result.winner)
+            return;
+        }
         addGameToListOrUpdate(gameState);
         requestUserInput(state.send);
     } else if (msg.type == 0) {
@@ -214,7 +219,7 @@ async function onMessage(msg) {
 }
 
 async function main() {
-    state.user = await API.getUserData().username;
+    state.user = await API.getUserData();
     state.send = await initWebsocket(onMessage);
     setupInvitationEvents();
     let games = await API.getGames();
@@ -259,9 +264,14 @@ async function requestUserInput(send) {
         capture: msg.data.capture,
         castle: msg.data.castle
     })
+    // renderMoveHistory(state.moves);
     const game = await API.getGameState(state.gameid);
     game.yourTurn = false;
     addGameToListOrUpdate(game);
+    let result = await state.match.getFinished()
+    if (result.finished) {
+        showFinishedCard(game, result.winner)
+    }
     // reload for server truth
     setTimeout(async () => {
         state.moves = await API.getMoves(state.gameid);
@@ -279,17 +289,26 @@ async function loadGame() {
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
     await state.match.load(init);
-
+    let result = await state.match.getFinished()
+    if (result.finished) {
+        showFinishedCard(gameState, result.winner);
+        return;
+    }
     if (gameState.yourTurn) {
         await requestUserInput(state.send);
     }
 }
 
-async function addGameToListOrUpdate(game) {
+async function addGameToListOrUpdate(game, finished = null) {
     let gameList = document.querySelector("[data-js-gamelist]");
     const white = parseActorUrlOrHandle(game.white);
     const black = parseActorUrlOrHandle(game.black);
-    const turnLabel = game.yourTurn ? "Your turn" : "Wait for opponents turn";
+    let turnLabel;
+    if (finished) {
+        turnLabel = finished;
+    } else {
+        turnLabel = game.yourTurn ? "Your turn" : "Wait for opponents turn";
+    }
     let li = document.querySelector(`[data-gameid="${game.id}"]`);
     const alreadyExists = li;
 
@@ -379,6 +398,60 @@ function renderMoveHistory(moves) {
         `;
     }
     moveHistory.innerHTML = html;
+}
+
+function showFinishedCard(gameDto, winner) {
+    let finished = document.getElementById("game-finished");
+
+    const white = parseActorUrlOrHandle(gameDto.white);
+    const black = parseActorUrlOrHandle(gameDto.black);
+    let ownColor;
+    // state.user.username contains handle
+    if (state.user.username == white.handle) {
+        ownColor = "white";
+    } else {
+        ownColor = "black";
+    }
+    /*
+    Jocly.PLAYER_A is always white and Jocly.PLAYER_B is always black
+    match.getFinished() returns an object with the following properties:
+        finished (boolean), winner (Jocly.PLAYER_A or Jocly.PLAYER_B or Jocly.DRAW)
+    */
+    let result;
+    let avatarClass;
+    if (winner === Jocly.PLAYER_A) {
+        if (ownColor == "white") {
+            result = "You won!";
+        } else {
+            result = `${white.handle} won!`
+        }
+        avatarClass = "avatar--is-white";
+    } else if (winner === Jocly.PLAYER_B) {
+        if (ownColor == "black") {
+            result = "You won!";
+        } else {
+            result = `${black.handle} won!`
+        }
+        avatarClass = "avatar--is-black";
+    } else {
+        result = "Draw!"
+        avatarClass = "avatar--is-blue";
+    }
+
+    const finishedCard = document.createElement("div");
+    finishedCard.className = "game-finished-card";
+    finishedCard.innerHTML = `
+        <div class="game-finished-card__title">Game finished</div>
+        <div class="game-finished-card__body">
+            <span class="game-finished__avatar ${avatarClass}" aria-hidden="true"></span>
+            <span class="game-finished__text">${result}</span>
+        </div>
+        <div class="game-finished__buttons">
+            <a class="btn btn--ghost" href="/replay#${state.gameid}">Replay Game</a>
+        </div>
+        `
+    finished.appendChild(finishedCard);
+    addGameToListOrUpdate(gameDto, result);
 }
 
 /* Event Listener */
