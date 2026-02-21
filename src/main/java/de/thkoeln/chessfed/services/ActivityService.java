@@ -281,6 +281,12 @@ public class ActivityService implements IActivityService {
                 }
                 processPlayMove(activity);
             } break;
+            case JOIN: {
+                if (activity.getObject() == null || activity.getObject().getType() != ObjectType.GAME) {
+                    break;
+                }
+                processJoinGame(activity);
+            } break;
         }
     }
 
@@ -299,6 +305,14 @@ public class ActivityService implements IActivityService {
         Arrays.stream(new Actor[]{game.getWhitePlayer(), game.getBlackPlayer()})
             .filter((a) -> federationService.isLocal(a.getFederation()))
             .forEach((a) -> joinGame(a, g));
+    }
+
+    private void processJoinGame(Activity join) {
+        FederatedObject gme = join.getObject();
+        if (!federationService.isLocal(gme)) {
+            ChessGame game = fetchGame(gme);
+            gameService.addRemoteGame(game);
+        }
     }
 
     private void processInvite(Activity invite) {

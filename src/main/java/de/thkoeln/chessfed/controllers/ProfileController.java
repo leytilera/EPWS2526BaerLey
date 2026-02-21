@@ -21,6 +21,7 @@ import de.thkoeln.chessfed.model.Actor;
 import de.thkoeln.chessfed.model.ChessGame;
 import de.thkoeln.chessfed.model.ChessPlayer;
 import de.thkoeln.chessfed.model.LocalUser;
+import de.thkoeln.chessfed.services.IActivityService;
 import de.thkoeln.chessfed.services.IActorService;
 import de.thkoeln.chessfed.services.IChessGameService;
 import de.thkoeln.chessfed.services.IFederationService;
@@ -33,15 +34,18 @@ public class ProfileController {
     private final IActorService actorService;
     private final IFederationService federationService;
     private final IChessGameService chessGameService;
+    private final IActivityService activityService;
 
     public ProfileController(LocalUserService localUserService,
                              IActorService actorService,
                              IFederationService federationService,
-                             IChessGameService chessGameService) {
+                             IChessGameService chessGameService,
+                             IActivityService activityService) {
         this.localUserService = localUserService;
         this.actorService = actorService;
         this.federationService = federationService;
         this.chessGameService = chessGameService;
+        this.activityService = activityService;
     }
 
     private ProfileViewModel toViewModel(LocalUser user) {
@@ -181,6 +185,9 @@ public class ProfileController {
         Actor actor;
         try {
             actor = actorService.getActorByAcct(acct);
+            if (!federationService.isLocal(actor.getFederation())) {
+                activityService.getOutbox(actor);
+            }
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found");
         }
