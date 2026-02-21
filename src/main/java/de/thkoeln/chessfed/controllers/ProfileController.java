@@ -64,26 +64,29 @@ public class ProfileController {
 
         Actor white = game.getWhitePlayer();
         Actor black = game.getBlackPlayer();
-
-        viewModel.setDate("--");
-        viewModel.setWhiteName(white.getLocalpart());
-        viewModel.setBlackName(black.getLocalpart());
-        viewModel.setWhiteInstance("@" + white.getDomain());
-        viewModel.setBlackInstance("@" + black.getDomain());
+        
+        viewModel.setGameId(game.getId().toString());
+        viewModel.setWhiteUsername(white.getLocalpart());
+        viewModel.setBlackUsername(black.getLocalpart());
+        viewModel.setWhiteHandle(white.getLocalpart() + "@" + white.getDomain());
+        viewModel.setBlackHandle(black.getLocalpart() + "@" + black.getDomain());
 
         if (game.isHasEnded()) {
             if (game.getCurrentTurn() == ChessPlayer.WHITE) {
                 viewModel.setWhiteScore("1");
                 viewModel.setBlackScore("0");
+                viewModel.setStatus("Finished");
             } else {
                 viewModel.setWhiteScore("0");
                 viewModel.setBlackScore("1");
+                viewModel.setStatus("Finished");
             }
         } else {
             viewModel.setWhiteScore("--");
             viewModel.setBlackScore("--");
+            viewModel.setStatus("Active");
         }
-        viewModel.setGameId(game.getId().toString());
+        viewModel.setMoveCount(String.valueOf(game.getMoveCounter()));
 
         return viewModel;
     }
@@ -125,6 +128,8 @@ public class ProfileController {
             .filter(game -> !game.isHasEnded())
             .map(this::toGameViewModel)
             .toList();
+        
+        viewModel.setCountFinishedGames(String.valueOf(finishedGames.size()));
 
         model.addAttribute("profile", viewModel);
         model.addAttribute("finishedGames", finishedGames);
@@ -154,8 +159,8 @@ public class ProfileController {
         String bio = editProfileDto.getBio();
         if (bio != null) {
             bio = bio.trim();
-            if (bio.length() > 280) {
-                bio = bio.substring(0, 280);
+            if (bio.length() > 254) {
+                bio = bio.substring(0, 254);
             }
         }
         localUser.setBio(bio);
@@ -213,6 +218,8 @@ public class ProfileController {
             .filter(game -> !game.isHasEnded())
             .map(this::toGameViewModel)
             .toList();
+
+        viewModel.setCountFinishedGames(String.valueOf(finishedGames.size()));
 
         model.addAttribute("profile", viewModel);
         model.addAttribute("finishedGames", finishedGames);

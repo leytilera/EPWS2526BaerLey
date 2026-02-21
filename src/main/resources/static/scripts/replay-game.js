@@ -1,8 +1,6 @@
 import { gameToJoclyState, objToJocly } from "./conversion.js";
 import { API } from "./api.js";
-
-console.log("[replay] script loaded");
-console.log("[replay] readyState:", document.readyState);
+import { parseActorUrlOrHandle, formatRawMoveToHistoryItem,applyPlayersInformation } from "./ui-helpers.js";
 
 const state = {
     gameid: null,
@@ -11,24 +9,6 @@ const state = {
     joclyMoveStrings: [],
     counter: 0,
 };
-
-function getLocalpartFromHandle(handle) {
-  if (!handle) return "unknown";
-  let string = String(handle);
-
-  if (string.startsWith("acct:")) string = string.slice(5);
-
-  try {
-    const url = new URL(string);
-    const last = url.pathname.split("/").filter(Boolean).pop();
-    return last || url.host || "Unknown";
-  } catch (_) {}
-
-  const at = string.indexOf("@");
-  if (at > 0) return string.slice(0, at);
-
-  return string;
-}
 
 function dtoToJoclyString(dto) {
     const obj = {
@@ -98,17 +78,6 @@ async function preloadAllMovesIntoJocly() {
     renderMoveHistory(state.moves, state.counter);
 }
 
-function applyPlayersInformation(gameDto) {
-  const whiteName = getLocalpartFromHandle(gameDto.white);
-  const blackName = getLocalpartFromHandle(gameDto.black);
-
-  const elTop = document.getElementById("top-player-name");
-  if (elTop) elTop.textContent = blackName;
-
-  const elBottom = document.getElementById("bottom-player-name");
-  if (elBottom) elBottom.textContent = whiteName;
-}
-
 function renderMoveHistory(moves, showUntil) {
     const moveHistory = document.getElementById("move-history");
     if (!moveHistory) return;
@@ -137,21 +106,6 @@ function renderMoveHistory(moves, showUntil) {
         `;
     }
     moveHistory.innerHTML = html;
-}
-
-function formatRawMoveToHistoryItem(rawMove) {
-    if (!rawMove) return;
-
-    if (rawMove.castle) {
-        return "O-O";
-    }
-    const seperator = rawMove.capture ? "x" : "-";
-    let moveItem = `${rawMove.source}${seperator}${rawMove.target}`;
-    if (rawMove.promote) {
-        moveItem += `=${rawMove.promote}`;
-    }
-
-    return moveItem;
 }
 
 async function main() {

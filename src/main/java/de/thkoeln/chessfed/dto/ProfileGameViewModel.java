@@ -1,53 +1,54 @@
 package de.thkoeln.chessfed.dto;
 
 public class ProfileGameViewModel {
-    private String date;
-    private String whiteName;
-    private String blackName;
-    private String whiteInstance;
-    private String blackInstance;
+    private String gameId;
+    private String whiteUsername;
+    private String blackUsername;
+    private String whiteHandle;
+    private String blackHandle;
     private String whiteScore;
     private String blackScore;
-    private String gameId;
+    private String moveCount;
+    private String status;
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setGameId(String date) {
+        this.gameId = date;
     }
 
-    public String getDate() {
-        return date;
+    public String getGameId() {
+        return gameId;
     }
 
-    public void setWhiteName(String whiteName) {
-        this.whiteName = whiteName;
+    public void setWhiteUsername(String whiteName) {
+        this.whiteUsername = whiteName;
     }
 
-    public String getWhiteName() {
-        return whiteName;
+    public String getWhiteUsername() {
+        return whiteUsername;
     }
 
-    public void setBlackName(String blackName) {
-        this.blackName = blackName;
+    public void setBlackUsername(String blackName) {
+        this.blackUsername = blackName;
     }
 
-    public String getBlackName() {
-        return blackName;
+    public String getBlackUsername() {
+        return blackUsername;
     }
 
-    public void setWhiteInstance(String whiteInstance) {
-        this.whiteInstance = whiteInstance;
+    public void setWhiteHandle(String whiteInstance) {
+        this.whiteHandle = whiteInstance;
     }
 
-    public String getWhiteInstance() {
-        return whiteInstance;
+    public String getWhiteHandle() {
+        return whiteHandle;
     }
 
-    public void setBlackInstance(String blackInstance) {
-        this.blackInstance = blackInstance;
+    public void setBlackHandle(String blackInstance) {
+        this.blackHandle = blackInstance;
     }
 
-    public String getBlackInstance() {
-        return blackInstance;
+    public String getBlackHandle() {
+        return blackHandle;
     }
 
     public void setWhiteScore(String whiteScore) {
@@ -60,17 +61,25 @@ public class ProfileGameViewModel {
 
     public void setBlackScore(String blackScore) {
         this.blackScore = blackScore;
-    }
+    } 
 
     public String getBlackScore() {
         return blackScore;
     }
 
-    public void setGameId(String gameId) {
-        this.gameId = gameId;
+    public void setMoveCount(String moveCount) {
+        this.moveCount = moveCount;
     }
 
-    public String getGameId() {
-        return gameId;
+    public String getMoveCount() {
+        return moveCount;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

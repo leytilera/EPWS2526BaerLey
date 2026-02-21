@@ -10,7 +10,7 @@
                         <div class="board-avatar avatar--is-black" id="top-player-color" aria-hidden="true"></div>
                         <div class="player-meta">
                             <div class="player-name" id="top-player-name">Black player</div>
-                            <div class="player-sub" id="top-player-status">Finished</div>
+                            <div class="player-status" id="top-player-status">Finished</div>
                         </div>
                     </div>
 
@@ -24,7 +24,7 @@
                         <div class="board-avatar avatar--is-white" id="bottom-player-color" aria-hidden="true"></div>
                         <div class="player-meta">
                             <div class="player-name" id="bottom-player-name">White Player</div>
-                            <div class="player-sub" id="bottom-player-status">Finished</div>
+                            <div class="player-status" id="bottom-player-status">Finished</div>
                         </div>
                     </div>
                 </section>

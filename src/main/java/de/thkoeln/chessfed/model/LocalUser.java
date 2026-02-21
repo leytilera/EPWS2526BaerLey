@@ -8,7 +8,7 @@ import jakarta.persistence.OneToOne;
 
 @Entity
 public class LocalUser {
-    
+     
     @Id
     private UUID id;
     private String username;

@@ -23,16 +23,20 @@
 
     --text: #e6edf6;
     --muted: #9fb1c3;
+    --text-hints: rgba(159, 177, 195, 0.75);
 
     --border: #243041;
     --border-2: rgba(36, 48, 65, 0.9);
     --border-3: rgba(159, 177, 195, 0.35);
     --border-4: rgba(255,255,255,0.06);
+    --border-focus: rgba(159, 177, 195, 0.8);
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
-    /* sizes */
+    /* radius */
     --radius: 14px;
+    --radius-s: 10px;
 
+    /* sizes */
     --left-panel-width: 320px;
     --right-panel-width: 352px;
     --boardSize: 600px;

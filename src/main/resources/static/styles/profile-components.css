@@ -44,8 +44,8 @@
   border-radius: var(--radius);
   padding: var(--space-5);
 
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 160px 1fr 1fr;
   align-items: flex-start;
   gap: var(--space-5);
 }
@@ -62,7 +62,7 @@
 .profile-informations-layout {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-width: 0;
 }
 
@@ -91,7 +91,7 @@
 /* bio */
 .profile-bio {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--size-m);
   color: var(--muted);
   max-width: 64ch;
 }
@@ -122,6 +122,8 @@
 /* button */
 .profile-edit {
   width: fit-content;
+  padding: var(--space-2) var(--space-3);
+  justify-self: end;
   align-self: flex-end;
   margin-top: auto;
 }
@@ -161,13 +163,14 @@
 
 .game-history__row {
   display: grid;
-  grid-template-columns: 120px 1.6fr 90px 1.2fr;
+  grid-template-columns: 180px 1.6fr 2fr 60px 1.2fr 80px;
   gap: var(--space-4);
   text-decoration: none;
 }
 
 .game-history__row-header {
   opacity: 0.8;
+  padding: 0 var(--space-2);
 }
 
 .game-history__row-item {
@@ -184,6 +187,15 @@
   gap: var(--space-2);
 }
 
+.game-history__id {
+    font-size: var(--size-s);
+    color: var(--accent-blue);
+    font-family: var(--mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .game-history__avatar {
   width: 14px;
   height: 14px;
@@ -191,6 +203,32 @@
   display: inline-block;
   flex: 0 0 auto;
   border: 1px solid var(--border-2);
+}
+
+.game-history__player-name {
+  font-size: var(--size-l);
+  margin-left: var(--space-1);
+  color: var(--text);
+}
+
+.game-history__player-handle {
+  font-size: var(--size-l);
+  color: var(--muted);
+}
+
+.game-history__result {
+  font-size: var(--size-l);
+  color: var(--accent-blue);
+}
+
+.game-history__status {
+  font-size: var(--size-l);
+  color: var(--text);
+}
+
+.game-history__moves {
+  font-size: var(--size-l);
+  color: var(--text);
 }
 
 /* EDIT PROFILE COMPONENTS
@@ -208,35 +246,11 @@
   height: 160px;
 }
 
-/* overlay avatar icon button */
-.avatar-edit-btn {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-
-  border: 1px solid var(--border-2);
-  background: var(--header);
-  color: var(--text);
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-}
-
-.avatar-edit-btn:hover {
-  filter: brightness(1.08);
-}
-
 .edit-form {
-  display: grid;
-  gap: var(--space-4);
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  font: inherit;
 }
 
 .field {
@@ -245,36 +259,53 @@
 }
 
 .field__label {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--size-m);
+  font-weight: 600;
   color: var(--text);
 }
 
-.field__input .field__textarea {
+.field__username {
+  font-size: var(--size-l);
+  font-weight: 600;
   width: 100%;
-  border-radius: 10px;
   border: 1px solid var(--border-3);
-  background: rgba(0, 0, 0, 0.12);
+  border-radius: var(--radius-s);
+  padding: var(--space-2);
+  background: var(--background);
+}
+
+.field__handle {
+  font-size: var(--size-l);
+  font-weight: 600;
+  width: 100%;
+  border: 1px solid var(--border-3);
+  border-radius: var(--radius-s);
+  padding: var(--space-2);
+  background: var(--background);
+}
+
+.field__input, 
+.field__textarea {
+  width: 100%;
+  border: 1px solid var(--border-3);
+  border-radius: var(--radius-s);
+  background: var(--background);
+  font: inherit;
   color: var(--text);
-  padding: 10px 12px;
-  font-size: 12px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--size-m);
   outline: none;
 }
 
 .field__input:focus,
 .field__textarea:focus {
-  border-color: rgba(159, 177, 195, 0.8);
-}
-
-.field__input[readonly] {
-  color: rgba(230, 237, 246, 0.85);
-  background: rgba(0, 0, 0, 0.08);
+  border-color: var(--border-focus)
 }
 
 .field__help {
-  margin: 0;
-  font-size: 11px;
-  color: rgba(159, 177, 195, 0.75);
+  margin-top: var(--space-1);
+  font-size: var(--size-xs);
+  color: var(--text-hints);
 }
 
 .edit-form__buttons {

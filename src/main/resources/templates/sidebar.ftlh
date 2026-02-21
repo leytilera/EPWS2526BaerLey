@@ -41,10 +41,13 @@
                 <h2 class="left-side-panel__section-title">Invite Friend to play</h2>
             </div>
 
-            <div class="invite__form">
-                <input class="invite__input" type="text" placeholder="Enter opponent handle or URL" data-js-opponent>
-                <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
-                <button class="btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
+            <div class="invite-form">
+                <input class="invite-form__input" type="text" placeholder="Enter opponent handle"
+                    data-js-opponent>
+                <div class="invite-form__buttons">
+                    <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
+                    <button class="btn invite__btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
+                </div>
             </div>
 
             <p class="invite__status" data-js-invite-status></p>

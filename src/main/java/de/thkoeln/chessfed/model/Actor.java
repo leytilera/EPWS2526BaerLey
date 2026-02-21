@@ -6,7 +6,7 @@ import jakarta.persistence.OneToOne;
 
 @Entity
 public class Actor {
-
+ 
     @Id
     private String id;
     private String localpart;

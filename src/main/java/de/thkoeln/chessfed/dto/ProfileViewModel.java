@@ -4,11 +4,11 @@ import java.util.UUID;
 
 public class ProfileViewModel {
     private boolean ownProfile;
-
-    private UUID id;
+    private UUID id; 
     private String username;
     private String handle;
     private String bio;
+    private String countFinishedGames;
 
     public UUID getId() {
         return id;
@@ -48,5 +48,13 @@ public class ProfileViewModel {
 
     public boolean isOwnProfile() {
         return ownProfile;
+    }
+
+    public void setCountFinishedGames(String countFinishedGames) {
+        this.countFinishedGames = countFinishedGames;
+    }
+
+    public String getCountFinishedGames() {
+        return countFinishedGames;
     }
 }
