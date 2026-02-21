@@ -1,6 +1,6 @@
 import { gameToJoclyState, objToJocly } from "./conversion.js";
 import { API } from "./api.js";
-import { parseActorUrlOrHandle, formatRawMoveToHistoryItem,applyPlayersInformation } from "./ui-helpers.js";
+import { parseActorUrlOrHandle, formatRawMoveToHistoryItem, applyPlayersInformation } from "./ui-helpers.js";
 
 const state = {
     gameid: null,

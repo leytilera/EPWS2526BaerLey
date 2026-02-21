@@ -1,14 +1,15 @@
 import { gameToJoclyState, joclyToObj, objToJocly } from "./conversion.js";
-import { parseActorUrlOrHandle, formatRawMoveToHistoryItem,applyPlayersInformation } from "./ui-helpers.js";
 import { initWebsocket } from "./websocket.js";
 import { API } from "./api.js";
+import { parseActorUrlOrHandle, formatRawMoveToHistoryItem, applyPlayersInformation } from "./ui-helpers.js";
 
 const state = {
     gameid: null,
     match: null,
     user: null,
     send: null,
-    moves: []
+    moves: [],
+    finishedByGame: new Map()
 };
 
 /* Invitations */
@@ -69,11 +70,6 @@ async function addInvitation(id, challenge) {
 
     if (list.querySelector(`[data-js-challenge="${id}"]`)) return;
 
-    let white = "Random";
-    if (challenge.white) {
-        white = challenge.white === challenge.source ? challenge.sourceHandle : "You";
-    }
-
     const li = document.createElement("li");
     li.className = "invitation-card";
     li.dataset.jsChallenge = id;
@@ -130,20 +126,23 @@ async function acceptInvite(challengeId) {
 /* Incoming messages & main */
 
 async function onMessage(msg) {
-    if (msg.type == 3 && msg.context == state.gameid) {
-        let moveStr = objToJocly(msg.data);
-        let move = await state.match.pickMove(moveStr);
-        await state.match.playMove(move);
-        const moves = await API.getMoves(state.gameid);
-        renderMoveHistory(moves);
-        const gameState = await API.getGameState(state.gameid);
-        let result = await state.match.getFinished()
-        if (result.finished) {
-            showFinishedCard(gameState, result.winner)
-            return;
-        }
+    if (msg.type == 3) {
+        let gameState = await API.getGameState(msg.context);
         addGameToListOrUpdate(gameState);
-        requestUserInput(state.send);
+        if (msg.context == state.gameid) {
+            let moveStr = objToJocly(msg.data);
+            let move = await state.match.pickMove(moveStr);
+            await state.match.playMove(move);
+            const moves = await API.getMoves(state.gameid);
+            renderMoveHistory(moves);
+            gameState = await API.getGameState(state.gameid);
+            let result = await state.match.getFinished()
+            if (result.finished) {
+                showFinishedCard(gameState, result.winner);
+                return;
+            }
+            requestUserInput(state.send);
+        }
     } else if (msg.type == 0) {
         const game = await API.getGameState(msg.context);
         addGameToListOrUpdate(game);
@@ -166,7 +165,7 @@ async function main() {
         })
     })
 
-    if (window.location.pathname == "/replay") return;
+    if (window.location.pathname !== "/play" && window.location.pathname !== "/") return;
     state.match = await Jocly.createMatch("classic-chess");
 
     let element = document.querySelector("[data-js-board]");
@@ -174,7 +173,6 @@ async function main() {
     await state.match.setViewOptions({ skin: "skin2dfull" });
 
     await loadGame();
-
 }
 
 /* Gameplay */
@@ -215,6 +213,9 @@ async function requestUserInput(send) {
 
 async function loadGame() {
     if (!state.gameid) return;
+    const finishedEl = document.getElementById("game-finished");
+    if (finishedEl) finishedEl.innerHTML = "";
+
     let gameState = await API.getGameState(state.gameid);
     applyPlayersInformation(gameState, state.user);
     state.moves = await API.getMoves(state.gameid);
@@ -223,9 +224,10 @@ async function loadGame() {
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
     await state.match.load(init);
-    let result = await state.match.getFinished()
-    if (result.finished) {
-        showFinishedCard(gameState, result.winner);
+    
+    const finished = state.finishedByGame.get(String(state.gameid));
+    if (finished) {
+        showFinishedCard(gameState, finished.winner);
         return;
     }
     if (gameState.yourTurn) {
@@ -307,6 +309,8 @@ function renderMoveHistory(moves) {
 
 function showFinishedCard(gameDto, winner) {
     let finished = document.getElementById("game-finished");
+    if (!finished) return;
+    finished.innerHTML = "";
 
     const white = parseActorUrlOrHandle(gameDto.white);
     const black = parseActorUrlOrHandle(gameDto.black);
@@ -357,6 +361,7 @@ function showFinishedCard(gameDto, winner) {
         `
     finished.appendChild(finishedCard);
     addGameToListOrUpdate(gameDto, result);
+    state.finishedByGame.set(String(gameDto.id), {winner, result});
 }
 
 /* Event Listener */
