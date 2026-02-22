@@ -3,10 +3,11 @@
 
 /* Three column base layout */
 .app-shell--base {
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: var(--left-panel-width) minmax(0, 1fr);
   gap: var(--space-5);
+  overflow: auto;
 }
 
 /* Two column nested layout */
@@ -14,6 +15,8 @@
   height: 100%;
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--right-panel-width);
+  gap: var(--space-5);
+  min-height: 0;
 }
 
 /* LEFT SIDE PANEL 
@@ -26,14 +29,17 @@
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   overflow: hidden;
+  min-height: 0;
 }
 
 .left-side-panel__header {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   gap: var(--space-4);
+  z-index: 10;
 }
 
 /* Chessfed logo */
@@ -93,14 +99,24 @@
 
 /* Content of Left Side Panel */
 .left-side-panel__content {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   padding-left: var(--space-5);
   padding-right: var(--space-5);
+  min-height: 0;
+}
+
+.sidebar-view {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .left-side-panel__section-header {
+  display: flex;
+  flex: 0 0 auto;
   background: var(--panel-2);
 }
 
@@ -109,43 +125,78 @@
   font-weight: 800;
 }
 
-.left-panel__scroll {
-  flex: 1;
-  min-height: 0;
+.left-side-panel__section-content-scroll {
+  flex: 1 1 auto;
   overflow-y: auto;
+  min-height: 0;
   padding-right: var(--space-2);
+  box-sizing: border-box;
+  background-clip: padding-box;
+}
+
+.left-side-panel__section-footer {
+  display: flex;
+  flex: 0 0 auto;
+  font-size: var(--size-s);
+  color: var(--muted);
+  padding: var(--space-3) 0;
+}
+
+.sidebar-view[hidden] {
+  display: none !important;
 }
 
 /* CENTER 
 #################################################################*/
 
 .center {
-  overflow: hidden;
+  height: 100vh;
+  min-height: 0;
   min-width: 0;
-  padding: var(--space-2);
+  display: flex;
 }
 
 /* Board */
 .board-layout {
-  height: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: var(--space-4);
   align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  overflow: hidden;
 }
 
 .player-row {
-  width: var(--boardSize);
+  flex: 0 0 auto;
+  width: 100%;
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   gap: var(--space-3);
+}
+
+.board-slot {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.board-slot--home {
+ margin: var(--space-7);
 }
 
 /* RIGHT SIDE PANEL
 #################################################################*/
 
-.right-column {
+.right-side-panel {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--gap);
@@ -153,53 +204,51 @@
   padding-left: 0;
 }
 
-.panel {
-  flex: 1 1 auto;
-  min-height: 0;
+.move-history {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  /*border: 1px solid var(--border);*/
   border-radius: var(--radius);
   background: var(--panel);
   box-shadow: var(--shadow);
   overflow: hidden;
 }
 
-.panel__header {
+.move-history__header {
+  flex: 0 0 auto;
   background: var(--header);
   border-bottom: 1px solid var(--border);
   padding-top: var(--space-4);
   padding-left: var(--space-5);
   padding-bottom: var(--space-4);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 
-.panel__title {
+.move-history__title {
   margin: 0;
   font-size: var(--size-xl);
   font-weight: 800;
   letter-spacing: 0.2px;
 }
 
-.badge {
-  font-size: 12px;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.03);
-}
-
-.panel__body {
-  padding: var(--space-5);
-}
-
-.panel__body--scroll {
+.move-history__body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
-  max-height: none;
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.move-history__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.move-history__footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-5);
 }

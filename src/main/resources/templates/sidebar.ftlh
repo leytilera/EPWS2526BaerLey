@@ -11,7 +11,7 @@
                 <i class="bi bi-people"></i>
             </button>
 
-            <!-- Notifications -->
+            <!-- Notifications/Invitations -->
             <button class="nav-bar__item" type="button" data-view="invitations" aria-label="Received Invitations">
                 <i class="bi bi-bell"></i>
             </button>
@@ -41,16 +41,18 @@
                 <h2 class="left-side-panel__section-title">Invite Friend to play</h2>
             </div>
 
-            <div class="invite-form">
-                <input class="invite-form__input" type="text" placeholder="Enter opponent handle"
-                    data-js-opponent>
-                <div class="invite-form__buttons">
-                    <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
-                    <button class="btn invite__btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
+            <div class="left-side-panel__section-content-scroll">
+                <div class="invite-form">
+                    <input class="invite-form__input" type="text" placeholder="Enter opponent handle" data-js-opponent>
+                    <div class="invite-form__buttons">
+                        <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
+                        <button class="btn invite__btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
+                    </div>
                 </div>
+                <p class="invite__status" data-js-invite-status></p>
             </div>
-
-            <p class="invite__status" data-js-invite-status></p>
+            <div class="left-side-panel__section-footer">Invite players or view their profiles
+                using their federated handles, eg. alice@chessfed.example.com </div>
         </section>
 
         <!-- Notifications/Invitations -->
@@ -59,10 +61,12 @@
                 <h2 class="left-side-panel__section-title">Invitations</h2>
             </div>
 
-            <div class="left-panel__scroll">
+            <div class="left-side-panel__section-content-scroll">
                 <ul class="invitations-list" data-js-invitations>
                 </ul>
             </div>
+
+            <div class="left-side-panel__section-footer">Check your active games for accepted Invitations</div>
         </section>
 
         <!-- Settings -->
@@ -77,7 +81,10 @@
             <div class="left-side-panel__section-header">
                 <h2 class="left-side-panel__section-title">Active Games</h2>
             </div>
-            <ul class="gamelist" data-js-gamelist></ul>
+            <div class="left-side-panel__section-content-scroll">
+                <ul class="gamelist" data-js-gamelist></ul>
+            </div>
+            <div class="left-side-panel__section-footer"></div>
         </section>
     </div>
 </aside>

@@ -4,6 +4,7 @@
         <div class="app-shell--nested-two-columns">
             <!-- middle column (for chessboard) -->
             <div class="center">
+                <section></section>
                 <section class="board-layout">
                     <!-- top player information (currently always black) -->
                     <div class="player-row">
@@ -15,7 +16,7 @@
                     </div>
 
                     <!-- chessboard -->
-                    <div class="board-wrap">
+                    <div class="board-slot">
                         <div id="board" class="board" data-js-board=""></div>
                     </div>
 
@@ -28,23 +29,26 @@
                         </div>
                     </div>
                 </section>
+                <section></section>
             </div>
 
             <!-- right column (move history)-->
-            <aside class="right-column">
+            <aside class="right-side-panel">
 
                 <!-- move history -->
-                <section class="panel">
-                    <header class="panel__header">
-                        <h2 class="panel__title">Move History</h2>
+                <section class="move-history">
+                    <header class="move-history__header">
+                        <h2 class="move-history__title">Move History</h2>
                     </header>
 
-                    <div class="panel__body panel__body--scroll">
-                        <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
-                        <div class="moves" id="move-history"></div>
-
-                        <!-- game finished card -->
-                         <div id="game-finished"></div>
+                    <div class="move-history__body">
+                        <div class="move-history__scroll">
+                            <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
+                            <div class="moves" id="move-history"></div>
+                        </div>
+                    </div>
+                    <div class="move-history__footer">
+                        <div id="game-finished"></div>
                     </div>
                 </section>
             </aside>

@@ -19,20 +19,20 @@
                         <div class="field">
                             <div class="field__label">Username</div>
                             <div class="field__username">${profile.username}</div>
-                            <p class="field__help">Your username can&apos;t be changed.</p>
+                            <div class="field__help">Your username can&apos;t be changed.</div>
                         </div>
 
                         <div class="field">
                             <div class="field__label" for="handle">Actor handle</div>
                             <div class="field__handle">${profile.handle}</div>
-                            <p class="field__help">Your handle can&apos;t be changed.</p>
+                            <div class="field__help">Your handle can&apos;t be changed.</div>
                         </div>
 
                         <div class="field">
                             <label class="field__label" for="bio">Bio</label>
                             <textarea id="bio" class="field__textarea" name="bio" rows="5"
                                 placeholder="Tell others something about you...">${form.bio!""}</textarea>
-                            <p class="field__help">Max. 255 characters</p>
+                            <div class="field__help">Max. 255 characters</div>
                         </div>
 
                         <div class="edit-form__buttons">

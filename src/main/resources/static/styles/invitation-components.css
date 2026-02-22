@@ -5,7 +5,6 @@
   list-style: none;
   padding: 0;
   margin: 0;
-
   display: grid;
   gap: var(--space-3);
 }
@@ -15,7 +14,7 @@
   background: var(--panel-2);
   border: 1px solid var(--border-2);
   border-radius: var(--radius);
-  padding: var(--space-4);
+  padding: var(--space-2) var(--space-3);
 
   display: grid;
   grid-template-columns: 40px 1fr;
@@ -26,10 +25,17 @@
 .invitation-avatar {
   width: 40px;
   height: 40px;
-  border-radius: 999px;
-  background: #1b2635;
-  /* replace with real profile pic of user later, if it exists */
-  border: 1px solid var(--border-2);
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 auto;
+  margin-top: var(--space-1);
+}
+
+.invitation-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .invitation-body {

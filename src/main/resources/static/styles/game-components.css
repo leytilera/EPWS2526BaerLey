@@ -36,22 +36,13 @@
 /* BOARD COMPONENTS
 #####################################################################*/
 
-.board-wrap {
-    flex: 1 1 auto;
-    min-height: 0;
-    display: grid;
-    place-items: center;
-    overflow: hidden;
-    padding: 16px;
-}
-
 .board {
-    width: var(--boardSize);
-    height: var(--boardSize);
+    aspect-ratio: 1 / 1;
+    width: auto;
+    height: 100%;
     border: 1px solid var(--border-4);
     border-radius: 3px;
-    background: #0a0e14;
-    overflow: hidden;
+    background: var(--background);
 }
 
 /* MOVE HISTORY
@@ -92,7 +83,6 @@
     display: flex;
     flex-direction: row;
     gap: var(--space-1);
-    padding: var(--space-5);
 }
 
 /* FINISHED CARD COMPONENTS
@@ -106,6 +96,7 @@
     padding: var(--space-2) var(--space-3);
     background: var(--accent-blue-2);
     margin-top: var(--space-6);
+    overflow: hidden;
 }
 
 .game-finished-card__title {
@@ -158,6 +149,7 @@
     padding: var(--space-2) var(--space-3);
     background: var(--panel-2);
     cursor: pointer;
+    overflow: hidden;
 }
 
 .gamelist-card:hover {

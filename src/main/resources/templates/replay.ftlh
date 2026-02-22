@@ -15,7 +15,7 @@
                     </div>
 
                     <!-- chessboard -->
-                    <div class="board-wrap">
+                    <div class="board-slot">
                         <div id="board" class="board" data-js-board=""></div>
                     </div>
 
@@ -31,24 +31,28 @@
             </div>
 
             <!-- right column (move history)-->
-            <aside class="right-column">
+            <aside class="right-side-panel">
 
                 <!-- move history -->
-                <section class="panel">
-                    <header class="panel__header">
-                        <h2 class="panel__title">Move History</h2>
+                <section class="move-history">
+                    <header class="move-history__header">
+                        <h2 class="move-history__title">Move History</h2>
                     </header>
 
-                    <div class="panel__body panel__body--scroll">
-                        <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
-                        <div class="moves" id="move-history"></div>
+                    <div class="move-history__body">
+                        <div class="move-history__scroll">
+                            <!-- rendering as table/row: MOVENUMBER | WHITE | BLACK -->
+                            <div class="moves" id="move-history"></div>
+                        </div>
                     </div>
 
-                    <div class="replay-buttons" data-js-replay-buttons>
-                        <button class="btn" type="button" data-action="first">First</button>
-                        <button class="btn" type="button" data-action="previous">◀</button>
-                        <button class="btn" type="button" data-action="next">▶</button>
-                        <button class="btn" type="button" data-action="last">Last</button>
+                    <div class="move-history__footer">
+                        <div class="replay-buttons" data-js-replay-buttons>
+                            <button class="btn" type="button" data-action="first">First</button>
+                            <button class="btn" type="button" data-action="previous">◀</button>
+                            <button class="btn" type="button" data-action="next">▶</button>
+                            <button class="btn" type="button" data-action="last">Last</button>
+                        </div>
                     </div>
                 </section>
             </aside>

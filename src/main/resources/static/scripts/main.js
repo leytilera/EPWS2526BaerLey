@@ -76,6 +76,11 @@ async function addInvitation(id, challenge) {
 
     const avatar = document.createElement("div");
     avatar.className = "invitation-avatar";
+    const img = document.createElement("img");
+    img.src = "/assets/Chessfed_Default_Avatar.jpg";
+    img.alt = `${challenge.sourceHandle} avatar`;
+    img.loading = "lazy";
+    avatar.appendChild(img);
     avatar.setAttribute("aria-hidden", "true");
 
     const body = document.createElement("div");
@@ -224,7 +229,7 @@ async function loadGame() {
     let init = gameToJoclyState(gameState);
     await state.match.abortUserTurn();
     await state.match.load(init);
-    
+
     const finished = state.finishedByGame.get(String(state.gameid));
     if (finished) {
         showFinishedCard(gameState, finished.winner);
@@ -361,7 +366,7 @@ function showFinishedCard(gameDto, winner) {
         `
     finished.appendChild(finishedCard);
     addGameToListOrUpdate(gameDto, result);
-    state.finishedByGame.set(String(gameDto.id), {winner, result});
+    state.finishedByGame.set(String(gameDto.id), { winner, result });
 }
 
 /* Event Listener */

@@ -3,16 +3,16 @@
 
 /* header */
 .profile {
+  height: 100vh;
   display: grid;
   gap: var(--space-5);
   align-content: start;
   padding: var(--space-6);
-  overflow: auto;
+  overflow-y: auto;
 }
 
 .profile-card {
   background: var(--panel);
-  border: 1px solid var(--border-2);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: var(--space-5);
@@ -43,7 +43,6 @@
   border: 1px solid var(--border-2);
   border-radius: var(--radius);
   padding: var(--space-5);
-
   display: grid;
   grid-template-columns: 160px 1fr 1fr;
   align-items: flex-start;
@@ -68,7 +67,7 @@
 
 /* username */
 .profile-username {
-  font-size: 20px;
+  font-size: var(--size-xl);
   font-weight: 800;
   color: var(--text);
   white-space: nowrap;
@@ -82,10 +81,11 @@
   flex-direction: row;
   gap: var(--space-2);
   align-items: center;
+  padding: var(--space-1);
 }
 
 .profile-handle {
-  font-size: 16px;
+  font-size: var(--size-l);
 }
 
 /* bio */
@@ -110,12 +110,12 @@
 }
 
 .profile-meta__item-label {
-  font-size: 11px;
-  color: rgba(159, 177, 195, 0.7);
+  font-size: var(--size-s);
+  color: var(--text-hints);
 }
 
 .profile-meta__item-value {
-  font-size: 12px;
+  font-size: var(--size-s);
   color: var(--text);
 }
 
@@ -138,7 +138,6 @@
   background: var(--panel);
   color: var(--text);
   text-decoration: none;
-  border: 1px solid var(--border-2);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: var(--space-5);
@@ -169,7 +168,8 @@
 }
 
 .game-history__row-header {
-  opacity: 0.8;
+  font-size: var(--size-m);
+  color: var(--muted);
   padding: 0 var(--space-2);
 }
 
@@ -246,7 +246,7 @@
   height: 160px;
 }
 
-.edit-form {
+.edit-profile-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
@@ -303,8 +303,7 @@
 }
 
 .field__help {
-  margin-top: var(--space-1);
-  font-size: var(--size-xs);
+  font-size: var(--size-s);
   color: var(--text-hints);
 }
 

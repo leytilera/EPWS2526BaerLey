@@ -30,6 +30,7 @@ function getInitialSidebarView() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("navigation script active");
     const navItems = document.querySelectorAll(".nav-bar__item[data-view]");
     navItems.forEach((btn) => {
         btn.addEventListener("click", () => {
