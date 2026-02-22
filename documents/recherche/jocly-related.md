@@ -1,4 +1,4 @@
-# Jockly-Interface
+# Jocly-Interface
 
 Es wurde testweise eine Partie über das Jocly Interface im Browser gespielt, um auszuprobieren wie das Interface von Jocly funktioniert und wie Partien exportiert werden.   
 Link: https://aclap-dev.github.io/jocly/examples/browser/control.html?game=classic-chess
