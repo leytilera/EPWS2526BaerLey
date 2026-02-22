@@ -35,10 +35,10 @@ Installationsschritte:
 
 ## Was ist nicht implementiert
 
-- Es gibt keine Zeitbegrenzung bei Spielen
-- Spieler können nur gezielt für ein Spiel angefragt werden, eine zufällige/ratingbasierte Spielerfindung ist nicht implementiert
-- Es gibt keine Spielerratings
-- Es ist kein Algorithmus zur Konfliktbehebung (zum Beispiel bei Zugvalidierung) implementiert
+- Es gibt keine Zeitbegrenzung bei Spielen (siehe [Timekeepting](./documents/technicalChallenges.md#timekeeping))
+- Spieler können nur gezielt für ein Spiel angefragt werden, eine zufällige/ratingbasierte Spielerfindung ist nicht implementiert (siehe [Matchmaking](./documents/technicalChallenges.md#matchmaking))
+- Es gibt keine Spielerratings (siehe [Rating](./documents/technicalChallenges.md#rating))
+- Es ist kein Algorithmus zur Konfliktbehebung (zum Beispiel bei Zugvalidierung) implementiert (siehe [Single Point of Truth](./documents/technicalChallenges.md#single-point-of-truth))
 - Es sind keine HTTP-Signaturen für federated requests implementiert
 
 ## Repository Struktur
