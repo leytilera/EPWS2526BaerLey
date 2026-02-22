@@ -41,6 +41,7 @@ function setupInvitationEvents() {
 
 document.addEventListener("DOMContentLoaded", () => {
     state.gameid = window.location.hash.substring(1);
+    const statusEl = document.querySelector("[data-js-invite-status]")
     let inviteButton = document.querySelector("[data-js-invite]");
     inviteButton.addEventListener("click", () => {
         let input = document.querySelector("[data-js-opponent]");
@@ -48,9 +49,17 @@ document.addEventListener("DOMContentLoaded", () => {
         input.value = "";
         API.createInvitation(opponent).then(result => {
             if (result) {
-                alert(`${opponent} was invited!`);
+                if (statusEl) {
+                    statusEl.textContent = `${opponent} was invited!`;
+                } else {
+                    alert(`${opponent} was invited!`);
+                }
             } else {
-                alert(`Can't invite ${opponent}`);
+                if (statusEl) {
+                    statusEl.textContent = `Can't invite ${opponent}`;
+                } else {
+                    alert(`Can't invite ${opponent}`);
+                }
             }
         });
     });
@@ -59,8 +68,18 @@ document.addEventListener("DOMContentLoaded", () => {
         let input = document.querySelector("[data-js-opponent]");
         let handle = input?.value?.trim();
         if (!handle) return;
-        window.location.href = `/users?acct=${encodeURIComponent(handle)}`
-    })
+        API.viewProfile(handle).then(result => {
+            if (result) {
+                window.location.href = `/users?acct=${encodeURIComponent(handle)}`;
+            } else {
+                if (statusEl) {
+                    statusEl.textContent = `Can't find ${handle}`;
+                } else {
+                    alert(`Can't find ${handle}`);
+                }
+            }
+        });
+    });
     main();
 });
 
@@ -361,7 +380,7 @@ function showFinishedCard(gameDto, winner) {
             <span class="game-finished__text">${result}</span>
         </div>
         <div class="game-finished__buttons">
-            <a class="btn btn--ghost" href="/replay#${state.gameid}">Replay Game</a>
+            <a class="btn btn--replay" href="/replay#${state.gameid}">Replay Game</a>
         </div>
         `
     finished.appendChild(finishedCard);

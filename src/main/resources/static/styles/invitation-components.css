@@ -111,8 +111,8 @@
 }
 
 .invite__status {
-  margin: 0;
-  font-size: 12px;
+  font-size: var(--size-s);
   color: var(--muted);
   min-height: 16px;
+  margin: var(--space-2) 0;
 }

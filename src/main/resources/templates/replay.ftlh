@@ -46,7 +46,8 @@
                         </div>
                     </div>
 
-                    <div class="move-history__footer">
+                    <div class="move-history__footer move-history__footer--replay">
+                        <div class="replay-text">Replay Game</div>
                         <div class="replay-buttons" data-js-replay-buttons>
                             <button class="btn" type="button" data-action="first">First</button>
                             <button class="btn" type="button" data-action="previous">◀</button>

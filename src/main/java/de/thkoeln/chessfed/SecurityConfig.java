@@ -22,6 +22,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> {
                 auth.requestMatchers("/").authenticated();
                 auth.requestMatchers("/api/**").authenticated();
+                auth.requestMatchers("/profile").authenticated();
+                auth.requestMatchers("/profile-edit").authenticated();
+                auth.requestMatchers("/play").authenticated();
+                auth.requestMatchers("/replay").authenticated();
                 auth.anyRequest().permitAll();
             })
             .oauth2Login(login -> {

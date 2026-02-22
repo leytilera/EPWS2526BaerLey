@@ -6,6 +6,11 @@
 
         <!-- navigation bar -->
         <nav class="nav-bar" aria-label="Sidebar Navigation">
+            <!-- Home -->
+            <a class="nav-bar__item" href="/" aria-label="Home">
+                <i class="bi bi-house"></i>
+            </a>
+
             <!-- Send Invitations -->
             <button class="nav-bar__item" type="button" data-view="invite" aria-label="Send Invitations">
                 <i class="bi bi-people"></i>
@@ -46,10 +51,11 @@
                     <input class="invite-form__input" type="text" placeholder="Enter opponent handle" data-js-opponent>
                     <div class="invite-form__buttons">
                         <button class="btn invite__btn" type="button" data-js-invite>Invite</button>
-                        <button class="btn invite__btn btn--ghost" type="button" data-js-view-profile>View Profile</button>
+                        <button class="btn invite__btn btn--ghost" type="button" data-js-view-profile>View
+                            Profile</button>
                     </div>
+                    <div class="invite__status" data-js-invite-status></div>
                 </div>
-                <p class="invite__status" data-js-invite-status></p>
             </div>
             <div class="left-side-panel__section-footer">Invite players or view their profiles
                 using their federated handles, eg. alice@chessfed.example.com </div>

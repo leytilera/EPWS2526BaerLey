@@ -19,7 +19,7 @@ async function getInvitations() {
 }
 
 async function createInvitation(opponent) {
-    let body = JSON.stringify({opponent: opponent});
+    let body = JSON.stringify({ opponent: opponent });
     return await fetch('/api/challenges', {
         method: "POST",
         headers: {
@@ -29,13 +29,20 @@ async function createInvitation(opponent) {
     }).then(res => res.ok);
 }
 
+async function viewProfile(handle) {
+    return await fetch(`/api/users/${encodeURIComponent(handle)}`, {
+        headers: { "Accept": "application/json" }
+    }).then(res => res.ok);
+}
+
 let API = {
     getGameState,
-    getUserData, 
+    getUserData,
     getGames,
     getMoves,
     getInvitations,
-    createInvitation
+    createInvitation,
+    viewProfile
 };
 
-export {API};
+export { API };

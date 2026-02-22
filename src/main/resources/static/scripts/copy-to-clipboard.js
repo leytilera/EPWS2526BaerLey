@@ -1,4 +1,5 @@
 document.addEventListener("click", async (e) => {
+  console.log("clipboard:", !!navigator.clipboard, "secure:", window.isSecureContext);
   const btn = e.target.closest("[data-js-copy-handle]");
   if (!btn) return;
 
