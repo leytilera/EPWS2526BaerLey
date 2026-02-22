@@ -88,6 +88,7 @@
 .replay-text {
     font-size: var(--size-m);
     font-weight: 700;
+    margin: var(--space-1) 0;
 }
 
 .btn--replay {

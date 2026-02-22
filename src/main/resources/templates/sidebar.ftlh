@@ -43,7 +43,7 @@
         <!-- Send Invitations -->
         <section class="sidebar-view" data-view="invite" hidden>
             <div class="left-side-panel__section-header">
-                <h2 class="left-side-panel__section-title">Invite Friend to play</h2>
+                <h2 class="left-side-panel__section-title">Invite a Friend to play</h2>
             </div>
 
             <div class="left-side-panel__section-content-scroll">

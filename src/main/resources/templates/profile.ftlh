@@ -29,9 +29,9 @@
                                 </button>
                             </div>
                             <#if profile.ownProfile>
-                                <p class="field__help">Share this with others so they can invite you.</p>
+                                <div class="field__help">Share this with others so they can invite you.</div>
                                 <#else>
-                                    <p class="field__help">Use this handle to invite this player.</p>
+                                    <div class="field__help">Use this handle to invite this player.</div>
                             </#if>
                         </div>
 
