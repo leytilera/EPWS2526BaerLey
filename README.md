@@ -62,5 +62,6 @@ Installationsschritte:
 |[documents/Architekturdiagramm-v2.drawio.png](./documents/Architekturdiagramm-v2.drawio.png)|Enthält das Architekturdiagramm|
 |[documents/datenmodell.png](./documents/datenmodell.png)|Enthält das Datenmodell|
 |[documents/domaenenmodell.png](./documents/domaenenmodell.png)|Enthält das Domänenmodell|
+|[documents/technicalChallenges.md](./documents/technicalChallenges.md)|Enthält Lösungsansätze für technische Herausforderungen bei der Weiterentwicklung|
 |[src/main/java](./src/main/java/)|Enthält den Quellcode für das Backend|
 |[src/main/resources/static](./src/main/resources/static/)|Enthält den Quellcode für das Frontend|

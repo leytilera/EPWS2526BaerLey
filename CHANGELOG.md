@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-02-22
+- Added possible solutions for some technical challenges
+- Cleaned up repository
+
 ## 2026-02-17
 - Added installation [instructions](./README.md#installationsanleitung) and [script](./generate_compose.sh)
 
