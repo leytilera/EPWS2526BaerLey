@@ -8,8 +8,7 @@ const state = {
     match: null,
     user: null,
     send: null,
-    moves: [],
-    finishedByGame: new Map()
+    moves: []
 };
 
 /* Invitations */
@@ -160,9 +159,8 @@ async function onMessage(msg) {
             const moves = await API.getMoves(state.gameid);
             renderMoveHistory(moves);
             gameState = await API.getGameState(state.gameid);
-            let result = await state.match.getFinished()
-            if (result.finished) {
-                showFinishedCard(gameState, result.winner);
+            if (gameState.finished) {
+                showFinishedCard(gameState);
                 return;
             }
             requestUserInput(state.send);
@@ -220,18 +218,17 @@ async function requestUserInput(send) {
         capture: msg.data.capture,
         castle: msg.data.castle
     })
-    // renderMoveHistory(state.moves);
     const game = await API.getGameState(state.gameid);
     game.yourTurn = false;
     addGameToListOrUpdate(game);
-    let result = await state.match.getFinished()
-    if (result.finished) {
-        showFinishedCard(game, result.winner)
-    }
-    // reload for server truth
+    // wait for server authority
     setTimeout(async () => {
         state.moves = await API.getMoves(state.gameid);
+        const gameState = await API.getGameState(state.gameid);
         renderMoveHistory(state.moves);
+        if (gameState.finished) {
+            showFinishedCard(gameState);
+        }
     }, 600);
 }
 
@@ -249,9 +246,8 @@ async function loadGame() {
     await state.match.abortUserTurn();
     await state.match.load(init);
 
-    const finished = state.finishedByGame.get(String(state.gameid));
-    if (finished) {
-        showFinishedCard(gameState, finished.winner);
+    if (gameState.finished) {
+        showFinishedCard(gameState);
         return;
     }
     if (gameState.yourTurn) {
@@ -331,46 +327,33 @@ function renderMoveHistory(moves) {
     moveHistory.innerHTML = html;
 }
 
-function showFinishedCard(gameDto, winner) {
+function showFinishedCard(gameDto) {
     let finished = document.getElementById("game-finished");
     if (!finished) return;
     finished.innerHTML = "";
 
     const white = parseActorUrlOrHandle(gameDto.white);
     const black = parseActorUrlOrHandle(gameDto.black);
-    let ownColor;
+    const winner = parseActorUrlOrHandle(gameDto.winner);
+
     // state.user.username contains handle
-    if (state.user.username == white.handle) {
-        ownColor = "white";
-    } else {
-        ownColor = "black";
-    }
-    /*
-    Jocly.PLAYER_A is always white and Jocly.PLAYER_B is always black
-    match.getFinished() returns an object with the following properties:
-        finished (boolean), winner (Jocly.PLAYER_A or Jocly.PLAYER_B or Jocly.DRAW)
-    */
     let result;
+    if (!winner.handle) {
+        result = "Draw!";
+    } else if (winner.handle == state.user.username) {
+        result = "You won!";
+    } else {
+        result = `${winner.handle} won!`;
+    }
     let avatarClass;
-    if (winner === Jocly.PLAYER_A) {
-        if (ownColor == "white") {
-            result = "You won!";
-        } else {
-            result = `${white.handle} won!`
-        }
+    if (winner.handle == white.handle) {
         avatarClass = "avatar--is-white";
-    } else if (winner === Jocly.PLAYER_B) {
-        if (ownColor == "black") {
-            result = "You won!";
-        } else {
-            result = `${black.handle} won!`
-        }
+    } else if (winner.handle == black.handle) {
         avatarClass = "avatar--is-black";
     } else {
-        result = "Draw!"
         avatarClass = "avatar--is-blue";
     }
-
+    
     const finishedCard = document.createElement("div");
     finishedCard.className = "game-finished-card";
     finishedCard.innerHTML = `
@@ -385,7 +368,6 @@ function showFinishedCard(gameDto, winner) {
         `
     finished.appendChild(finishedCard);
     addGameToListOrUpdate(gameDto, result);
-    state.finishedByGame.set(String(gameDto.id), { winner, result });
 }
 
 /* Event Listener */

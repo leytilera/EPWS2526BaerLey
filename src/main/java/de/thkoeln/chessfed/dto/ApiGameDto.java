@@ -12,7 +12,9 @@ public class ApiGameDto {
     private String white;
     private String black;
     private boolean yourTurn;
-
+    private boolean finished;
+    private String winner;
+    
     public UUID getId() {
         return id;
     }
@@ -76,5 +78,20 @@ public class ApiGameDto {
     public void setYourTurn(boolean yourTurn) {
         this.yourTurn = yourTurn;
     }
-    
+
+    public boolean isFinished() {
+        return finished;
+    }
+
+    public void setFinished(boolean finished) {
+        this.finished = finished;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
 }

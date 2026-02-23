@@ -151,6 +151,8 @@ public class MappingService implements IMappingService {
         castleState.setBlackShort(game.getCastleState().isBlackShort());
         castleState.setBlackLong(game.getCastleState().isBlackLong());
         dto.setCastleState(castleState);
+        dto.setFinished(game.isHasEnded());
+        dto.setWinner(!game.isHasEnded() || game.getCurrentTurn() == ChessPlayer.NONE ? null : (game.getCurrentTurn() == ChessPlayer.WHITE) ? game.getWhitePlayer().getId() : game.getBlackPlayer().getId());
         if (game.getEnPassentField() >= 0) dto.setEnPassantField(boardService.getFieldDescriptor(game.getEnPassentField()));
         String[][] board = new String[8][8];
         for (int i = 0; i < board.length; i++) {
