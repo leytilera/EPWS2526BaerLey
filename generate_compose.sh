@@ -206,13 +206,14 @@ staticClients:
   secret: ${OIDC_SECRET}
   redirectURIs:
   - 'https://${APP_DOMAIN}/login/oauth2/code/openid'
+staticPasswords:
 EOF
 }
 
 generate_caddyfile() {
   cat <<EOF > deployment/Caddyfile
 ${APP_DOMAIN} {
-    handle_path /dex/* {
+    handle /dex/* {
         reverse_proxy http://dex:5556
     }
 EOF
