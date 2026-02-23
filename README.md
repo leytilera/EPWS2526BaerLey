@@ -60,6 +60,8 @@ Installationsschritte:
 |[documents/targetAudienceAnalysis.md](./documents/targetAudienceAnalysis.md)|Enthält die Zielgruppenanalyse|
 |[documents/eloCalculation.md](./documents/eloCalculation.md)|Enthält den Algorithmus zur Berechnung der Elo-Zahl (siehe Glossar)|
 |[documents/Architekturdiagramm-v2.drawio.png](./documents/Architekturdiagramm-v2.drawio.png)|Enthält das Architekturdiagramm|
+|[documents/sequence_diagram_send_invitation.drawio.png](./documents/sequence_diagram_send_invitation.drawio.png)|Enthält ein detailliertes UML Sequenzdiagramm für den Ablauf beim Senden einer Spieleinladung|
+|[documents/sequence_diagram_play_move.drawio.png](./documents/sequence_diagram_play_move.drawio.png)|Enthält ein detailliertes UML Sequenzdiagramm für den Ablauf beim Spielen eines Schachzuges|
 |[documents/datenmodell.png](./documents/datenmodell.png)|Enthält das Datenmodell|
 |[documents/domaenenmodell.png](./documents/domaenenmodell.png)|Enthält das Domänenmodell|
 |[documents/technicalChallenges.md](./documents/technicalChallenges.md)|Enthält Lösungsansätze für technische Herausforderungen bei der Weiterentwicklung|
