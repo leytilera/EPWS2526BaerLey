@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-mkdir -p deployments
+mkdir -p deployment
 echo "services:" > docker-compose.yaml
 
 generate_app_service() {
