@@ -2,7 +2,22 @@
 
 ## 2026-02-22
 - Added possible solutions for some technical challenges
+- Added sequence diagrams for invitations and playing a move
 - Cleaned up repository
+
+## 2026-02-21
+- Improved UI
+- Added who's turn to active games overview
+
+## 2026-02-20
+- Show winner when game is finished
+
+## 2026-02-19
+- Implemented game replay logic and replay page
+- Added game history for active and played games in profile
+
+## 2026-02-18  
+- Implemented navigation and profile pages in frontend
 
 ## 2026-02-17
 - Added installation [instructions](./README.md#installationsanleitung) and [script](./generate_compose.sh)
