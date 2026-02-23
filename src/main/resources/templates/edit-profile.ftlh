@@ -12,7 +12,7 @@
                 <div class="profile-card__body">
 
                     <!-- Avatar (placeholder image)-->
-                    <img class="profile-avatar" src="/assets/ChessFed_Default_Avatar.jpg"
+                    <img class="profile-avatar" src="/assets/Chessfed_Default_Avatar.jpg"
                         alt="Profile Avatar" width="72" height="72" loading="lazy" />
 
                     <form class="edit-profile-form" method="post" action="/profile/edit">
