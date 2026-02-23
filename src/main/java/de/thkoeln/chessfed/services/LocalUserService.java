@@ -22,7 +22,7 @@ public class LocalUserService extends OidcUserService {
 
     private ILocalUserRepository userRepository;
     private IActorService actorService;
-    @Value("${username.attritube}")
+    @Value("${username.attribute}")
     private String usernameAttritube;
 
     @Autowired
