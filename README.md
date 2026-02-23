@@ -13,6 +13,7 @@ Folgende Programme müssen auf dem Server installiert sein:
 - docker (inklusive docker compose)
 - bash
 - git
+- openssl
 - htpasswd (optional)
 
 Installationsschritte:
